@@ -1,0 +1,1 @@
+# Puedes guardar los JSON Schema aquí
