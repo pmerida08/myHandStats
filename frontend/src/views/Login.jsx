@@ -1,16 +1,16 @@
+import { Link } from 'react-router-dom'
 import {
-    Box,
-    Button,
-    Container,
-    FormControl,
-    FormLabel,
-    Heading,
-    Input,
-    Stack,
-    Text,
-    Image,
-    useBreakpointValue,
-  } from '@chakra-ui/react'
+  Box,
+  Button,
+  Container,
+  FormControl,
+  Heading,
+  Input,
+  Stack,
+  Text,
+  Image,
+} from '@chakra-ui/react'
+
   import { useState } from 'react'
   
   // Imágenes de perfil falsas (puedes usar tus propias imágenes o avatares)
@@ -49,18 +49,19 @@ import {
         position="relative"
         overflow="hidden"
       >
-<Box
-  position="absolute"
-  top="0"
-  left="0"
-  w="100%"
-  h="100%"
-  backgroundImage="url('/Group 4.svg')"
-  backgroundRepeat="no-repeat"
-  backgroundSize="400px"
-  backgroundPosition="top left"
-  zIndex={0}
-/>
+    <Box
+      position="absolute"
+      top="0"
+      left="0"
+      w="100%"
+      h="100%"
+     // Aun no hay imagen backgroundImage="url('/.svg')"
+      backgroundRepeat="no-repeat"
+      backgroundSize="cover"
+      backgroundPosition="center"
+      zIndex={0}
+    />
+
 
   
         <Container maxW="container.sm" zIndex={1}>
@@ -138,6 +139,19 @@ import {
                   Tú
                 </Box>
               </Stack>
+              <Text fontSize="sm">
+                ¿Aún no tienes cuenta?{" "}
+                <Button
+                  as={Link}
+                  to="/registrar"
+                  variant="link"
+                  color="#F43F5E"
+                  fontWeight="bold"
+                  size="md"
+                >
+                  Regístrate
+                </Button>
+              </Text>
             </Box>
           </Box>
         </Container>
