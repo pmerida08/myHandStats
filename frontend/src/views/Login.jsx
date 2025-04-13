@@ -13,14 +13,6 @@ import {
 
   import { useState } from 'react'
   
-  // Imágenes de perfil falsas (puedes usar tus propias imágenes o avatares)
-  const avatars = [
-    'https://randomuser.me/api/portraits/women/65.jpg',
-    'https://randomuser.me/api/portraits/women/75.jpg',
-    'https://randomuser.me/api/portraits/men/45.jpg',
-    'https://randomuser.me/api/portraits/men/55.jpg',
-    'https://randomuser.me/api/portraits/lego/1.jpg',
-  ]
   
   const Login = () => {
     const [email, setEmail] = useState('')
@@ -110,35 +102,6 @@ import {
             </form>
   
             <Box mt={10}>
-              <Text fontWeight="bold" fontSize="lg">
-                Únete <Text as="span" color="#F43F5E">a</Text> MyHandStats
-              </Text>
-              <Stack direction="row" justify="center" mt={3} spacing={-2}>
-                {avatars.map((src, index) => (
-                  <Image
-                    key={index}
-                    src={src}
-                    boxSize="40px"
-                    borderRadius="full"
-                    border="3px solid white"
-                    zIndex={avatars.length - index}
-                  />
-                ))}
-                <Box
-                  boxSize="40px"
-                  borderRadius="full"
-                  bg="black"
-                  color="white"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  fontWeight="bold"
-                  fontSize="sm"
-                  border="3px solid white"
-                >
-                  Tú
-                </Box>
-              </Stack>
               <Text fontSize="sm">
                 ¿Aún no tienes cuenta?{" "}
                 <Button
