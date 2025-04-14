@@ -1,6 +1,8 @@
 from fastapi import FastAPI
-from api.routes import auth
+from routes import usuario_routes
 
+# Crear la instancia de FastAPI
 app = FastAPI()
 
-app.include_router(auth.router)
+# Registrar las rutas
+app.include_router(usuario_routes.router)
