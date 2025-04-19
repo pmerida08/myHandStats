@@ -1,4 +1,4 @@
-from fastapi import appRouter, HTTPException
+from fastapi import APIRouter, HTTPException
 from typing import List
 from app.models.usuario import UsuarioCreate, UsuarioUpdate, UsuarioOut, LoginRequest
 from app.supabase_client import supabase
@@ -6,9 +6,9 @@ from app.services.auth import verificar_password, generar_token
 
 from app.utils.hashing import hash_password
 
-router = appRouter()
+router = APIRouter()
 
-@router.post("/", response_model=UsuarioOut)
+@router.post("/register/", response_model=UsuarioOut)
 def crear_usuario(usuario: UsuarioCreate):
     data = usuario.dict()
     data["password"] = hash_password(data["password"])
