@@ -6,7 +6,7 @@ from app.supabase_client import supabase
 router = APIRouter()
 
 @router.get("/", response_model=List[Jugador])
-async def get_jugadores():
+def get_jugadores():
     response = supabase.table("jugadores").select("*, posicion_id:posiciones(nombre)").execute()
 
     if getattr(response, "error", None):
@@ -23,3 +23,12 @@ def obtener_jugador(id: int):
 
     jugador = response.data[0]
     return jugador
+
+@router.post("/", response_model=JugadorOut)
+def crear_jugador(jugador: JugadorCreate):
+    response = supabase.table("jugadores").insert(jugador.dict()).execute()
+
+    if getattr(response, "error", None):
+        raise HTTPException(status_code=400, detail=f"Error al crear el jugador: {response.error.message}")
+
+    return response.data[0]

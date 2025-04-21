@@ -18,8 +18,9 @@ class Jugador(BaseModel):
 class JugadorCreate(BaseModel):
     nombre: str
     dorsal: int
-    posicion: str
-    fecha_nacimiento: datetime
+    posicion: int
+    foto: Optional[str] = None
+    fecha_nacimiento: Optional[datetime] = None  # Permite None
 
     class Config:
         orm_mode = True
