@@ -25,7 +25,6 @@ class Usuario(BaseModel):
 
 # Modelo para actualizar datos de usuarios (los campos son opcionales)
 class UsuarioUpdate(BaseModel):
-    id: int
     nombre: Optional[str] = None
     email: Optional[str] = None
     password: Optional[str] = None

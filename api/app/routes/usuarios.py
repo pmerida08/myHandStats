@@ -54,18 +54,18 @@ def obtener_usuario(id: int):
     user.pop("contraseña", None)  # Asegura que no se devuelve la contraseña
     return user
 
-
 @router.put("/{id}", response_model=UsuarioOut)
 def actualizar_usuario(id: int, usuario: UsuarioUpdate):
     data = usuario.dict(exclude_unset=True)
     if "password" in data:
         data["password"] = hash_password(data["password"])
-    
+
     response = supabase.table("usuarios").update(data).eq("id", id).execute()
 
-    if response.error:
-        raise HTTPException(status_code=400, detail=response.error.message)
-    
+    # Si no se actualizó ningún registro (por ejemplo, el ID no existe)
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
     updated_user = response.data[0]
     updated_user.pop("password", None)
     return updated_user
