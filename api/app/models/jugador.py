@@ -43,10 +43,11 @@ class JugadorOut(BaseModel):
     id: int
     nombre: str
     dorsal: int
-    posicion: str
-    fecha_nacimiento: datetime
-    fecha_registro: datetime
-    fecha_actualizacion: datetime
+    posicion: int
+    foto: Optional[str] = None
+    fecha_nacimiento: Optional[datetime] = None  # Permite None
+    fecha_registro: Optional[datetime] = None  # Permite None
+    fecha_actualizacion: Optional[datetime] = None  # Permite None
 
     class Config:
         orm_mode = True

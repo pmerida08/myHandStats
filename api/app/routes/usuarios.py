@@ -51,7 +51,7 @@ def obtener_usuario(id: int):
         raise HTTPException(status_code=500, detail="Usuario no encontrado")
 
     user = response.data
-    user.pop("contraseña", None)  # Asegura que no se devuelve la contraseña
+    user.pop("password", None)  # Asegura que no se devuelve la contraseña
     return user
 
 @router.put("/{id}", response_model=UsuarioOut)
