@@ -43,8 +43,6 @@ def listar_usuarios():
     return response.data
 
 
-
-
 @router.get("/{id}", response_model=UsuarioOut)
 def obtener_usuario(id: int):
     response = supabase.table("usuarios").select("*").eq("id", id).single().execute()
@@ -76,9 +74,10 @@ def actualizar_usuario(id: int, usuario: UsuarioUpdate):
 def eliminar_usuario(id: int):
     response = supabase.table("usuarios").delete().eq("id", id).execute()
 
-    if response.error:
-        raise HTTPException(status_code=400, detail=response.error.message)
-    
+    # Si la respuesta tiene data vacía, es que no se encontró el usuario
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
     return {"message": "Usuario eliminado correctamente"}
 
 
