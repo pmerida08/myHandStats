@@ -45,7 +45,7 @@ def eliminar_jugador(id: int):
 
     return {"message": "Jugador eliminado correctamente"}
 
-@router.put("/jugadores/{id}")
+@router.put("/{id}")
 def actualizar_jugador(id: int, jugador: JugadorUpdate):
     # Convertimos a diccionario y eliminamos campos no enviados
     datos_actualizados = jugador.dict(exclude_unset=True)
