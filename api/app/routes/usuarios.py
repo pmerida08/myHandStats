@@ -43,16 +43,19 @@ def listar_usuarios():
     return response.data
 
 
+
+
 @router.get("/{id}", response_model=UsuarioOut)
 def obtener_usuario(id: int):
     response = supabase.table("usuarios").select("*").eq("id", id).single().execute()
 
-    if response.error or not response.data:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    
+    if response.data is None:
+        raise HTTPException(status_code=500, detail="Usuario no encontrado")
+
     user = response.data
-    user.pop("password", None)
+    user.pop("contraseña", None)  # Asegura que no se devuelve la contraseña
     return user
+
 
 @router.put("/{id}", response_model=UsuarioOut)
 def actualizar_usuario(id: int, usuario: UsuarioUpdate):
