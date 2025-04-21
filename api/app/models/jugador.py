@@ -9,9 +9,7 @@ class Jugador(BaseModel):
     posicion: int
     foto: Optional[str] = None
     fecha_nacimiento: Optional[datetime] = None  # Permite None
-    fecha_registro: Optional[datetime] = None  # Permite None
-    fecha_actualizacion: Optional[datetime] = None  # Permite None
-
+   
     class Config:
         orm_mode = True
 
@@ -28,7 +26,8 @@ class JugadorCreate(BaseModel):
 class JugadorUpdate(BaseModel):
     nombre: Optional[str] = None
     dorsal: Optional[int] = None
-    posicion: Optional[str] = None
+    posicion: Optional[int] = None
+    foto: Optional[str] = None
     fecha_nacimiento: Optional[datetime] = None
 
     class Config:
@@ -47,8 +46,6 @@ class JugadorOut(BaseModel):
     posicion: int
     foto: Optional[str] = None
     fecha_nacimiento: Optional[datetime] = None  # Permite None
-    fecha_registro: Optional[datetime] = None  # Permite None
-    fecha_actualizacion: Optional[datetime] = None  # Permite None
-
+    
     class Config:
         orm_mode = True
