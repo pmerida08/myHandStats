@@ -3,7 +3,6 @@ from typing import List
 from app.models.usuario import UsuarioCreate, UsuarioUpdate, UsuarioOut, LoginRequest
 from app.supabase_client import supabase
 from app.services.auth import verificar_password, generar_token
-
 from app.utils.hashing import hash_password
 
 router = APIRouter()
