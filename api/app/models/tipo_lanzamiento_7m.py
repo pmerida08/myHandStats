@@ -5,6 +5,7 @@ from datetime import datetime
 class TipoLanzamiento7M(BaseModel):
     id: int
     nombre: str
+    tipo: str
 
     class Config:
         orm_mode = True
