@@ -3,28 +3,19 @@
 ### Usuarios
 | **Funcionalidad**         | **Método** | **Endpoint**               |**Acceso**   |
 |---------------------------|------------|----------------------------|-------------|
-| Registro de Usuarios      | POST       | /usuarios/register/        |Publico      |
-| Inicio de Sesión          | POST       | /usuarios/login/           |Publico      |
+| Registro de Usuarios      | POST       | /register/                 |Publico      |
+| Inicio de Sesión          | POST       | /login/                    |Publico      |
 | Actualizar Usuario        | PUT        | /usuarios/                 |Privado      |
-| Listar Usuarios por email | GET        | /usuarios/                 |Privado      |
+| Listar Usuario por email  | GET        | /usuarios/                 |Privado      |
 
 ### Equipos
 | **Funcionalidad**                   | **Método** | **Endpoint**               |**Acceso**   |
 |-------------------------------------|------------|----------------------------|-------------|
 | Creación de equipos                 | POST       | /equipos/                  |Privado      |
-| Listado de equipos de usaurio       | GET        | /equipos/                  |Privado      |
+| Listado de equipos de usuario       | GET        | /equipos/                  |Privado      |
 | Listado de equipo de usaurio por id | GET        | /equipos/{id}              |Privado      |
-| Actualizar Equipo                   | PUT        | /equipo/                   |Privado      |
-
-
-### Jugadores
-| **Funcionalidad**           | **Método** | **Endpoint**               |**Acceso**   |
-|-----------------------------|------------|----------------------------|-------------|
-| Creación de Jugador         | POST       | /equipos/jugador/          | Privado     |
-| Listar Jugadores Equipo     | GET        | /equipos/jugador/          | Privado     |
-| Listar Jugador Equipo       | GET        | /equipos/jugador/{id}      | Privado     |
-| Actualizar Jugadores Equipo | PUT        | /equipos/jugador/          | Privado     |
-| Actualizar Jugador Equipo   | PUT        | /equipos/jugador/{id}      | Privado     |
+| Actualizar Equipo                   | PUT        | /equipos/{id}              |Privado      |
+| Eliminar Equipo                     | DELETE     | /equipo/                   |Privado      |
 
 
 ### Jugadores
