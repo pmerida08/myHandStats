@@ -7,6 +7,7 @@ class UsuarioCreate(BaseModel):
     nombre: str
     email: str
     password: str
+    rol: str
 
     class Config:
         orm_mode = True
@@ -17,8 +18,9 @@ class Usuario(BaseModel):
     nombre: str
     email: str
     password: str
-    fecha_registro: datetime
-    fecha_actualizacion: datetime
+    rol: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         orm_mode = True
@@ -28,6 +30,7 @@ class UsuarioUpdate(BaseModel):
     nombre: Optional[str] = None
     email: Optional[str] = None
     password: Optional[str] = None
+    rol: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -44,8 +47,10 @@ class UsuarioOut(BaseModel):
     id: int
     nombre: str
     email: str
-    fecha_registro: datetime
-    fecha_actualizacion: datetime
+    rol: str
+    clubs_id: int
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         orm_mode = True

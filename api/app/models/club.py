@@ -8,6 +8,7 @@ class Club(BaseModel):
     descripcion: str
     logo: str
     suscripcion_at: str
+    fecha_suscripcion: datetime
     tel_contacto: str
 
     class Config:
@@ -18,6 +19,7 @@ class ClubCreate(BaseModel):
     descripcion: str
     logo: str
     suscripcion_at: str
+    fecha_suscripcion: datetime
     tel_contacto: str
 
     class Config:

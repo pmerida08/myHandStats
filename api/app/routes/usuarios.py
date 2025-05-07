@@ -10,27 +10,33 @@ from app.utils.hashing import pwd_context
 
 router = APIRouter()
 
-@router.post("/register/", response_model=UsuarioOut)
+@router.post("/register", response_model=UsuarioOut)
 def crear_usuario(usuario: UsuarioCreate):
-    data = usuario.dict()
-    data["password"] = hash_password(data["password"])
-
     try:
-        # Realizamos la inserción en la base de datos
-        response = supabase.table("usuarios").insert(data).execute()
+        # 1. Crear el club
+        data_club = {"nombre": f"Club de {usuario.nombre}"}
+        response_club = supabase.table("clubes").insert(data_club).execute()
 
-        # Verificamos si la respuesta contiene datos
-        if response.data and isinstance(response.data, list) and len(response.data) > 0:
-            # Asegurémonos de que los datos son un diccionario
-            usuario_creado = response.data[0]  # Accedemos al primer elemento de la lista
-            return UsuarioOut(**usuario_creado)
-        else:
-            raise HTTPException(status_code=500, detail="No se encontraron datos en la respuesta de Supabase.")
+        if not response_club.data:
+            raise HTTPException(status_code=500, detail="No se pudo crear el club")
+
+        club_id = response_club.data[0]["id"]
+
+        # 2. Crear el usuario con el club_id
+        data_usuario = usuario.dict()
+        data_usuario["password"] = hash_password(data_usuario["password"])
+        data_usuario["clubs_id"] = club_id
+
+        response_user = supabase.table("usuarios").insert(data_usuario).execute()
+
+        if not response_user.data:
+            raise HTTPException(status_code=500, detail="No se pudo crear el usuario")
+
+        return UsuarioOut(**response_user.data[0])
+    
     except Exception as e:
-        print(f"Exception: {e}")
-        raise HTTPException(status_code=500, detail="Error inesperado al crear el usuario")
-
-
+        print("Error en registro:", e)
+        raise HTTPException(status_code=500, detail="Error al registrar el usuario")
 
 # @router.get("/", response_model=List[UsuarioOut])
 # def listar_usuarios():
