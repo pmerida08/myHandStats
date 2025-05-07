@@ -89,7 +89,6 @@ def eliminar_usuario(id: int):
     return {"message": "Usuario eliminado correctamente"}
 
 
-
 def autenticar_usuario(email: str, password: str):
     response = supabase.table("usuarios").select("*").eq("email", email).single().execute()
 
@@ -104,7 +103,6 @@ def autenticar_usuario(email: str, password: str):
         return None
 
     return usuario
-
 
 
 @router.post("/login")

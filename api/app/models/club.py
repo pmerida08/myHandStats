@@ -44,10 +44,12 @@ class ClubDelete(BaseModel):
 class ClubOut(BaseModel):
     id: int
     nombre: str
-    descripcion: str
-    logo: str
-    suscripcion_at: str
-    tel_contacto: str
+    descripcion: Optional[str] = None
+    logo: Optional[str] = None
+    suscripcion_at: Optional[str] = None
+    tel_contacto: Optional[str] = None
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
 
     class Config:
         orm_mode = True
