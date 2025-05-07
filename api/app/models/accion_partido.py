@@ -4,31 +4,40 @@ from datetime import datetime
 
 class AccionPartido(BaseModel):
     id: int
-    partido_id: int
-    jugador_id: int
-    minuto: int
-    tipo_accion: str
-    tipo_lanzamiento_id: Optional[str] = None
-    tipo_7m_id: Optional[str] = None
-    tipo_perdida_id: Optional[str] = None
-    zona_lanzamiento_id: Optional[str] = None
-    fase_juego_id: Optional[str] = None
-    resultado: Optional[str] = None
+    minuto: str
+    jugadores_partido_id: int
+    acciones_id: int
 
     class Config:
         orm_mode = True
 
 class AccionPartidoCreate(BaseModel):
-    partido_id: int
-    jugador_id: int
-    minuto: int
-    tipo_accion: str
-    tipo_lanzamiento_id: Optional[str] = None
-    tipo_7m_id: Optional[str] = None
-    tipo_perdida_id: Optional[str] = None
-    zona_lanzamiento_id: Optional[str] = None
-    fase_juego_id: Optional[str] = None
-    resultado: Optional[str] = None
+    minuto: str
+    jugadores_partido_id: int
+    acciones_id: int
+
+    class Config:
+        orm_mode = True
+
+class AccionPartidoUpdate(BaseModel):
+    minuto: Optional[str] = None
+    jugadores_partido_id: Optional[int] = None
+    acciones_id: Optional[int] = None
+
+    class Config:
+        orm_mode = True
+
+class AccionPartidoDelete(BaseModel):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+class AccionPartidoOut(BaseModel):
+    id: int
+    minuto: str
+    jugadores_partido_id: int
+    acciones_id: int
 
     class Config:
         orm_mode = True
