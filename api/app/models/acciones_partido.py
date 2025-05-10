@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
-class AccionPartido(BaseModel):
+class AccionesPartido(BaseModel):
     id: int
     minuto: str
     jugadores_partido_id: int
@@ -11,7 +11,7 @@ class AccionPartido(BaseModel):
     class Config:
         orm_mode = True
 
-class AccionPartidoCreate(BaseModel):
+class AccionesPartidoCreate(BaseModel):
     minuto: str
     jugadores_partido_id: int
     acciones_id: int
@@ -19,7 +19,7 @@ class AccionPartidoCreate(BaseModel):
     class Config:
         orm_mode = True
 
-class AccionPartidoUpdate(BaseModel):
+class AccionesPartidoUpdate(BaseModel):
     minuto: Optional[str] = None
     jugadores_partido_id: Optional[int] = None
     acciones_id: Optional[int] = None
@@ -27,13 +27,13 @@ class AccionPartidoUpdate(BaseModel):
     class Config:
         orm_mode = True
 
-class AccionPartidoDelete(BaseModel):
+class AccionesPartidoDelete(BaseModel):
     id: int
 
     class Config:
         orm_mode = True
 
-class AccionPartidoOut(BaseModel):
+class AccionesPartidoOut(BaseModel):
     id: int
     minuto: str
     jugadores_partido_id: int

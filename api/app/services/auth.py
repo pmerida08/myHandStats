@@ -1,7 +1,7 @@
 # app/services/auth.py
 import bcrypt
 import jwt
-from jose import jwt, JWTError
+from jwt import PyJWTError as JWTError
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
