@@ -3,4 +3,103 @@ from typing import Optional
 from datetime import datetime
 
 class JugadorPartido(BaseModel):
+    id: int
+    golesli: int
+    golesld: int
+    golesei: int
+    golesed: int
+    golesc: int
+    goles7m: int
+    golest: int
+    golespi: int
+    tarjetas_amarillas: int
+    tarjetas_rojas: int
+    lanzamientos: int
+    lanzamientos_7m: int
+    asistencias: int
+    exclusiones: int
+    recuperaciones: int
+    perdidas: int
+    paradas: int
+    partido_id: int
+    jugador_id: int
+
+    class Config:
+        orm_mode = True
     
+class JugadorPartidoCreate(BaseModel):
+    golesli: int
+    golesld: int
+    golesei: int
+    golesed: int
+    golesc: int
+    goles7m: int
+    golest: int
+    golespi: int
+    tarjetas_amarillas: int
+    tarjetas_rojas: int
+    lanzamientos: int
+    lanzamientos_7m: int
+    asistencias: int
+    exclusiones: int
+    recuperaciones: int
+    perdidas: int
+    paradas: int
+    partido_id: int
+    jugador_id: int
+
+    class Config:
+        orm_mode = True
+
+class JugadorPartidoUpdate(BaseModel):
+    golesli: Optional[int] = None
+    golesld: Optional[int] = None
+    golesei: Optional[int] = None
+    golesed: Optional[int] = None
+    golesc: Optional[int] = None
+    goles7m: Optional[int] = None
+    golest: Optional[int] = None
+    golespi: Optional[int] = None
+    tarjetas_amarillas: Optional[int] = None
+    tarjetas_rojas: Optional[int] = None
+    lanzamientos: Optional[int] = None
+    lanzamientos_7m: Optional[int] = None
+    asistencias: Optional[int] = None
+    exclusiones: Optional[int] = None
+    recuperaciones: Optional[int] = None
+    perdidas: Optional[int] = None
+    paradas: Optional[int] = None
+
+    class Config:
+        orm_mode = True
+
+class JugadorPartidoDelete(BaseModel):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+class JugadorPartidoOut(BaseModel):
+    id: int
+    golesli: int
+    golesld: int
+    golesei: int
+    golesed: int
+    golesc: int
+    goles7m: int
+    golest: int
+    golespi: int
+    tarjetas_amarillas: int
+    tarjetas_rojas: int
+    lanzamientos: int
+    lanzamientos_7m: int
+    asistencias: int
+    exclusiones: int
+    recuperaciones: int
+    perdidas: int
+    paradas: int
+    partido_id: int
+    jugador_id: int
+
+    class Config:
+        orm_mode = True

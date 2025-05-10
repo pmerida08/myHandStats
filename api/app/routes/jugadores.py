@@ -26,7 +26,12 @@ def obtener_jugador(id: int):
 
 @router.post("/", response_model=JugadorOut)
 def crear_jugador(jugador: JugadorCreate):
-    response = supabase.table("jugadores").insert(jugador.dict()).execute()
+    jugador_dict = jugador.dict()
+    
+    # Convertir fecha a string en formato ISO (YYYY-MM-DD)
+    jugador_dict["fecha_nac"] = jugador_dict["fecha_nac"].isoformat()
+
+    response = supabase.table("jugadores").insert(jugador_dict).execute()
 
     if getattr(response, "error", None):
         raise HTTPException(status_code=400, detail=f"Error al crear el jugador: {response.error.message}")

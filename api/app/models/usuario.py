@@ -59,3 +59,14 @@ class LoginRequest(BaseModel):
     email: str
     password: str
 
+    class Config:
+        orm_mode = True
+
+class RegisterRequest(BaseModel):
+    nombre: str
+    email: str
+    password: str
+    rol: str = "administrador"
+
+    class Config:
+        orm_mode = True
