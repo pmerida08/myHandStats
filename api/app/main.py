@@ -1,8 +1,18 @@
 # app/main.py
 from fastapi import FastAPI
-from app.routes import acciones, usuarios, jugadores, equipos, partidos, posiciones, fases_juego, acciones_partidos, clubes, clubes_entradores, entrenadores, equipos_entrenadores, jugadores_partidos, jugadores_posiciones, accion_fase
+
+from app.routes import usuarios, jugadores, equipos, partidos, posiciones, fases_juego, acciones_partidos, clubes, clubes_entradores, acciones_fases, entrenadores, equipos_entrenadores, jugadores_partidos, jugadores_posiciones
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(usuarios.router, prefix="/usuarios")
 app.include_router(clubes.router, prefix="/clubes")
