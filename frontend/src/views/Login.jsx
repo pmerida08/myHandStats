@@ -3,7 +3,6 @@ import {
   Button,
   Container,
   FormControl,
-  FormLabel,
   Heading,
   Input,
   Stack,
@@ -11,29 +10,43 @@ import {
   Image,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ NECESARIO para navegar
 import avatar1 from "../assets/avatars/avatar_1.png";
 import avatar2 from "../assets/avatars/avatar_2.png";
 import avatar3 from "../assets/avatars/avatar_3.png";
 import avatar4 from "../assets/avatars/avatar_4.png";
 
-// Imágenes de perfil falsas (puedes usar tus propias imágenes o avatares)
+// Avatares falsos
 const avatars = [avatar1, avatar2, avatar3, avatar4];
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate(); // ✅ Inicializar
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // fetch('/api/login', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ email, password }),
-    // })
-    //   .then((res) => res.json())
-    //   .then((data) => console.log(data))
-    //   .catch((err) => console.error(err))
-    console.log({ email, password });
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/usuarios/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Error de backend:", errorText);
+        throw new Error("Credenciales incorrectas");
+      }
+
+      const data = await res.json();
+      sessionStorage.setItem("token", data.access_token); // ✅ Guardar token
+      navigate("/dashboard"); // ✅ Redirección
+    } catch (err) {
+      console.error("Error al iniciar sesión:", err.message);
+      alert("Email o contraseña incorrectos.");
+    }
   };
 
   return (
@@ -98,12 +111,7 @@ const Login = () => {
                   _placeholder={{ color: "gray.500" }}
                 />
               </FormControl>
-              <Button
-                type="submit"
-                colorScheme="red"
-                bg="#F43F5E"
-                color="white"
-              >
+              <Button type="submit" bg="#F43F5E" color="white">
                 Submit
               </Button>
             </Stack>
