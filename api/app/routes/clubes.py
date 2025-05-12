@@ -82,20 +82,17 @@ def eliminar_club(club_id: int):
     return {"message": "Club eliminado correctamente"}
 
 
-@router.put("/{id}")
-def actualizar_club(id: int, club: ClubUpdate):
-    datos_actualizados = club.dict(exclude_unset=True)
+@router.put("/")
+def actualizar_club(club_data: ClubUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
+    # Solo los administradores pueden actualizar el club
+    if datos_token["rol"] != "admin":
+        raise HTTPException(status_code=403, detail="Solo los administradores pueden actualizar el club")
 
-    if not datos_actualizados:
-        raise HTTPException(status_code=400, detail="No se proporcionaron datos para actualizar")
-    
-    club_existente = supabase.table("clubes").select("*").eq("id", id).execute()
-    if not club_existente.data or len(club_existente.data) == 0:
+    # Actualizar el club con el id_club del token
+    data = club_data.dict(exclude_unset=True)
+    response = supabase.table("clubes").update(data).eq("id", datos_token["id_club"]).execute()
+
+    if not response.data:
         raise HTTPException(status_code=404, detail="Club no encontrado")
-    
-    try:
-        respuesta = supabase.table("clubes").update(datos_actualizados).eq("id", id).execute()
-        return {"mensaje": "Equipo actualizado correctamente", "datos_actualizados": respuesta.data}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al actualizar el club: {str(e)}")
 
+    return response.data[0]
