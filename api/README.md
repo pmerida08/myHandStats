@@ -79,7 +79,7 @@
 
 ### Acciones
 
-| **Funcionalidad**   | **Método** | **Endpoint**   | **Acceso** |
-| ------------------- | ---------- | -------------- | ---------- |
-| Listar Tipos acción | GET        | /tipos_acción/ | Publico    |
-
+| **Funcionalidad**   | **Método** | **Endpoint**                   | **Acceso** |
+| ------------------- | ---------- | ------------------------------ | ---------- |
+| Listar Tipos acción | GET        | /acciones/                     | Publico    |
+| Filtrar acción      | GET        | /acciones/filtrar?tipo_accion= | Publico    |

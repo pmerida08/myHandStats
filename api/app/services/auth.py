@@ -11,10 +11,13 @@ def verificar_password(hashed_password: str, plain_password: str) -> bool:
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 
-def generar_token(email: str):
+def generar_token(email: str, user_id: int, clubs_id: int, rol: str):
     expire = datetime.utcnow() + timedelta(minutes=EXPIRATION_MINUTES)
     payload = {
         "sub": email,  
+        "id": user_id,
+        "clubs_id": clubs_id,
+        "rol": rol,
         "exp": expire
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
@@ -23,7 +26,7 @@ def generar_token(email: str):
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-def obtener_email_desde_token(token: str = Depends(oauth2_scheme)):
+def obtener_info_desde_token(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="No se pudieron validar las credenciales",
@@ -32,9 +35,18 @@ def obtener_email_desde_token(token: str = Depends(oauth2_scheme)):
     try:
         # Decodifica el token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")  # ⚡ Asegúrate de que el email esté en "sub"
+        email: str = payload.get("sub")  # Asegúrate de que el email esté en "sub"
+        user_id: int = payload.get("id")
+        clubs_id: int = payload.get("clubs_id")
+        rol: str = payload.get("rol")
+
         if email is None:
             raise credentials_exception
-        return email
+        return {
+            "email": email,
+            "user_id": user_id,
+            "clubs_id": clubs_id,
+            "rol": rol
+        }
     except JWTError:
         raise credentials_exception
