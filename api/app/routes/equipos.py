@@ -1,18 +1,22 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from typing import List
 from app.models.equipo import Equipo, EquipoCreate, EquipoUpdate, EquipoDelete, EquipoOut
+from app.models.jugador import JugadorOut
 from app.supabase_client import supabase
+from app.services.auth import obtener_info_desde_token
 
 router = APIRouter()
 
-@router.get("/", response_model=List[Equipo])
-def get_equipos():
-    response = supabase.table("equipos").select("*").execute()
 
-    if getattr (response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al obtener los usuarios: {response.error.message}")
+@router.get("/", response_model=List[EquipoOut])
+def obtener_equipos(datos_token: dict = Depends(obtener_info_desde_token)):
+    if datos_token["rol"] != "admin":
+        raise HTTPException(status_code=403, detail="Solo los administradores pueden ver los equipos del club")
+
+    response = supabase.table("equipos").select("*").eq("clubs_id", datos_token["clubs_id"]).execute()
 
     return response.data
+
         
 @router.get("/{equipo_id}", response_model=EquipoOut)
 def obtener_equipo(equipo_id: int):
@@ -23,6 +27,17 @@ def obtener_equipo(equipo_id: int):
 
     equipo = response.data[0]
     return equipo
+
+
+@router.get("/{equipo_id}/jugadores/", response_model=List[JugadorOut])
+def obtener_jugadores_equipo(equipo_id: int):
+    response = supabase.table("jugadores").select("*").eq("equipos_id", equipo_id).execute()
+
+    if not response.data or len(response.data) == 0:
+        raise HTTPException(status_code=404, detail="No se encontraron jugadores para este equipo")
+
+    return response.data
+
 
 @router.post("/", response_model=EquipoOut)
 def crear_equipo(equipo: EquipoCreate):

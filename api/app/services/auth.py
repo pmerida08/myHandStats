@@ -6,6 +6,9 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
 from app.config import SECRET_KEY, ALGORITHM, EXPIRATION_MINUTES
+from app.supabase_client import supabase
+from app.utils.hashing import pwd_context  
+
 
 def verificar_password(hashed_password: str, plain_password: str) -> bool:
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
@@ -50,3 +53,18 @@ def obtener_info_desde_token(token: str = Depends(oauth2_scheme)):
         }
     except JWTError:
         raise credentials_exception
+
+def autenticar_usuario(email: str, password: str):
+    response = supabase.table("usuarios").select("*").eq("email", email).single().execute()
+
+    # Verificar si la respuesta contiene datos
+    if not response.data:
+        return None
+
+    usuario = response.data  # Acceder a los datos directamente
+
+    # Verificar si la contraseña es correcta
+    if not pwd_context.verify(password, usuario["password"]):
+        return None
+
+    return usuario

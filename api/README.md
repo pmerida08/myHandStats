@@ -4,12 +4,13 @@
 
 ### Usuarios
 
-| **Funcionalidad**        | **Método** | **Endpoint** | **Acceso** |
-| ------------------------ | ---------- | ------------ | ---------- |
-| Registro de Usuarios     | POST       | /register/   | Publico    |
-| Inicio de Sesión         | POST       | /login/      | Publico    |
-| Actualizar Usuario       | PUT        | /usuario/    | Privado    |
-| Listar Usuario por email | GET        | /usuario/    | Privado    |
+| **Funcionalidad**        | **Método** | **Endpoint**       | **Acceso** |
+| ------------------------ | ---------- | ------------------ | ---------- |
+| Registro de Usuarios     | POST       | /register/         | Publico    |
+| Inicio de Sesión         | POST       | /login/            | Publico    |
+| Actualizar Usuario       | PUT        | /usuario/          | Privado    |
+| Listar Usuario por JWT   | GET        | /usuario/perfil/   | Privado    |
+
 
 ### Entrenadores
 
