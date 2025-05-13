@@ -16,7 +16,7 @@ def get_jugadores_partidos():
 
 @router.get("/{id}", response_model=JugadorPartidoOut)
 def obtener_jugador_partido(id: int):
-    response = supabase.table("jugadores_partidos").select("*, jugador_id:jugadores(nombre), partido_id:partidos(fecha)").eq("id", id).execute()
+    response = supabase.table("jugadores_partido").select("*, jugador_id:jugadores(nombre), partido_id:partidos(fecha)").eq("id", id).execute()
 
     if not response.data or len(response.data) == 0:
         raise HTTPException(status_code=404, detail="JugadorPartido no encontrado")
@@ -26,7 +26,7 @@ def obtener_jugador_partido(id: int):
 
 @router.post("/", response_model=JugadorPartidoOut)
 def crear_jugador_partido(jugador_partido: JugadorPartidoCreate):
-    response = supabase.table("jugadores_partidos").insert(jugador_partido.dict()).execute()
+    response = supabase.table("jugadores_partido").insert(jugador_partido.dict()).execute()
 
     if getattr(response, "error", None):
         raise HTTPException(status_code=400, detail=f"Error al crear el jugador_partido: {response.error.message}")

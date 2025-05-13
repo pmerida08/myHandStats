@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from app.services.auth import obtener_info_desde_token
 from typing import List
 from app.models.usuario import UsuarioOut, UsuarioCreate
+from app.models.equipo import EquipoOut
 from app.utils.hashing import hash_password
 from app.models.club import Club, ClubCreate, ClubUpdate, ClubDelete, ClubOut
 from app.supabase_client import supabase
@@ -35,6 +36,19 @@ def obtener_usuarios_club(datos_token: dict = Depends(obtener_info_desde_token))
 
     if getattr (response, "error", None):
         raise HTTPException(status_code=400, detail=f"Error al obtener los usuarios: {response.error.message}")
+
+    return response.data
+
+
+@router.get("/equipos/", response_model=List[EquipoOut])
+def obtener_usuarios_club(datos_token: dict = Depends(obtener_info_desde_token)):
+    if datos_token["rol"] != "admin":
+        raise HTTPException(status_code=403, detail="Solo los administradores pueden ver los equipos del club")
+
+    response = supabase.table("equipos").select("*").eq("clubs_id", datos_token["clubs_id"]).execute()
+
+    if getattr (response, "error", None):
+        raise HTTPException(status_code=400, detail=f"Error al obtener los equipos: {response.error.message}")
 
     return response.data
 

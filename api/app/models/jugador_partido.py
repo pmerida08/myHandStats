@@ -21,8 +21,8 @@ class JugadorPartido(BaseModel):
     recuperaciones: int
     perdidas: int
     paradas: int
-    partido_id: int
-    jugador_id: int
+    partidos_id: int
+    jugadores_id: int
 
     class Config:
         orm_mode = True
@@ -45,8 +45,8 @@ class JugadorPartidoCreate(BaseModel):
     recuperaciones: int
     perdidas: int
     paradas: int
-    partido_id: int
-    jugador_id: int
+    partidos_id: int
+    jugadores_id: int
 
     class Config:
         orm_mode = True
@@ -98,8 +98,8 @@ class JugadorPartidoOut(BaseModel):
     recuperaciones: int
     perdidas: int
     paradas: int
-    partido_id: int
-    jugador_id: int
-
+    partidos_id: int
+    jugadores_id: int
+    
     class Config:
         orm_mode = True
