@@ -4,7 +4,8 @@ import Registrar from "./views/Registrar";
 import VistaAdmin from "./views/VistaAdmin";
 import DashboardPrincipal from "./views/DashboardPrincipal";
 import DashboardPartido from "./views/DashboardPartido.jsx";
-
+import Jugadores from "./views/Jugadores.jsx";
+import './index.css';
 function App() {
   return (
     <BrowserRouter>
@@ -14,7 +15,7 @@ function App() {
         <Route path="/admin" element={<VistaAdmin />} />
         <Route path="/dashboard" element={<DashboardPrincipal />} />
         <Route path="/nuevo-partido" element={<DashboardPartido />} />
-        
+        <Route path="/jugadores" element={<Jugadores />} />
       </Routes>
     </BrowserRouter>
   );
