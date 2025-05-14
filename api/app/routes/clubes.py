@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from app.services.auth import obtener_info_desde_token
 from typing import List
 from app.models.usuario import UsuarioOut, UsuarioCreate
-from app.models.equipo import EquipoOut
+from app.models.equipo import EquipoOut, EquipoCreate
 from app.utils.hashing import hash_password
 from app.models.club import Club, ClubCreate, ClubUpdate, ClubDelete, ClubOut
 from app.supabase_client import supabase
@@ -41,7 +41,7 @@ def obtener_usuarios_club(datos_token: dict = Depends(obtener_info_desde_token))
 
 
 @router.get("/equipos/", response_model=List[EquipoOut])
-def obtener_usuarios_club(datos_token: dict = Depends(obtener_info_desde_token)):
+def obtener_equipos_club(datos_token: dict = Depends(obtener_info_desde_token)):
     if datos_token["rol"] != "admin":
         raise HTTPException(status_code=403, detail="Solo los administradores pueden ver los equipos del club")
 
@@ -53,14 +53,22 @@ def obtener_usuarios_club(datos_token: dict = Depends(obtener_info_desde_token))
     return response.data
 
 
-# @router.post("/", response_model=ClubOut)
-# def crear_club(club: ClubCreate):
-#     response = supabase.table("clubes").insert(club.dict()).execute()
 
-#     if getattr (response, "error", None):
-#         raise HTTPException(status_code=400, detail=f"Error al crear el club: {response.error.message}")
+@router.post("/nuevo_equipo/", response_model=EquipoOut)
+def crear_equipo(equipo: EquipoCreate, datos_token: dict = Depends(obtener_info_desde_token)):
 
-#     return response.data[0]
+    if datos_token["rol"] != "admin":
+        raise HTTPException(status_code=403, detail="Solo administradores pueden registrar nuevos equipos")
+
+    data = equipo.dict()
+    data["clubs_id"] = datos_token["clubs_id"]
+
+    response = supabase.table("equipos").insert(data).execute()
+
+    if getattr (response, "error", None):
+        raise HTTPException(status_code=400, detail=f"Error al crear el equipo: {response.error.message}")
+
+    return response.data[0]
 
 
 @router.post("/usuario/register", response_model=UsuarioOut)

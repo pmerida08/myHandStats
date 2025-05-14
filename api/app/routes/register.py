@@ -25,6 +25,7 @@ def crear_usuario(usuario: UsuarioCreate):
         # 2. Crear el usuario con el club_id
         data_usuario = usuario.dict()
         data_usuario["password"] = hash_password(data_usuario["password"])
+        data_usuario["rol"] = "admin"  
         data_usuario["clubs_id"] = club_id
 
         response_user = supabase.table("usuarios").insert(data_usuario).execute()

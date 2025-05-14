@@ -27,7 +27,6 @@
 
 | **Funcionalidad**       | **Método** | **Endpoint**           | **Acceso** |
 | ----------------------- | ---------- | ---------------------- | ---------- |
-| Registro de Club        | POST       | /club/register/        | Privado    |
 | Listar club             | GET        | /club/{id}             | Privado    |
 | Actualizar Club         | PUT        | /club/{id}             | Privado    |
 | Eliminar club           | DELETE     | /club/{id}             | Privado    |
