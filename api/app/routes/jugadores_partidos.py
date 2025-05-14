@@ -24,14 +24,14 @@ def obtener_jugador_partido(id: int):
     jugador_partido = response.data[0]
     return jugador_partido
 
-@router.post("/", response_model=JugadorPartidoOut)
-def crear_jugador_partido(jugador_partido: JugadorPartidoCreate):
-    response = supabase.table("jugadores_partido").insert(jugador_partido.dict()).execute()
+# @router.post("/", response_model=JugadorPartidoOut)
+# def crear_jugador_partido(jugador_partido: JugadorPartidoCreate):
+#     response = supabase.table("jugadores_partido").insert(jugador_partido.dict()).execute()
 
-    if getattr(response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al crear el jugador_partido: {response.error.message}")
+#     if getattr(response, "error", None):
+#         raise HTTPException(status_code=400, detail=f"Error al crear el jugador_partido: {response.error.message}")
 
-    return response.data[0]
+#     return response.data[0]
 
 @router.delete("/{id}")
 def eliminar_jugador_partido(id: int):

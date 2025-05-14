@@ -147,7 +147,7 @@ def crear_entrenador(equipo_id: int, entrenador: EntrenadorCreate, datos_token: 
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
     if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
         raise HTTPException(status_code=403, detail="No tienes permiso para crear entrenadores para este equipo")
-    
+
     # Crear el entrenador
     entrenador_dict = entrenador.dict()
     response = supabase.table("entrenadores").insert(entrenador_dict).execute()
