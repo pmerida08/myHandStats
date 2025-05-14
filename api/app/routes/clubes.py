@@ -5,6 +5,7 @@ from app.models.usuario import UsuarioOut, UsuarioCreate
 from app.models.equipo import EquipoOut, EquipoCreate
 from app.utils.hashing import hash_password
 from app.models.club import Club, ClubCreate, ClubUpdate, ClubDelete, ClubOut
+from app.models.entrenador import EntrenadorOut
 from app.supabase_client import supabase
 
 router = APIRouter()
@@ -52,6 +53,18 @@ def obtener_equipos_club(datos_token: dict = Depends(obtener_info_desde_token)):
 
     return response.data
 
+
+# @router.get("/entrenadores/", response_model=List[EntrenadorOut])
+# def obtener_entrenadores_club(datos_token: dict = Depends(obtener_info_desde_token)):
+#     if datos_token["rol"] != "admin":
+#         raise HTTPException(status_code=403, detail="Solo los administradores pueden ver los entrenadores del club")
+
+#     response = supabase.table("entrenadores").select("*").eq("clubs_id", datos_token["clubs_id"]).execute()
+
+#     if getattr (response, "error", None):
+#         raise HTTPException(status_code=400, detail=f"Error al obtener los entrenadores: {response.error.message}")
+
+#     return response.data
 
 
 @router.post("/nuevo_equipo/", response_model=EquipoOut)

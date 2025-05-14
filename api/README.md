@@ -36,13 +36,13 @@
 
 ### Equipos
 
-| **Funcionalidad**           | **Método** | **Endpoint**       | **Acceso** |
-| --------------------------- | ---------- | ------------------ | ---------- |
-| Creación de equipo          | POST       | /club/equipo/      | Privado    |
-| Listado de equipos del club | GET        | /club/equipos/     | Privado    |
-| Listado de equipo por id    | GET        | /equipo/{id}       | Privado    |
-| Actualizar Equipo           | PUT        | /club/equipos/{id} | Privado    |
-| Eliminar Equipo             | DELETE     | /club/equipo/{id}  | Privado    |
+| **Funcionalidad**           | **Método** | **Endpoint**          | **Acceso** |
+| --------------------------- | ---------- | --------------------- | ---------- |
+| Creación de equipo          | POST       | /club/nuevo_equipo/   | Privado    |
+| Listado de equipos del club | GET        | /club/equipos/        | Privado    |
+| Listado de equipo por id    | GET        | /equipo/{id}          | Privado    |
+| Actualizar Equipo           | PUT        | /club/equipos/{id}    | Privado    |
+| Eliminar Equipo             | DELETE     | /club/equipo/{id}     | Privado    |
 
 ### Jugadores
 
@@ -76,6 +76,13 @@
 | Listar Acción               | GET        | /equipo/accion_partido/{id}           | Privado    |
 | Actualizar Acción           | PUT        | /equipo/accion_partido/{id}           | Privado    |
 | Eliminar Acción Partido     | DELETE     | /equipo/accion_partido/{id}           | Privado    |
+
+
+### Jugadores-Partido
+| **Funcionalidad**           | **Método** | **Endpoint**                          | **Acceso** |
+| --------------------------- | ---------- | ------------------------------------- | ---------- |
+| Añadir Jugador Partido      | POST       | /equipo/jugador_partido/               | Privado    |
+
 
 ### Acciones
 
