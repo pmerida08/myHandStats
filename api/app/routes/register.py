@@ -1,19 +1,14 @@
-from fastapi import APIRouter, HTTPException , Depends
-from fastapi.security import OAuth2PasswordRequestForm
-from passlib.context import CryptContext
-from typing import List
-from app.models.usuario import UsuarioCreate, UsuarioUpdate, UsuarioOut, LoginRequest
+from fastapi import APIRouter, HTTPException
+from app.models.usuario import UsuarioCreate, UsuarioOut
 from app.supabase_client import supabase
-from app.services.auth import verificar_password, generar_token, obtener_info_desde_token
 from app.utils.hashing import hash_password
-from app.utils.hashing import pwd_context  
 
 router = APIRouter()
 
 @router.post("/", response_model=UsuarioOut)
 def crear_usuario(usuario: UsuarioCreate):
     try:
-        # 1. Crear el club
+        # 1. Crear el club ya que cada usuario que se registre tendra un club asociado
         data_club = {"nombre": f"Club de {usuario.nombre}"}
         response_club = supabase.table("clubes").insert(data_club).execute()
 

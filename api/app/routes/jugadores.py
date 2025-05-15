@@ -14,6 +14,7 @@ router = APIRouter()
 
 #     return response.data
 
+
 # @router.get("/{id}", response_model=JugadorOut)
 # def obtener_jugador(id: int):
 #     response = supabase.table("jugadores").select("*, posicion_id:posiciones(nombre)").eq("id", id).execute()

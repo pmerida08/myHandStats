@@ -13,9 +13,7 @@ router = APIRouter()
 
 @router.get("/", response_model=List[EquipoOut])
 def obtener_equipos_club(datos_token: dict = Depends(obtener_info_desde_token)):
-    if datos_token["rol"] != "admin":
-        raise HTTPException(status_code=403, detail="Solo los administradores pueden ver los equipos del club")
-
+    
     response = supabase.table("equipos").select("*").eq("clubs_id", datos_token["clubs_id"]).execute()
 
     return response.data
@@ -83,6 +81,22 @@ def obtener_jugadores_equipo(equipo_id: int , datos_token: dict = Depends(obtene
 
     return response.data
 
+@router.get("/{equipo_id}/jugador/{jugador_id}", response_model=JugadorOut)
+def obtener_jugador_equipo(equipo_id: int, jugador_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
+    equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
+
+    if not equipo_data.data:
+        raise HTTPException(status_code=404, detail="Equipo no encontrado")
+    
+    if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
+        raise HTTPException(status_code=403, detail="No tienes permiso para ver los jugadores de este equipo")
+
+    # Verificar que el jugador está asociado al equipo
+    jugador_data = supabase.table("jugadores").select("*").eq("id", jugador_id).eq("equipos_id", equipo_id).execute()
+    if not jugador_data.data or len(jugador_data.data) == 0:
+        raise HTTPException(status_code=404, detail="Jugador no encontrado")
+
+    return jugador_data.data[0]
 
 # @router.post("/", response_model=EquipoOut)
 # def crear_equipo(equipo: EquipoCreate):

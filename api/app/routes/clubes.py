@@ -4,8 +4,7 @@ from typing import List
 from app.models.usuario import UsuarioOut, UsuarioCreate
 from app.models.equipo import EquipoOut, EquipoCreate
 from app.utils.hashing import hash_password
-from app.models.club import Club, ClubCreate, ClubUpdate, ClubDelete, ClubOut
-from app.models.entrenador import EntrenadorOut
+from app.models.club import ClubUpdate, ClubOut
 from app.supabase_client import supabase
 
 router = APIRouter()
@@ -21,7 +20,7 @@ router = APIRouter()
 
 
 @router.get("/", response_model=ClubOut)
-def obtener_club(datos_token: dict = Depends(obtener_info_desde_token)):
+def obtener_info_club(datos_token: dict = Depends(obtener_info_desde_token)):
     club_id = datos_token["clubs_id"]
     response = supabase.table("clubes").select("*").eq("id", club_id).execute()
 
@@ -68,7 +67,7 @@ def obtener_equipos_club(datos_token: dict = Depends(obtener_info_desde_token)):
 
 
 @router.post("/nuevo_equipo/", response_model=EquipoOut)
-def crear_equipo(equipo: EquipoCreate, datos_token: dict = Depends(obtener_info_desde_token)):
+def crear_nuevo_equipo_club(equipo: EquipoCreate, datos_token: dict = Depends(obtener_info_desde_token)):
 
     if datos_token["rol"] != "admin":
         raise HTTPException(status_code=403, detail="Solo administradores pueden registrar nuevos equipos")
@@ -85,8 +84,7 @@ def crear_equipo(equipo: EquipoCreate, datos_token: dict = Depends(obtener_info_
 
 
 @router.post("/usuario/register", response_model=UsuarioOut)
-def registrar_usuario(usuario: UsuarioCreate, datos_token: dict = Depends(obtener_info_desde_token)):
-    # Verificamos que solo un admin puede registrar nuevos usuarios
+def registrar_nuevo_usuario_club(usuario: UsuarioCreate, datos_token: dict = Depends(obtener_info_desde_token)):
     if datos_token["rol"] != "admin":
         raise HTTPException(status_code=403, detail="Solo administradores pueden registrar nuevos usuarios")
 
@@ -96,7 +94,6 @@ def registrar_usuario(usuario: UsuarioCreate, datos_token: dict = Depends(obtene
     data["clubs_id"] = datos_token["clubs_id"]
     data["password"] = hash_password(data["password"])
 
-    # Insertamos el nuevo usuario en Supabase
     response = supabase.table("usuarios").insert(data).execute()
 
     nuevo_usuario = response.data[0]
@@ -104,17 +101,17 @@ def registrar_usuario(usuario: UsuarioCreate, datos_token: dict = Depends(obtene
     return nuevo_usuario
 
 
-@router.delete("/{club_id}")
-def eliminar_club(club_id: int):
-    response = supabase.table("clubes").delete().eq("id", club_id).execute()
+# @router.delete("/{club_id}")
+# def eliminar_club(club_id: int):
+#     response = supabase.table("clubes").delete().eq("id", club_id).execute()
 
-    if getattr(response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al eliminar el club: {response.error.message}")
+#     if getattr(response, "error", None):
+#         raise HTTPException(status_code=400, detail=f"Error al eliminar el club: {response.error.message}")
 
-    if response.data == 0:
-        raise HTTPException(status_code=404, detail="Club no encontrado")
+#     if response.data == 0:
+#         raise HTTPException(status_code=404, detail="Club no encontrado")
 
-    return {"message": "Club eliminado correctamente"}
+#     return {"message": "Club eliminado correctamente"}
 
 
 @router.put("/")

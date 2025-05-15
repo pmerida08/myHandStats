@@ -1,11 +1,6 @@
-from fastapi import APIRouter, HTTPException , Depends
-from fastapi.security import OAuth2PasswordRequestForm
-from passlib.context import CryptContext
-from typing import List
-from app.models.usuario import UsuarioCreate, UsuarioUpdate, UsuarioOut, LoginRequest
-from app.supabase_client import supabase
-from app.services.auth import verificar_password, generar_token, obtener_info_desde_token, autenticar_usuario
-from app.utils.hashing import hash_password
+from fastapi import APIRouter, HTTPException 
+from app.models.usuario import LoginRequest
+from app.services.auth import generar_token, autenticar_usuario
 
 router = APIRouter()
 

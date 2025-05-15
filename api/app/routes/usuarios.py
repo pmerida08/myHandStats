@@ -1,14 +1,11 @@
-from fastapi import APIRouter, HTTPException , Depends
-from fastapi.security import OAuth2PasswordRequestForm
-from passlib.context import CryptContext
-from typing import List
-from app.models.usuario import UsuarioCreate, UsuarioUpdate, UsuarioOut, LoginRequest
+from fastapi import APIRouter, HTTPException, Depends
+from app.models.usuario import UsuarioUpdate, UsuarioOut
 from app.supabase_client import supabase
-from app.services.auth import verificar_password, generar_token, obtener_info_desde_token
+from app.services.auth import obtener_info_desde_token
 from app.utils.hashing import hash_password
-from app.utils.hashing import pwd_context  
 
 router = APIRouter()
+
 
 @router.put("/{id}", response_model=UsuarioOut)
 def actualizar_usuario(id: int, usuario: UsuarioUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
@@ -35,15 +32,15 @@ def actualizar_usuario(id: int, usuario: UsuarioUpdate, datos_token: dict = Depe
     return updated_user
 
 
-@router.delete("/{id}")
-def eliminar_usuario(id: int):
-    response = supabase.table("usuarios").delete().eq("id", id).execute()
+# @router.delete("/{id}")
+# def eliminar_usuario(id: int):
+#     response = supabase.table("usuarios").delete().eq("id", id).execute()
 
-    # Si la respuesta tiene data vacía, es que no se encontró el usuario
-    if not response.data:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+#     # Si la respuesta tiene data vacía, es que no se encontró el usuario
+#     if not response.data:
+#         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    return {"message": "Usuario eliminado correctamente"}
+#     return {"message": "Usuario eliminado correctamente"}
 
 
 @router.get("/perfil", tags=["Usuarios"])
