@@ -8,9 +8,11 @@ import {
   Stack,
   Text,
   Image,
+  Alert,
+  AlertIcon,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ NECESARIO para navegar
+import { useNavigate } from "react-router-dom";
 import avatar1 from "../assets/avatars/avatar_1.png";
 import avatar2 from "../assets/avatars/avatar_2.png";
 import avatar3 from "../assets/avatars/avatar_3.png";
@@ -22,30 +24,36 @@ const avatars = [avatar1, avatar2, avatar3, avatar4];
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); // ✅ Inicializar
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
+  const handleLogin = async (email, password) => {
     try {
-      const res = await fetch("http://myhandstats.onrender.com/login", {
+      setError(""); // Limpiar error anterior
+
+      const response = await fetch("https://myhandstats.onrender.com/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ email, password }),
       });
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Error de backend:", errorText);
-        throw new Error("Credenciales incorrectas");
+      if (!response.ok) {
+        throw new Error("Credenciales inválidas");
       }
 
-      const data = await res.json();
-      sessionStorage.setItem("token", data.access_token); // ✅ Guardar token
-      navigate("/dashboard"); // ✅ Redirección
-    } catch (err) {
-      console.error("Error al iniciar sesión:", err.message);
-      alert("Email o contraseña incorrectos.");
+      const data = await response.json();
+      console.log("Token recibido:", data.access_token);
+
+      // ✅ Guardar token en localStorage
+      localStorage.setItem("token", data.access_token);
+
+      // ✅ Redirigir a otra vista tras login
+      navigate("/dashboard"); // cámbialo por la ruta deseada
+    } catch (error) {
+      setError(error.message || "Error al iniciar sesión");
+      console.error("Error al iniciar sesión:", error.message);
     }
   };
 
@@ -89,7 +97,19 @@ const Login = () => {
             ¿Cuánta posesión ha tenido tu equipo? Esto y mucho más.
           </Text>
 
-          <form onSubmit={handleLogin}>
+          {error && (
+            <Alert status="error" mb={4} borderRadius="md">
+              <AlertIcon />
+              {error}
+            </Alert>
+          )}
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleLogin(email, password);
+            }}
+          >
             <Stack spacing={4} mb={4}>
               <FormControl>
                 <Input
