@@ -5,67 +5,37 @@ from app.supabase_client import supabase
 
 router = APIRouter()
 
-@router.get("/", response_model=List[Jugador])
-def get_jugadores():
-    response = supabase.table("jugadores").select("*, posicion_id:posiciones(nombre)").execute()
+# @router.get("/", response_model=List[Jugador])
+# def get_jugadores():
+#     response = supabase.table("jugadores").select("*, posicion_id:posiciones(nombre)").execute()
 
-    if getattr(response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al obtener los Jugadores: {response.error.message}")
+#     if getattr(response, "error", None):
+#         raise HTTPException(status_code=400, detail=f"Error al obtener los Jugadores: {response.error.message}")
 
-    return response.data
+#     return response.data
 
-@router.get("/{id}", response_model=JugadorOut)
-def obtener_jugador(id: int):
-    response = supabase.table("jugadores").select("*, posicion_id:posiciones(nombre)").eq("id", id).execute()
 
-    if not response.data or len(response.data) == 0:
-        raise HTTPException(status_code=404, detail="Jugador no encontrado")
+# @router.get("/{id}", response_model=JugadorOut)
+# def obtener_jugador(id: int):
+#     response = supabase.table("jugadores").select("*, posicion_id:posiciones(nombre)").eq("id", id).execute()
 
-    jugador = response.data[0]
-    return jugador
+#     if not response.data or len(response.data) == 0:
+#         raise HTTPException(status_code=404, detail="Jugador no encontrado")
 
-@router.post("/", response_model=JugadorOut)
-def crear_jugador(jugador: JugadorCreate):
-    jugador_dict = jugador.dict()
-    
-    # Convertir fecha a string en formato ISO (YYYY-MM-DD)
-    jugador_dict["fecha_nac"] = jugador_dict["fecha_nac"].isoformat()
+#     jugador = response.data[0]
+#     return jugador
 
-    response = supabase.table("jugadores").insert(jugador_dict).execute()
 
-    if getattr(response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al crear el jugador: {response.error.message}")
+# @router.delete("/{id}")
+# def eliminar_jugador(id: int):
+#     response = supabase.table("jugadores").delete().eq("id", id).execute()
 
-    return response.data[0]
+#     if getattr(response, "error", None):
+#         raise HTTPException(status_code=400, detail=f"Error al eliminar el jugador: {response.error.message}")
 
-@router.delete("/{id}")
-def eliminar_jugador(id: int):
-    response = supabase.table("jugadores").delete().eq("id", id).execute()
+#     if response.data == 0:
+#         raise HTTPException(status_code=404, detail="Jugador no encontrado")
 
-    if getattr(response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al eliminar el jugador: {response.error.message}")
+#     return {"message": "Jugador eliminado correctamente"}
 
-    if response.data == 0:
-        raise HTTPException(status_code=404, detail="Jugador no encontrado")
 
-    return {"message": "Jugador eliminado correctamente"}
-
-@router.put("/{id}")
-def actualizar_jugador(id: int, jugador: JugadorUpdate):
-    # Convertimos a diccionario y eliminamos campos no enviados
-    datos_actualizados = jugador.dict(exclude_unset=True)
-
-    if not datos_actualizados:
-        raise HTTPException(status_code=400, detail="No se proporcionaron datos para actualizar")
-
-    # Comprobamos si el jugador existe
-    jugador_existente = supabase.table("jugadores").select("id").eq("id", id).execute()
-    if not jugador_existente.data:
-        raise HTTPException(status_code=404, detail="Jugador no encontrado")
-
-    # Hacemos el update
-    try:
-        respuesta = supabase.table("jugadores").update(datos_actualizados).eq("id", id).execute()
-        return {"mensaje": "Jugador actualizado correctamente", "datos": respuesta.data}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al actualizar jugador: {str(e)}")

@@ -5,33 +5,25 @@ from app.supabase_client import supabase
 
 router = APIRouter()
 
-@router.get("/", response_model=List[Entrenador])
-def get_entrenadores():
-    response = supabase.table("entrenadores").select("*").execute()
+# @router.get("/", response_model=List[Entrenador])
+# def get_entrenadores():
+#     response = supabase.table("entrenadores").select("*").execute()
 
-    if getattr (response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al obtener los entrenadores: {response.error.message}")
+#     if getattr (response, "error", None):
+#         raise HTTPException(status_code=400, detail=f"Error al obtener los entrenadores: {response.error.message}")
 
-    return response.data
+#     return response.data
 
-@router.get("/{entrenador_id}", response_model=EntrenadorOut)
-def obtener_entrenador(entrenador_id: int):
-    response = supabase.table("entrenadores").select("*").eq("id", entrenador_id).execute()
 
-    if not response.data or len(response.data) == 0:
-            raise HTTPException(status_code=404, detail="Entrenador no encontrado")
 
-    entrenador = response.data[0]
-    return entrenador
+# @router.post("/", response_model=EntrenadorOut)
+# def crear_entrenador(entrenador: EntrenadorCreate):
+#     response = supabase.table("entrenadores").insert(entrenador.dict()).execute()
 
-@router.post("/", response_model=EntrenadorOut)
-def crear_entrenador(entrenador: EntrenadorCreate):
-    response = supabase.table("entrenadores").insert(entrenador.dict()).execute()
+#     if getattr (response, "error", None):
+#         raise HTTPException(status_code=400, detail=f"Error al crear el entrenador: {response.error.message}")
 
-    if getattr (response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al crear el entrenador: {response.error.message}")
-
-    return response.data[0]
+#     return response.data[0]
 
 @router.delete("/{entrenador_id}")
 def eliminar_entrenador(entrenador_id: int):

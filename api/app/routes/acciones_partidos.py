@@ -1,11 +1,11 @@
 from fastapi import APIRouter, HTTPException
 from typing import List
-from app.models.accion_partido import AccionPartido, AccionPartidoCreate
+from app.models.acciones_partido import AccionesPartido, AccionesPartidoCreate
 from app.supabase_client import supabase
 
 router = APIRouter()
 
-@router.get("/", response_model=List[AccionPartido])
+@router.get("/", response_model=List[AccionesPartido])
 def get_acciones_partidos():
     
     response = supabase.table("acciones_partido").select("*").execute()
@@ -15,8 +15,8 @@ def get_acciones_partidos():
     
     return response.data
 
-@router.post("/", response_model=AccionPartidoCreate)
-def create_accion_partido(accion_partido: AccionPartidoCreate):
+@router.post("/", response_model=AccionesPartidoCreate)
+def create_accion_partido(accion_partido: AccionesPartidoCreate):
     
     response = supabase.table("acciones_partido").insert(accion_partido.dict()).execute()
 

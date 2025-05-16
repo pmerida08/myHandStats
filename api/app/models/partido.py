@@ -4,25 +4,31 @@ from datetime import datetime
 
 class Partido(BaseModel):
     id: int
-    equipo_id: int
-    equipo_rival: str
     fecha: datetime
+    goles_id_equipo: int
+    goles_id_equiporival: int
+    equiporival_id: str
+    equipos_id: int
 
     class Config:
         orm_mode = True
-
+        
 class PartidoCreate(BaseModel):
-    equipo_id: int
-    equipo_rival: str
-    fecha: Optional[datetime] = None
+    fecha: datetime
+    goles_id_equipo: int
+    goles_id_equiporival: int
+    equiporival_id: str
+    equipos_id: int
 
     class Config:
         orm_mode = True
 
 class PartidoUpdate(BaseModel):
-    equipo_id: Optional[int] = None
-    equipo_rival: Optional[str] = None
     fecha: Optional[datetime] = None
+    goles_id_equipo: Optional[int] = None
+    goles_id_equiporival: Optional[int] = None
+    equiporival_id: Optional[str] = None
+    equipos_id: Optional[int] = None
 
     class Config:
         orm_mode = True
@@ -35,9 +41,13 @@ class PartidoDelete(BaseModel):
 
 class PartidoOut(BaseModel):
     id: int
-    equipo_id: int
-    equipo_rival: str
     fecha: datetime
+    goles_id_equipo: int
+    goles_id_equiporival: int
+    equiporival_id: str
+    equipos_id: int
 
     class Config:
         orm_mode = True
+
+    

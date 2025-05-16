@@ -1,8 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
 
-class club_entrenador(BaseModel):
+class ClubEntrenador(BaseModel):
     club_id: int
     entrenador_id: int
 
