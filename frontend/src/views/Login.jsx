@@ -28,7 +28,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://https://myhandstats.onrender.com/login", {
+      const res = await fetch("http://myhandstats.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
