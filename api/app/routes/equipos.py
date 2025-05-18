@@ -5,6 +5,7 @@ from app.models.jugador import JugadorOut, JugadorCreate, JugadorUpdate
 from app.models.partido import PartidoOut, PartidoCreate
 from app.models.entrenador import EntrenadorOut, EntrenadorCreate, EntrenadorUpdate
 from app.models.jugador_partido import JugadorPartidoOut, JugadorPartidoCreate, JugadorPartidoUpdate
+from app.models.acciones_partido import AccionesPartidoOut, AccionesPartidoCreate, AccionesPartidoUpdate
 from app.supabase_client import supabase
 from app.services.auth import obtener_info_desde_token
 from datetime import datetime
@@ -222,6 +223,63 @@ def obtener_partidos_jugador_equipo(equipo_id: int, jugador_id: int, datos_token
     return partidos_data.data
 
 
+@router.get("/{equipo_id}/partido/{partido_id}/acciones_partido/", response_model=List[AccionesPartidoOut])
+def obtener_acciones_partido_equipo(equipo_id: int, partido_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
+    equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
+    if not equipo_data.data:
+        raise HTTPException(status_code=404, detail="Equipo no encontrado")
+    
+    if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
+        raise HTTPException(status_code=403, detail="No tienes permiso para ver las acciones de este partido")
+    
+    # Verificar que el partido está asociado al equipo
+    partido_data = supabase.table("partidos").select("*").eq("id", partido_id).eq("equipos_id", equipo_id).execute()
+    if not partido_data.data or len(partido_data.data) == 0:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+
+    # Obtener los jugadores_partido asociados a este partido
+    jugadores_partido = supabase.table("jugadores_partido").select("id").eq("partidos_id", partido_id).execute()
+    if not jugadores_partido.data or len(jugadores_partido.data) == 0:
+        raise HTTPException(status_code=404, detail="No se encontraron jugadores para este partido")
+
+    jugadores_partido_ids = [jp["id"] for jp in jugadores_partido.data]
+
+    # Obtener las acciones asociadas a esos jugadores_partido
+    acciones = supabase.table("acciones_partido").select("*").in_("jugadores_partido_id", jugadores_partido_ids).execute()
+    if not acciones.data or len(acciones.data) == 0:
+        raise HTTPException(status_code=404, detail="No se encontraron acciones para este partido")
+
+    return acciones.data
+
+
+@router.get("/{equipo_id}/partido/{partido_id}/accion_partido/{accion_partido_id}", response_model=AccionesPartidoOut)
+def obtener_accion_partido_equipo(equipo_id: int, partido_id: int, accion_partido_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
+    equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
+    if not equipo_data.data:
+        raise HTTPException(status_code=404, detail="Equipo no encontrado")
+    
+    if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
+        raise HTTPException(status_code=403, detail="No tienes permiso para ver las acciones de este partido")
+    
+    # Verificar que el partido está asociado al equipo
+    partido_data = supabase.table("partidos").select("*").eq("id", partido_id).eq("equipos_id", equipo_id).execute()
+    if not partido_data.data or len(partido_data.data) == 0:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+
+    # Verificar que la acción está asociada a un jugador_partido de este partido
+    accion = supabase.table("acciones_partido").select("*").eq("id", accion_partido_id).execute()
+    if not accion.data or len(accion.data) == 0:
+        raise HTTPException(status_code=404, detail="Acción no encontrada")
+    
+    # Comprobar que el jugador_partido de la acción pertenece al partido
+    jugador_partido_id = accion.data[0]["jugadores_partido_id"]
+    jugador_partido = supabase.table("jugadores_partido").select("*").eq("id", jugador_partido_id).eq("partidos_id", partido_id).execute()
+    if not jugador_partido.data or len(jugador_partido.data) == 0:
+        raise HTTPException(status_code=404, detail="La acción no pertenece a este partido")
+    
+    return accion.data[0]
+
+
 # @router.post("/", response_model=EquipoOut)
 # def crear_equipo(equipo: EquipoCreate):
 #     response = supabase.table("equipos").insert(equipo.dict()).execute()
@@ -335,6 +393,7 @@ def crear_jugador_partido_equipo(equipo_id: int, partido_id: int, jugador_partid
         raise HTTPException(status_code=400, detail=f"Error al crear el jugador_partido: {response.error.message}")
 
     return response.data[0]
+
 
 # @router.delete("/{equipo_id}")
 # def eliminar_equipo(equipo_id: int):
@@ -466,7 +525,7 @@ def actualizar_partido_equipo(equipo_id: int, partido_id: int, partido: PartidoC
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al actualizar el partido: {str(e)}")
     
-    
+
 @router.put("/{equipo_id}/partido/{partido_id}/jugador_partido/{jugador_partido_id}", response_model=JugadorPartidoOut)
 def actualizar_jugador_partido_equipo(equipo_id: int, partido_id: int, jugador_partido_id: int, jugador_partido: JugadorPartidoUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
