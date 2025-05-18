@@ -100,7 +100,7 @@ const Partidos = () => {
                   size="sm"
                   colorScheme="whiteAlpha"
                   variant="outline"
-                  onClick={() => navigate(`/partido/${partido.id}`)}
+                  onClick={() => navigate(`/resumen-partido/${partido.id}`)}
                 >
                   Ver Partido
                 </Button>
