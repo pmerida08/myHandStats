@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box, Flex, Icon, Text, Button, Grid, SimpleGrid, Select,
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter,
