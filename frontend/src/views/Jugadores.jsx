@@ -41,7 +41,7 @@ const Jugadores = () => {
     const body = {
       nombre: nuevoJugador.nombre,
       fecha_nac: nuevoJugador.fecha_nacimiento,
-      foto: null,
+      foto: "foto.jpg",
       dorsal: parseInt(nuevoJugador.dorsal),
       equipos_id: parseInt(equipoSeleccionado),
       posicion_id: nuevoJugador.posicion,
