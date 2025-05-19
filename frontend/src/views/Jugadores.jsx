@@ -1,12 +1,12 @@
-import { 
+import {
   Box, Text, SimpleGrid, IconButton, Avatar, Button,
   useBreakpointValue, Spinner, useDisclosure, Flex, Icon,
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter,
-  ModalBody, ModalCloseButton, FormControl, Input, VStack
+  ModalBody, ModalCloseButton, FormControl, Input, VStack, Select
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { FaPlus, FaUser, FaBars } from 'react-icons/fa';
-import Sidebar from '../components/Sidebar'; 
+import Sidebar from '../components/Sidebar';
 
 const Jugadores = () => {
   const gridCols = useBreakpointValue({ base: 1, sm: 2, md: 3, lg: 4 });
@@ -16,6 +16,7 @@ const Jugadores = () => {
   const [equipoSeleccionado, setEquipoSeleccionado] = useState('');
   const [jugadores, setJugadores] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [posiciones, setPosiciones] = useState([]);
 
   const [nuevoJugador, setNuevoJugador] = useState({
     nombre: '',
@@ -43,6 +44,7 @@ const Jugadores = () => {
       foto: null,
       dorsal: parseInt(nuevoJugador.dorsal),
       equipos_id: parseInt(equipoSeleccionado),
+      posicion_id: nuevoJugador.posicion,
       golesei: 0, golesli: 0, golesld: 0, goles7m: 0, golesc: 0,
       golesed: 0, golest: 0, golespi: 0, lanzamiento_7m: 0,
       lanzamientos: 0, perdidas: 0, recuperaciones: 0, exclusiones: 0,
@@ -101,9 +103,29 @@ const Jugadores = () => {
       .finally(() => setLoading(false));
   };
 
+  const cargarPosiciones = () => {
+    fetch('https://myhandstats.onrender.com/posiciones')
+      .then((res) => res.json())
+      .then((data) => setPosiciones(data))
+      .catch((err) => console.error('Error al cargar posiciones:', err));
+  };
+
   useEffect(() => {
     cargarJugadores();
+    cargarPosiciones();
   }, []);
+
+  const calcularEdad = (fechaNacimiento) => {
+  const hoy = new Date();
+  const nacimiento = new Date(fechaNacimiento);
+  let edad = hoy.getFullYear() - nacimiento.getFullYear();
+  const m = hoy.getMonth() - nacimiento.getMonth();
+  if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+    edad--;
+  }
+  return edad;
+  };
+
 
   return (
     <Box p={4} position="relative">
@@ -143,16 +165,14 @@ const Jugadores = () => {
                 {jugador.nombre}
               </Text>
               <Text fontSize="sm" color="gray.600">
-                Fecha de nacimiento:{" "}
-                {jugador.fecha_nac
-                  ? new Date(jugador.fecha_nac).toLocaleDateString("es-ES")
-                  : "—"}
+                Edad: {jugador.fecha_nac ? calcularEdad(jugador.fecha_nac) + ' años' : '—'}
               </Text>
+
               <Text fontSize="sm" color="gray.600">
                 Dorsal: {jugador.dorsal}
               </Text>
               <Text fontSize="sm" color="gray.600" mb={4}>
-                {jugador.posicion || "Sin posición"}
+                {jugador.posicion ? jugador.posicion.replace(/_/g, ' ') : "Sin posición"}
               </Text>
               <Button
                 bg="#014C4C"
@@ -201,7 +221,18 @@ const Jugadores = () => {
                 <Input name="dorsal" placeholder="Dorsal" value={nuevoJugador.dorsal} onChange={handleInputChange} />
               </FormControl>
               <FormControl>
-                <Input name="posicion" placeholder="Posición" value={nuevoJugador.posicion} onChange={handleInputChange} />
+                <Select
+                  name="posicion"
+                  placeholder="Selecciona una posición"
+                  value={nuevoJugador.posicion}
+                  onChange={(e) => setNuevoJugador(prev => ({ ...prev, posicion: parseInt(e.target.value) }))}
+                >
+                  {posiciones.map((pos) => (
+                    <option key={pos.id} value={pos.id}>
+                      {pos.nombre.replace(/_/g, ' ')}
+                    </option>
+                  ))}
+                </Select>
               </FormControl>
             </VStack>
           </ModalBody>
