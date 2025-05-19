@@ -28,6 +28,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             <MenuItem icon={FaFutbol} label="Partidos" onClick={() => handleNavigate('/partidos')} />
             <MenuItem icon={FaPlusCircle} label="Nuevo Partido" onClick={() => handleNavigate('/nuevo-partido')} />
             <MenuItem icon={FaChartBar} label="Estadísticas avanzadas" onClick={() => handleNavigate('/estadisticas')} />
+            <MenuItem icon={FaUser} label="Seleccionar Equipo" onClick={() => handleNavigate('/seleccionar-equipo')} />
           </Flex>
         </DrawerBody>
       </DrawerContent>

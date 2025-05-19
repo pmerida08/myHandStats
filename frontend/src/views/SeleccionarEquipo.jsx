@@ -6,14 +6,20 @@ import {
   Text,
   Button,
   Flex,
+  Icon,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaBars } from 'react-icons/fa';
+import Sidebar from '../components/Sidebar';
 
 const SeleccionEquipo = () => {
   const [equipos, setEquipos] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const token = localStorage.getItem('token');
 
@@ -41,16 +47,23 @@ const SeleccionEquipo = () => {
 
   const handleSeleccion = (equipo) => {
     console.log('Equipo seleccionado:', equipo);
-    localStorage.setItem('id_equipo', equipo.id); // Guarda el ID del club
-    navigate('/dashboard'); // Redirige al dashboard
+    localStorage.setItem('id_equipo', equipo.id);
+    navigate('/dashboard');
   };
 
   return (
-    <Box p={6}>
+    <Box p={6} minH="100vh" bg="white">
+      {/* Sidebar desplegable */}
+      <Sidebar isOpen={isOpen} onClose={onClose} />
+
+      {/* Header con icono de menú y título */}
       <Flex justify="space-between" align="center" mb={6}>
+        <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
         <Heading size="lg" color="#014C4C">Selecciona tu equipo</Heading>
+        <Box w="6" />
       </Flex>
 
+      {/* Contenido principal */}
       {loading ? (
         <Box textAlign="center" mt={10}>
           <Spinner size="xl" color="teal.600" />
