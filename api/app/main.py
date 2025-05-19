@@ -14,6 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 app.include_router(login.router, prefix="/login")
 app.include_router(register.router, prefix="/register")
 app.include_router(usuarios.router, prefix="/usuario")
