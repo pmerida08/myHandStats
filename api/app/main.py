@@ -8,11 +8,12 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  
+    allow_origins=["http://localhost:5173", "https://myhandstats.netlify.app"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 app.include_router(login.router, prefix="/login")
 app.include_router(register.router, prefix="/register")
@@ -25,7 +26,7 @@ app.include_router(partidos.router, prefix="/partidos")
 app.include_router(posiciones.router, prefix="/posiciones")
 app.include_router(fases_juego.router, prefix="/fases_juego")
 app.include_router(jugadores_partidos.router, prefix="/jugadores_partidos")
-app.include_router(acciones_partidos.router, prefix="/acciones_partidos")
+app.include_router(acciones_partidos.router, prefix="/accion_partido")
 app.include_router(clubes_entradores.router, prefix="/clubes_entradores")
 app.include_router(acciones_fases.router, prefix="/accion_fases")
 app.include_router(entrenadores.router, prefix="/entrenadores")
