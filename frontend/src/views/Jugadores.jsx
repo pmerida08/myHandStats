@@ -100,7 +100,7 @@ const crearJugador = () => {
     robo: 0
   };
 
-  fetch(`https://myhandstats.onrender.com/equipos/${equipoSeleccionado}/jugador/`, {
+  fetch(`https://myhandstats.onrender.com/equipo/${equipoSeleccionado}/jugador/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

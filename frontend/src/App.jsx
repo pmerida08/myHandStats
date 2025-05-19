@@ -7,6 +7,7 @@ import DashboardPartido from "./views/DashboardPartido.jsx";
 import Jugadores from "./views/Jugadores.jsx";
 import Partidos from "./views/Partidos.jsx";
 import ResumenPartido from "./views/ResumenPartido.jsx";  
+import SeleccionarEquipo from "./views/SeleccionarEquipo.jsx";
 import './index.css';
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/nuevo-partido" element={<DashboardPartido />} />
         <Route path="/jugadores" element={<Jugadores />} />
         <Route path="/partidos" element={<Partidos />} />
+        <Route path="/seleccionar-equipo" element={<SeleccionarEquipo />} />
         <Route path="/resumen-partido/:equipo_id/:partido_id" element={<ResumenPartido />} />
       </Routes>
     </BrowserRouter>
