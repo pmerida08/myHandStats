@@ -29,7 +29,9 @@ const Login = () => {
 
   const handleLogin = async (email, password) => {
     try {
-      const res = await fetch("http://https://myhandstats.onrender.com/login", {
+      setError(""); // Limpiar error anterior
+
+      const response = await fetch("https://myhandstats.onrender.com/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
