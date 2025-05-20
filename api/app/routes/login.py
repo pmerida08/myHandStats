@@ -11,5 +11,7 @@ def login(data: LoginRequest):
     if not usuario:
         raise HTTPException(status_code=400, detail="Credenciales incorrectas")
     
-    token = generar_token(usuario["email"], usuario["id"], usuario["clubs_id"], usuario["rol"])
+    print(usuario)  # <-- Añade esto temporalmente para depurar
+
+    token = generar_token(usuario["nombre"], usuario["email"], usuario["id"], usuario["clubs_id"], usuario["rol"])
     return {"access_token": token, "token_type": "bearer"}

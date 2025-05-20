@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box, Flex, Icon, Text, Button, Grid, SimpleGrid, Select,
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter,
@@ -237,7 +237,7 @@ return (
             'Gol en Contra', 'Pérdida', 'Amarilla', 'Roja', 'Azul', '2 Minutos', 'Recupe.'
           ].map((accion) =>
             typeof accion === 'string' ? (
-              <Button key={accion} size="sm" variant="outline" onClick={() => handleAccion(accion)}>{accion}</Button>
+              <Button key={accion}  padding="16dp" variant="outline" onClick={() => handleAccion(accion)}>{accion}</Button>
             ) : (
               <Button
                 key={accion.label}
