@@ -26,7 +26,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
+ 
   const handleLogin = async (email, password) => {
     try {
       setError(""); // Limpiar error anterior
@@ -50,7 +50,7 @@ const Login = () => {
       localStorage.setItem("token", data.access_token);
 
       // ✅ Redirigir a otra vista tras login
-      navigate("/dashboard"); // cámbialo por la ruta deseada
+      navigate("/seleccionar-equipo"); // cámbialo por la ruta deseada
     } catch (error) {
       setError(error.message || "Error al iniciar sesión");
       console.error("Error al iniciar sesión:", error.message);

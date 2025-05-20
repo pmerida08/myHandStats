@@ -14,9 +14,10 @@ def verificar_password(hashed_password: str, plain_password: str) -> bool:
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 
-def generar_token(email: str, user_id: int, clubs_id: int, rol: str):
+def generar_token(nombre: str, email: str, user_id: int, clubs_id: int, rol: str):
     expire = datetime.utcnow() + timedelta(minutes=EXPIRATION_MINUTES)
     payload = {
+        "nombre": nombre,
         "sub": email,  
         "id": user_id,
         "clubs_id": clubs_id,
@@ -38,6 +39,7 @@ def obtener_info_desde_token(token: str = Depends(oauth2_scheme)):
     try:
         # Decodifica el token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        nombre: str = payload.get("nombre")
         email: str = payload.get("sub")  # Asegúrate de que el email esté en "sub"
         user_id: int = payload.get("id")
         clubs_id: int = payload.get("clubs_id")
@@ -46,6 +48,7 @@ def obtener_info_desde_token(token: str = Depends(oauth2_scheme)):
         if email is None:
             raise credentials_exception
         return {
+            "nombre": nombre,
             "email": email,
             "user_id": user_id,
             "clubs_id": clubs_id,

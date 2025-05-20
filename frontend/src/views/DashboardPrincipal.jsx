@@ -1,12 +1,37 @@
-import React from 'react';
+import { useEffect, useState } from "react";
 import {
-  Box, Text, Flex, Icon, Button, Grid, Divider, useDisclosure
-} from '@chakra-ui/react';
-import { FaBars, FaArrowUp, FaArrowDown } from 'react-icons/fa';
-import Sidebar from '../components/Sidebar'; 
+  Box,
+  Text,
+  Flex,
+  Icon,
+  Button,
+  Grid,
+  Divider,
+  useDisclosure,
+  Avatar,
+} from "@chakra-ui/react";
+import { FaBars, FaArrowUp, FaArrowDown } from "react-icons/fa";
+import Sidebar from "../components/Sidebar";
 
 const DashboardPrincipal = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token"); // o donde guardes tu token
+    fetch("https://myhandstats.onrender.com/usuario/perfil", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {      
+        console.log("Nombre de usuario:", data.info);
+        
+        setUserName(data.info.nombre);
+      })
+      .catch(() => setUserName("Usuario"));
+  }, []);
 
   return (
     <Box p={4} minH="100vh" bg="white">
@@ -16,17 +41,32 @@ const DashboardPrincipal = () => {
       {/* Header con título y hamburguesa */}
       <Flex align="center" justify="space-between" mb={8}>
         <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-        <Text fontSize="2xl" fontWeight="bold" color="#014C4C">Dashboard</Text>
-        <Box w="6" />
+        <Text fontSize="2xl" fontWeight="bold" color="#014C4C">
+          Dashboard
+          {console.log("Nombre de usuario:", userName)}
+        </Text>
+
+        {/* Avatar de usuario */}
+        <Flex align="center" gap={2}>
+          <Text fontSize="sm" color="#014C4C">
+            {userName}
+          </Text>
+          <Avatar
+            name={userName}
+            src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/sign/imagenes/perfil.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzUwNmYzZWZkLTg5ZDktNGI0YS1hZjMwLTdjYzQyY2Q0MjcyMCJ9.eyJ1cmwiOiJpbWFnZW5lcy9wZXJmaWwuanBnIiwiaWF0IjoxNzQ3Njc1NjIyLCJleHAiOjE3NzkyMTE2MjJ9.paxIryVGuoxiwBFFusk7ZS4aONm1S4S06XYEuk3D2bI"
+          />
+        </Flex>
       </Flex>
 
       {/* Grid principal */}
-      <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={6}>
+      <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
         {/* Goles últimos partidos */}
         <Box borderWidth="1px" borderRadius="md" p={4}>
           <Flex justify="space-between" mb={2}>
             <Text fontWeight="bold">Goles últimos partidos</Text>
-            <Button size="sm" variant="outline">View Report</Button>
+            <Button size="sm" variant="outline">
+              View Report
+            </Button>
           </Flex>
           <Flex align="center" gap={2} color="green.500" fontSize="sm" mb={2}>
             <Icon as={FaArrowUp} />
@@ -46,7 +86,9 @@ const DashboardPrincipal = () => {
         <Box borderWidth="1px" borderRadius="md" p={4}>
           <Flex justify="space-between" mb={2}>
             <Text fontWeight="bold">Fases del Juego últimos partidos</Text>
-            <Button size="sm" variant="ghost" isDisabled>View Report</Button>
+            <Button size="sm" variant="ghost" isDisabled>
+              View Report
+            </Button>
           </Flex>
           <Text fontSize="sm">Aún no hay registros</Text>
         </Box>
@@ -73,7 +115,9 @@ const DashboardPrincipal = () => {
         <Box borderWidth="1px" borderRadius="md" p={4}>
           <Flex justify="space-between" mb={2}>
             <Text fontWeight="bold">Order</Text>
-            <Button size="sm" variant="outline">View Report</Button>
+            <Button size="sm" variant="outline">
+              View Report
+            </Button>
           </Flex>
           <Flex align="center" gap={2} color="red.500" fontSize="sm" mb={2}>
             <Icon as={FaArrowDown} />

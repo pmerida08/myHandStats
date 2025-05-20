@@ -1,45 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box, Text, Flex, Icon, Button, SimpleGrid, useDisclosure, Spinner, Select, Circle, VStack
+  Box, Text, Flex, Icon, Button, SimpleGrid, useDisclosure, Spinner, Circle, VStack
 } from '@chakra-ui/react';
 import { FaBars } from 'react-icons/fa';
 import Sidebar from '../components/Sidebar';
 import { useNavigate } from 'react-router-dom';
 
 const Partidos = () => {
-  const [equipos, setEquipos] = useState([]);
-  const [equipoSeleccionado, setEquipoSeleccionado] = useState("");
   const [partidos, setPartidos] = useState([]);
   const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
+  const equipo_id = localStorage.getItem("equipo_id"); // <-- Tomamos el ID guardado
 
-  // Obtener equipos
   useEffect(() => {
-    fetch('https://myhandstats.onrender.com/club/equipos', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setEquipos(data);
-        } else {
-          console.error('Respuesta inesperada:', data);
-          setEquipos([]);
-        }
-      })
-      .catch((err) => console.error('Error al cargar equipos:', err));
-  }, []);
-
-  // Obtener partidos al seleccionar equipo
-  useEffect(() => {
-    if (!equipoSeleccionado) return;
+    if (!equipo_id) return;
     setLoading(true);
-    fetch(`https://myhandstats.onrender.com/equipo/${equipoSeleccionado}/partidos`, {
+    fetch(`https://myhandstats.onrender.com/equipo/${equipo_id}/partidos`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -51,7 +30,7 @@ const Partidos = () => {
       })
       .catch((err) => console.error("Error al cargar partidos", err))
       .finally(() => setLoading(false));
-  }, [equipoSeleccionado]);
+  }, [equipo_id]);
 
   return (
     <Box p={4} minH="100vh" bg="white">
@@ -62,22 +41,6 @@ const Partidos = () => {
         <Text fontSize="2xl" fontWeight="bold" color="#014C4C">Partidos</Text>
         <Box w="6" />
       </Flex>
-
-      <Box maxW="300px" mb={6} mx="auto">
-        <Select
-          placeholder="Selecciona un equipo"
-          value={equipoSeleccionado}
-          onChange={(e) => {
-            const id = e.target.value;
-            setEquipoSeleccionado(id);
-            localStorage.setItem("equipo_id", id);
-          }}
-        >
-          {equipos.map((equipo) => (
-            <option key={equipo.id} value={equipo.id}>{equipo.nombre}</option>
-          ))}
-        </Select>
-      </Box>
 
       {loading ? (
         <Flex justify="center" mt={10}><Spinner size="xl" /></Flex>

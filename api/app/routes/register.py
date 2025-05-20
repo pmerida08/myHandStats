@@ -8,6 +8,11 @@ router = APIRouter()
 @router.post("/", response_model=UsuarioOut)
 def crear_usuario(usuario: UsuarioCreate):
     try:
+        # Comprobar si ya existe un usuario con ese email
+        usuario_existente = supabase.table("usuarios").select("*").eq("email", usuario.email).execute()
+        if usuario_existente.data and len(usuario_existente.data) > 0:
+            raise HTTPException(status_code=400, detail="Ya existe un usuario registrado con ese email")
+
         # 1. Crear el club ya que cada usuario que se registre tendra un club asociado
         data_club = {"nombre": f"Club de {usuario.nombre}"}
         response_club = supabase.table("clubes").insert(data_club).execute()

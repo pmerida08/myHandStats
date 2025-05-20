@@ -35,17 +35,14 @@ const Registrar = () => {
       return
     }
 
-    // 🔒 Simulación de registro sin API
-    // Cuando tengas backend, descomenta el bloque de fetch de abajo
-
-    /*
+    
     try {
-      const res = await fetch('http://localhost:8000/registrar', {
+      const res = await fetch('https://localhost:8000/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ nombre, email, password }),
+        body: JSON.stringify({ nombre, email, password, rol: "", clubs_id: "" }), 
       })
 
       const data = await res.json()
@@ -61,7 +58,7 @@ const Registrar = () => {
       alert('Error de conexión con el servidor')
       return
     }
-    */
+    
 
     alert('Registro simulado con éxito')
     navigate('/')
