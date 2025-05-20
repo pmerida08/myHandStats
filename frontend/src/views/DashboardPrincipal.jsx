@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Text,
@@ -18,11 +18,17 @@ const DashboardPrincipal = () => {
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    fetch("https://myhandstats.onrender.com/usuario/perfil")
+    const token = localStorage.getItem("token"); // o donde guardes tu token
+    fetch("https://myhandstats.onrender.com/usuario/perfil", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
-      .then((data) => {
-        // Ajusta esto según la estructura real de tu respuesta   
-        setUserName(data.info.nombre || "Usuario");
+      .then((data) => {      
+        console.log("Nombre de usuario:", data.info);
+        
+        setUserName(data.info.nombre);
       })
       .catch(() => setUserName("Usuario"));
   }, []);
@@ -37,6 +43,7 @@ const DashboardPrincipal = () => {
         <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
         <Text fontSize="2xl" fontWeight="bold" color="#014C4C">
           Dashboard
+          {console.log("Nombre de usuario:", userName)}
         </Text>
 
         {/* Avatar de usuario */}
