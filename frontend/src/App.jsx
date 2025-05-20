@@ -8,12 +8,14 @@ import Jugadores from "./views/Jugadores.jsx";
 import Partidos from "./views/Partidos.jsx";
 import ResumenPartido from "./views/ResumenPartido.jsx";  
 import SeleccionarEquipo from "./views/SeleccionarEquipo.jsx";
+import LandingPage from "./views/LandingPage.jsx";
 import './index.css';
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/registrar" element={<Registrar />} />
         <Route path="/admin" element={<VistaAdmin />} />
         <Route path="/dashboard" element={<DashboardPrincipal />} />
