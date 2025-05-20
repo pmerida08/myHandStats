@@ -42,8 +42,8 @@ const Sidebar = ({ isOpen, onClose }) => {
             {isAdmin && (
               <MenuItem icon={FaBuilding} label="Club" onClick={() => handleNavigate('/club')} />
             )}
-          </Flex>
             <MenuItem icon={FaChartBar} label="Estadísticas avanzadas" onClick={() => handleNavigate('/estadisticas')} />
+          </Flex>
         </DrawerBody>
       </DrawerContent>
     </Drawer>
