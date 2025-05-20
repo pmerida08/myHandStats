@@ -12,10 +12,16 @@ import {
 } from "@chakra-ui/react";
 import { FaBars, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
+import { Doughnut } from "react-chartjs-2";
+import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
+Chart.register(ArcElement, Tooltip, Legend);
 
 const DashboardPrincipal = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [userName, setUserName] = useState("");
+  const [club, setClub] = useState([]);
+  const [partido, setPartido] = useState("");
+  const [jugador, setJugador] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token"); // o donde guardes tu token
@@ -25,13 +31,46 @@ const DashboardPrincipal = () => {
       },
     })
       .then((res) => res.json())
-      .then((data) => {      
-        console.log("Nombre de usuario:", data.info);
-        
+      .then((data) => {
         setUserName(data.info.nombre);
       })
       .catch(() => setUserName("Usuario"));
   }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    // Supón que tienes el id del club del usuario en una variable clubIdUsuario
+    // Si lo tienes en el perfil, puedes guardarlo en el estado al obtener el perfil
+    const clubIdUsuario = localStorage.getItem("club_id"); // o donde lo guardes
+
+    fetch("https://myhandstats.onrender.com/club", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        // Asegúrate de que clubIdUsuario sea un número si los ids son numéricos
+        const clubData = data.info.find((club) => club.id === Number(clubIdUsuario));
+        if (clubData) {
+          setClub({ nombre: clubData.nombre, logo: clubData.logo });
+        } else {
+          setClub({ nombre: "Club no encontrado", logo: "" });
+        }
+      })
+      .catch(() => setClub({ nombre: "Club ejemplo", logo: "Logo ejemplo" }));
+  }, []);
+
+  const golesData = {
+    labels: ["Goles a favor", "Goles en contra"],
+    datasets: [
+      {
+        data: [12, 8], // Reemplaza con tus datos reales
+        backgroundColor: ["#014C4C", "#e2e8f0"],
+        borderWidth: 1,
+      },
+    ],
+  };
 
   return (
     <Box p={4} minH="100vh" bg="white">
@@ -41,10 +80,15 @@ const DashboardPrincipal = () => {
       {/* Header con título y hamburguesa */}
       <Flex align="center" justify="space-between" mb={8}>
         <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-        <Text fontSize="2xl" fontWeight="bold" color="#014C4C">
-          Dashboard
-          {console.log("Nombre de usuario:", userName)}
-        </Text>
+        <Flex align="center" gap={3}>
+          <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
+            Dashboard
+          </Text>
+          <Avatar name={club.nombre} src={club.logo} />
+          <Text fontSize="sm" color="gray.500">
+            {club.nombre}
+          </Text>
+        </Flex>
 
         {/* Avatar de usuario */}
         <Flex align="center" gap={2}>
@@ -68,13 +112,11 @@ const DashboardPrincipal = () => {
               View Report
             </Button>
           </Flex>
-          <Flex align="center" gap={2} color="green.500" fontSize="sm" mb={2}>
-            <Icon as={FaArrowUp} />
-            <Text>0% vs last week</Text>
-          </Flex>
-          <Text fontSize="sm">Aún no hay registros</Text>
+          <Box h="200px" w="200px" mx="auto">
+            <Doughnut data={golesData} />
+          </Box>
           <Divider my={4} />
-          <Flex gap={4}>
+          <Flex gap={4} justify="center">
             <Box h={2} w={2} borderRadius="full" bg="#014C4C" />
             <Text fontSize="xs">Goles a favor</Text>
             <Box h={2} w={2} borderRadius="full" bg="gray.300" />

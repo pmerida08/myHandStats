@@ -66,7 +66,7 @@ class RegisterRequest(BaseModel):
     nombre: str
     email: str
     password: str
-    rol: str = "administrador"
+    rol: str = "admin"
 
     class Config:
         orm_mode = True

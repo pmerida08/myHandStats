@@ -5,7 +5,7 @@ from app.supabase_client import supabase
 
 router = APIRouter()
 
-@router.get("/", response_model=List[JugadorPartido])
+@router.get("/", response_model=List[JugadorPartido]) # NO VA
 def get_jugadores_partidos():
     response = supabase.table("jugadores_partidos").select("*, jugador_id:jugadores(nombre), partido_id:partidos(fecha)").execute()
 
