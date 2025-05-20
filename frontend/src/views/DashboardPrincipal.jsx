@@ -19,7 +19,7 @@ Chart.register(ArcElement, Tooltip, Legend);
 const DashboardPrincipal = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [userName, setUserName] = useState("");
-  const [club, setClub] = useState("");
+  const [club, setClub] = useState([]);
   const [partido, setPartido] = useState("");
   const [jugador, setJugador] = useState("");
 
@@ -33,23 +33,32 @@ const DashboardPrincipal = () => {
       .then((res) => res.json())
       .then((data) => {
         setUserName(data.info.nombre);
-        setClub(data.info.club_id);
       })
       .catch(() => setUserName("Usuario"));
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("token"); // o donde guardes tu token
-    fetch("https://myhandstats.onrender.com/jugadores_partidos", {
+    const token = localStorage.getItem("token");
+    // Supón que tienes el id del club del usuario en una variable clubIdUsuario
+    // Si lo tienes en el perfil, puedes guardarlo en el estado al obtener el perfil
+    const clubIdUsuario = localStorage.getItem("club_id"); // o donde lo guardes
+
+    fetch("https://myhandstats.onrender.com/club", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        // Asegúrate de que clubIdUsuario sea un número si los ids son numéricos
+        const clubData = data.info.find((club) => club.id === Number(clubIdUsuario));
+        if (clubData) {
+          setClub({ nombre: clubData.nombre, logo: clubData.logo });
+        } else {
+          setClub({ nombre: "Club no encontrado", logo: "" });
+        }
       })
-      .catch(() => console.log("Error al obtener los datos del jugador"));
+      .catch(() => setClub({ nombre: "Club ejemplo", logo: "Logo ejemplo" }));
   }, []);
 
   const golesData = {
@@ -71,10 +80,15 @@ const DashboardPrincipal = () => {
       {/* Header con título y hamburguesa */}
       <Flex align="center" justify="space-between" mb={8}>
         <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-        <Text fontSize="2xl" fontWeight="bold" color="#014C4C">
-          Dashboard
-          {/* {console.log("Nombre de usuario:", userName)} */}
-        </Text>
+        <Flex align="center" gap={3}>
+          <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
+            Dashboard
+          </Text>
+          <Avatar name={club.nombre} src={club.logo} />
+          <Text fontSize="sm" color="gray.500">
+            {club.nombre}
+          </Text>
+        </Flex>
 
         {/* Avatar de usuario */}
         <Flex align="center" gap={2}>
