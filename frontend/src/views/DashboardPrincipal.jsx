@@ -12,10 +12,16 @@ import {
 } from "@chakra-ui/react";
 import { FaBars, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
+import { Doughnut } from "react-chartjs-2";
+import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
+Chart.register(ArcElement, Tooltip, Legend);
 
 const DashboardPrincipal = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [userName, setUserName] = useState("");
+  const [club, setClub] = useState("");
+  const [partido, setPartido] = useState("");
+  const [jugador, setJugador] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token"); // o donde guardes tu token
@@ -25,13 +31,37 @@ const DashboardPrincipal = () => {
       },
     })
       .then((res) => res.json())
-      .then((data) => {      
-        console.log("Nombre de usuario:", data.info);
-        
+      .then((data) => {
         setUserName(data.info.nombre);
+        setClub(data.info.club_id);
       })
       .catch(() => setUserName("Usuario"));
   }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token"); // o donde guardes tu token
+    fetch("https://myhandstats.onrender.com/jugadores_partidos", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+      })
+      .catch(() => console.log("Error al obtener los datos del jugador"));
+  }, []);
+
+  const golesData = {
+    labels: ["Goles a favor", "Goles en contra"],
+    datasets: [
+      {
+        data: [12, 8], // Reemplaza con tus datos reales
+        backgroundColor: ["#014C4C", "#e2e8f0"],
+        borderWidth: 1,
+      },
+    ],
+  };
 
   return (
     <Box p={4} minH="100vh" bg="white">
@@ -43,7 +73,7 @@ const DashboardPrincipal = () => {
         <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
         <Text fontSize="2xl" fontWeight="bold" color="#014C4C">
           Dashboard
-          {console.log("Nombre de usuario:", userName)}
+          {/* {console.log("Nombre de usuario:", userName)} */}
         </Text>
 
         {/* Avatar de usuario */}
@@ -68,13 +98,11 @@ const DashboardPrincipal = () => {
               View Report
             </Button>
           </Flex>
-          <Flex align="center" gap={2} color="green.500" fontSize="sm" mb={2}>
-            <Icon as={FaArrowUp} />
-            <Text>0% vs last week</Text>
-          </Flex>
-          <Text fontSize="sm">Aún no hay registros</Text>
+          <Box h="200px" w="200px" mx="auto">
+            <Doughnut data={golesData} />
+          </Box>
           <Divider my={4} />
-          <Flex gap={4}>
+          <Flex gap={4} justify="center">
             <Box h={2} w={2} borderRadius="full" bg="#014C4C" />
             <Text fontSize="xs">Goles a favor</Text>
             <Box h={2} w={2} borderRadius="full" bg="gray.300" />
