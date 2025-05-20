@@ -1,66 +1,56 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from typing import List
-from app.models.jugador_partido import JugadorPartido, JugadorPartidoCreate, JugadorPartidoUpdate, JugadorPartidoOut
+from app.models.club_entrenador import ClubEntrenador, ClubEntrenadorCreate, ClubEntrenadorUpdate, ClubEntrenadorDelete, ClubEntrenadorOut
 from app.supabase_client import supabase
 
 router = APIRouter()
 
-@router.get("/", response_model=List[JugadorPartido])
-def get_jugadores_partidos():
-    response = supabase.table("jugadores_partidos").select("*, jugador_id:jugadores(nombre), partido_id:partidos(fecha)").execute()
+# @router.get("/", response_model=List[ClubEntrenadorOut])
+# def get_clubes_entrenadores():
+#     response = supabase.table("clubes_entrenadores").select("*").execute()
 
-    if getattr(response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al obtener los JugadoresPartidos: {response.error.message}")
+#     if getattr(response, "error", None):
+#         raise HTTPException(status_code=400, detail=f"Error al obtener los clubes-entrenadores: {response.error.message}")
 
-    return response.data
+#     return response.data
 
-@router.get("/{id}", response_model=JugadorPartidoOut)
-def obtener_jugador_partido(id: int):
-    response = supabase.table("jugadores_partidos").select("*, jugador_id:jugadores(nombre), partido_id:partidos(fecha)").eq("id", id).execute()
+# @router.post("/", response_model=ClubEntrenadorOut)
+# def crear_club_entrenador(club_entrenador: ClubEntrenadorCreate):
+#     response = supabase.table("clubes_entrenadores").insert(club_entrenador.dict()).execute()
 
-    if not response.data or len(response.data) == 0:
-        raise HTTPException(status_code=404, detail="JugadorPartido no encontrado")
+#     if getattr(response, "error", None):
+#         raise HTTPException(status_code=400, detail=f"Error al crear el club-entrenador: {response.error.message}")
 
-    jugador_partido = response.data[0]
-    return jugador_partido
+#     return response.data[0]
 
-@router.post("/", response_model=JugadorPartidoOut)
-def crear_jugador_partido(jugador_partido: JugadorPartidoCreate):
-    response = supabase.table("jugadores_partidos").insert(jugador_partido.dict()).execute()
+# @router.delete("/{club_id}/{entrenador_id}")
+# def eliminar_club_entrenador(club_id: int, entrenador_id: int):
+#     response = supabase.table("clubes_entrenadores").delete().eq("club_id", club_id).eq("entrenador_id", entrenador_id).execute()
 
-    if getattr(response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al crear el jugador_partido: {response.error.message}")
+#     if getattr(response, "error", None):
+#         raise HTTPException(status_code=400, detail=f"Error al eliminar el club-entrenador: {response.error.message}")
 
-    return response.data[0]
+#     if response.data == 0:
+#         raise HTTPException(status_code=404, detail="Club-entrenador no encontrado")
 
-@router.delete("/{id}")
-def eliminar_jugador_partido(id: int):
-    response = supabase.table("jugadores_partidos").delete().eq("id", id).execute()
+#     return {"message": "Club-entrenador eliminado correctamente"}
 
-    if getattr(response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al eliminar el jugador_partido: {response.error.message}")
+# @router.put("/{club_id}/{entrenador_id}")
+# def actualizar_club_entrenador(club_id: int, entrenador_id: int, club_entrenador: ClubEntrenadorUpdate):
+#     datos_actualizados = club_entrenador.dict(exclude_unset=True)
 
-    if response.data == 0:
-        raise HTTPException(status_code=404, detail="JugadorPartido no encontrado")
-
-    return {"message": "JugadorPartido eliminado correctamente"}
-
-@router.put("/{id}")
-def actualizar_jugador_partido(id: int, jugador_partido: JugadorPartidoUpdate):
-    # Convertimos a diccionario y eliminamos campos no enviados
-    datos_actualizados = jugador_partido.dict(exclude_unset=True)
-
-    if not datos_actualizados:
-        raise HTTPException(status_code=400, detail="No se proporcionaron datos para actualizar")
-
-    # Comprobamos si el jugador_partido existe
-    jugador_partido_existente = supabase.table("jugadores_partidos").select("id").eq("id", id).execute()
-    if not jugador_partido_existente.data:
-        raise HTTPException(status_code=404, detail="JugadorPartido no encontrado")
-
-    response = supabase.table("jugadores_partidos").update(datos_actualizados).eq("id", id).execute()
-
-    if getattr(response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al actualizar el jugador_partido: {response.error.message}")
-
-    return response.data[0]
+#     if not datos_actualizados:
+#         raise HTTPException(status_code=400, detail="No se proporcionaron datos para actualizar")
+    
+#     club_entrenador_existente = supabase.table("clubes_entrenadores").select("*").eq("club_id", club_id).eq("entrenador_id", entrenador_id).execute()
+#     if not club_entrenador_existente.data or len(club_entrenador_existente.data) == 0:
+#         raise HTTPException(status_code=404, detail="Club-entrenador no encontrado")
+    
+#     try:
+#         respuesta = supabase.table("clubes_entrenadores").update(datos_actualizados).eq("club_id", club_id).eq("entrenador_id", entrenador_id).execute()
+#         if getattr(respuesta, "error", None):
+#             raise HTTPException(status_code=400, detail=f"Error al actualizar el club-entrenador: {respuesta.error.message}")
+        
+#         return {"message": "Club-entrenador actualizado correctamente"}
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
