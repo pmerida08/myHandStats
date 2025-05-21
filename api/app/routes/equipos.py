@@ -76,24 +76,52 @@ def obtener_entrenador_equipo(equipo_id: int, entrenador_id: int, datos_token: d
 
     return entrenador_data.data[0]
 
-
 @router.get("/{equipo_id}/jugadores/", response_model=List[JugadorOut])
-def obtener_jugadores_equipo(equipo_id: int , datos_token: dict = Depends(obtener_info_desde_token)):
-
+def obtener_jugadores_equipo(equipo_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
 
+    if not equipo_data.data:
+        raise HTTPException(status_code=404, detail="Equipo no encontrado")
     if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
         raise HTTPException(status_code=403, detail="No tienes permiso para ver los jugadores de este equipo")
-    
-    if not equipo_data.data:
-        raise HTTPException(status_code=404, detail="Equipo no encontrado")    
 
     response = supabase.table("jugadores").select("*").eq("equipos_id", equipo_id).execute()
-
     if not response.data or len(response.data) == 0:
         raise HTTPException(status_code=404, detail="No se encontraron jugadores para este equipo")
 
-    return response.data
+    jugadores = response.data
+
+    # Obtener posiciones para todos los jugadores de este equipo
+    jugador_ids = [jugador["id"] for jugador in jugadores]
+    posiciones_resp = supabase.table("jugador_posicion").select("*").in_("jugador_id", jugador_ids).execute()
+    posiciones = posiciones_resp.data if posiciones_resp.data else []
+
+    # Obtener todos los ids de posición únicos
+    posicion_ids = list({pos["posicion_id"] for pos in posiciones})
+    # Obtener los nombres de las posiciones
+    posiciones_nombres_resp = supabase.table("posiciones").select("*").in_("id", posicion_ids).execute()
+    posiciones_nombres = posiciones_nombres_resp.data if posiciones_nombres_resp.data else []
+
+    # Mapear id de posición a nombre
+    id_a_nombre = {p["id"]: p["nombre"] for p in posiciones_nombres}
+
+    # Mapear id de posición a objeto PosicionOut
+    id_a_posicion = {p["id"]: {"id": p["id"], "nombre": p["nombre"]} for p in posiciones_nombres}
+
+    # Mapear jugador_id a su(s) posición(es) (como objetos)
+    posiciones_map = {}
+    for pos in posiciones:
+        if pos["jugador_id"] not in posiciones_map:
+            posiciones_map[pos["jugador_id"]] = []
+        posicion_obj = id_a_posicion.get(pos["posicion_id"])
+        if posicion_obj:
+            posiciones_map[pos["jugador_id"]].append(posicion_obj)
+
+    # Añadir la(s) posición(es) al jugador
+    for jugador in jugadores:
+        jugador["posiciones"] = posiciones_map.get(jugador["id"], [])
+
+    return jugadores
 
 
 @router.get("/{equipo_id}/jugador/{jugador_id}", response_model=JugadorOut)
@@ -427,7 +455,7 @@ def actualizar_equipo(id: int, equipo: EquipoUpdate, datos_token: dict = Depends
         raise HTTPException(status_code=400, detail="No se proporcionaron datos para actualizar")
     
     equipo_existente = supabase.table("equipos").select("*").eq("id", id).execute()
-    if not equipo_existente.data or len(equipo_existente.data) == 0:
+    if not equipo_existante.data or len(equipo_existente.data) == 0:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
     
     try:

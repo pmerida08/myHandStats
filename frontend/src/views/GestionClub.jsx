@@ -1,30 +1,59 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Heading, Text, Button, Stack } from "@chakra-ui/react";
-
-// Simulación: reemplaza esto con tu contexto real de autenticación
-const useAuth = () => {
-  return {
-    token: {
-      rol: "admin", // o "user", para probar redirección
-      clubs_id: 1,
-    },
-  };
-};
+import {
+  Box, Heading, Text, Button, Stack, Icon, Flex, useDisclosure, Spinner, Center
+} from "@chakra-ui/react";
+import { FaBars } from "react-icons/fa";
+import Sidebar from '../components/Sidebar';
 
 const ClubAdminPanel = () => {
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const [token, setToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
-    if (token.rol !== "admin") {
-      navigate("/dashboard");
+    const storedToken = localStorage.getItem("token");
+
+    if (storedToken) {
+      try {
+        const decodedToken = JSON.parse(atob(storedToken.split('.')[1]));
+        if (decodedToken.rol !== "admin") {
+          navigate("/dashboard");
+        } else {
+          setToken(decodedToken);
+        }
+      } catch (error) {
+        console.error("Error al decodificar el token", error);
+        navigate("/login");
+      }
+    } else {
+      navigate("/login");
     }
-  }, [token, navigate]);
+
+    setIsLoading(false);
+  }, [navigate]);
+
+  if (isLoading) {
+    return (
+      <Center h="100vh">
+        <Spinner size="xl" />
+      </Center>
+    );
+  }
+
+  if (!token) return null;
 
   return (
     <Box p={6}>
-      <Heading mb={4}>Panel de Administración del Club</Heading>
+      <Sidebar isOpen={isOpen} onClose={onClose} />
+
+      <Flex align="center" justify="space-between" mb={6}>
+        <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
+        <Heading size="lg">Panel de Administración del Club</Heading>
+        <Box w="6" />
+      </Flex>
+
       <Text mb={6}>Bienvenido, administrador. Aquí puedes gestionar tu club.</Text>
 
       <Stack spacing={4}>

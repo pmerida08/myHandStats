@@ -14,7 +14,11 @@ import { FaBars, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import { Doughnut } from "react-chartjs-2";
 import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
+import AuthWrapper from "../components/AuthWrapper";
+
 Chart.register(ArcElement, Tooltip, Legend);
+
+
 
 const DashboardPrincipal = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -73,6 +77,7 @@ const DashboardPrincipal = () => {
   };
 
   return (
+    <AuthWrapper requiredRole={null}>
     <Box p={4} minH="100vh" bg="white">
       {/* Sidebar desplegable */}
       <Sidebar isOpen={isOpen} onClose={onClose} />
@@ -169,6 +174,7 @@ const DashboardPrincipal = () => {
         </Box>
       </Grid>
     </Box>
+    </AuthWrapper>
   );
 };
 

@@ -8,3 +8,10 @@ class Posicion(BaseModel):
 
     class Config:
         orm_mode = True
+
+class PosicionOut(BaseModel):
+    id: int
+    nombre: str
+
+    class Config:
+        orm_mode = True

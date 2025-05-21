@@ -14,7 +14,10 @@ import { useNavigate } from 'react-router-dom';
 import { FaBars } from 'react-icons/fa';
 import Sidebar from '../components/Sidebar';
 
+
 const SeleccionEquipo = () => {
+
+
   const [equipos, setEquipos] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
