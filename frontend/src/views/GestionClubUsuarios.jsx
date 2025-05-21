@@ -46,6 +46,8 @@ const UsuariosClubAdmin = () => {
     rol: "",
   });
 
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [clubId, setClubId] = useState(null);
   const [token, setToken] = useState(null);
   const [isTokenLoading, setIsTokenLoading] = useState(true);
@@ -61,10 +63,8 @@ const UsuariosClubAdmin = () => {
           navigate("/dashboard");
         } else {
           setToken(storedToken);
-          setClubId(decodedToken.clubs_id);  // <-- Obtener clubs_id
+          setClubId(decodedToken.clubs_id);
         }
-
-    
       } catch (error) {
         console.error("Error al decodificar el token", error);
         navigate("/login");
@@ -104,10 +104,8 @@ const UsuariosClubAdmin = () => {
       email: nuevoUsuario.email,
       password: nuevoUsuario.contraseña,
       rol: nuevoUsuario.rol,
-      clubs_id: clubId, 
+      clubs_id: clubId,
     };
-
-    
 
     fetch("https://myhandstats.onrender.com/club/usuario/register", {
       method: "POST",
@@ -150,6 +148,80 @@ const UsuariosClubAdmin = () => {
       });
   };
 
+  const editarUsuario = () => {
+    if (nuevoUsuario.contraseña && nuevoUsuario.contraseña !== nuevoUsuario.confirmarContraseña) {
+      toast({
+        title: "Las contraseñas no coinciden.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    const usuarioEditado = {
+      nombre: nuevoUsuario.nombre,
+      email: nuevoUsuario.email,
+      rol: nuevoUsuario.rol,
+      ...(nuevoUsuario.contraseña && { password: nuevoUsuario.contraseña }),
+    };
+
+    fetch(`https://myhandstats.onrender.com/club/usuario/${usuarioSeleccionado.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(usuarioEditado),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al editar usuario");
+        return res.json();
+      })
+      .then(() => {
+        toast({
+          title: "Usuario actualizado exitosamente",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        setIsModalOpen(false);
+        setNuevoUsuario({
+          nombre: "",
+          email: "",
+          contraseña: "",
+          confirmarContraseña: "",
+          rol: "",
+        });
+        setModoEdicion(false);
+        setUsuarioSeleccionado(null);
+        cargarUsuarios();
+      })
+      .catch((err) => {
+        console.error("Error al editar usuario:", err);
+        toast({
+          title: "Error al editar usuario",
+          description: err.message,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+      });
+  };
+
+  const abrirModalEdicion = (usuario) => {
+    setModoEdicion(true);
+    setUsuarioSeleccionado(usuario);
+    setNuevoUsuario({
+      nombre: usuario.nombre,
+      email: usuario.email,
+      contraseña: "",
+      confirmarContraseña: "",
+      rol: usuario.rol,
+    });
+    setIsModalOpen(true);
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNuevoUsuario((prev) => ({ ...prev, [name]: value }));
@@ -187,36 +259,46 @@ const UsuariosClubAdmin = () => {
           </Box>
         ) : (
           <SimpleGrid columns={gridCols} spacing={6}>
-            {usuarios.map((usuario) => (
-              <Box
-                key={usuario.id}
-                bg="#e0f7f7"
-                borderRadius="2xl"
-                boxShadow="lg"
-                p={6}
-                textAlign="center"
-                maxW="320px"
-                w="100%"
-                mx="auto"
-                transition="all 0.3s ease"
-                _hover={{
-                  transform: "translateY(-5px)",
-                  boxShadow: "xl",
-                  bg: "#d3f0f0",
-                }}
-              >
-                <Avatar icon={<FaUser />} size="2xl" bg="#a8dadc" mb={4} />
-                <Text fontWeight="bold" fontSize="lg" color="#014C4C" mb={1}>
-                  {usuario.nombre}
-                </Text>
-                <Text fontSize="sm" color="gray.600" mb={1}>
-                  Email: {usuario.email}
-                </Text>
-                <Text fontSize="sm" color="gray.600">
-                  Rol: {usuario.rol}
-                </Text>
-              </Box>
-            ))}
+            {usuarios
+              .filter((usuario) => usuario.rol !== "admin") // <-- Filtra los admin
+              .map((usuario) => (
+                <Box
+                  key={usuario.id}
+                  bg="#e0f7f7"
+                  borderRadius="2xl"
+                  boxShadow="lg"
+                  p={6}
+                  textAlign="center"
+                  maxW="320px"
+                  w="100%"
+                  mx="auto"
+                  transition="all 0.3s ease"
+                  _hover={{
+                    transform: "translateY(-5px)",
+                    boxShadow: "xl",
+                    bg: "#d3f0f0",
+                  }}
+                >
+                  <Avatar icon={<FaUser />} size="2xl" bg="#a8dadc" mb={4} />
+                  <Text fontWeight="bold" fontSize="lg" color="#014C4C" mb={1}>
+                    {usuario.nombre}
+                  </Text>
+                  <Text fontSize="sm" color="gray.600" mb={1}>
+                    Email: {usuario.email}
+                  </Text>
+                  <Text fontSize="sm" color="gray.600">
+                    Rol: {usuario.rol}
+                  </Text>
+                  <Button
+                    size="sm"
+                    colorScheme="teal"
+                    mt={3}
+                    onClick={() => abrirModalEdicion(usuario)}
+                  >
+                    Editar
+                  </Button>
+                </Box>
+              ))}
           </SimpleGrid>
         )}
 
@@ -232,7 +314,17 @@ const UsuariosClubAdmin = () => {
           aria-label="Añadir usuario"
           boxShadow="lg"
           _hover={{ bg: "#013C3C" }}
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setModoEdicion(false);
+            setNuevoUsuario({
+              nombre: "",
+              email: "",
+              contraseña: "",
+              confirmarContraseña: "",
+              rol: "",
+            });
+            setIsModalOpen(true);
+          }}
         />
 
         <Modal
@@ -243,7 +335,7 @@ const UsuariosClubAdmin = () => {
         >
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Crear Nuevo Usuario</ModalHeader>
+            <ModalHeader>{modoEdicion ? "Editar Usuario" : "Crear Nuevo Usuario"}</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <VStack spacing={4}>
@@ -296,8 +388,8 @@ const UsuariosClubAdmin = () => {
               </VStack>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme="teal" mr={3} onClick={crearUsuario}>
-                Crear
+              <Button colorScheme="teal" mr={3} onClick={modoEdicion ? editarUsuario : crearUsuario}>
+                {modoEdicion ? "Guardar cambios" : "Crear"}
               </Button>
               <Button variant="ghost" onClick={() => setIsModalOpen(false)}>
                 Cancelar
