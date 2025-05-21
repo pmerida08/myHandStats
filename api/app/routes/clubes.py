@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.services.auth import obtener_info_desde_token
 from typing import List
-from app.models.usuario import UsuarioOut, UsuarioCreate
+from app.models.usuario import UsuarioOut, UsuarioCreate, UsuarioUpdate
 from app.models.equipo import EquipoOut, EquipoCreate
 from app.models.entrenador import EntrenadorOut, EntrenadorCreate
 from app.utils.hashing import hash_password
@@ -167,7 +167,6 @@ def actualizar_club(club_data: ClubUpdate, datos_token: dict = Depends(obtener_i
 
     return response.data[0]
 
-
 @router.put("/equipo/{equipo_id}")
 def actualizar_equipo(equipo_id: int, equipo_data: EquipoCreate, datos_token: dict = Depends(obtener_info_desde_token)):
     # Solo los administradores pueden actualizar el equipo
@@ -184,10 +183,15 @@ def actualizar_equipo(equipo_id: int, equipo_data: EquipoCreate, datos_token: di
     return response.data[0]
 
 @router.put("usuario/{usuario_id}")
-def actualizar_usuario(usuario_id: int, usuario_data: UsuarioCreate, datos_token: dict = Depends(obtener_info_desde_token)):
+def actualizar_usuario(usuario_id: int, usuario_data: UsuarioUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
     # Solo los administradores pueden actualizar el usuario
     if datos_token["rol"] != "admin":
         raise HTTPException(status_code=403, detail="Solo los administradores pueden actualizar el usuario")
+    
+    # Comprobar si el usuario pertenece al club
+    usuario = supabase.table("usuarios").select("*").eq("id", usuario_id).eq("clubs_id", datos_token["clubs_id"]).execute()
+    if not usuario.data or len(usuario.data) == 0:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado o no pertenece al club")
 
     # Actualizar el usuario con el id_club del token
     data = usuario_data.dict(exclude_unset=True)
