@@ -64,13 +64,13 @@ const ClubAdminPanel = () => {
           <Button colorScheme="blue" onClick={() => navigate("/club/usuarios")}>
             Gestionar Usuarios
           </Button>
-          <Button colorScheme="green" onClick={() => navigate("/admin/equipos")}>
+          <Button colorScheme="green" onClick={() => navigate("/club/equipos")}>
             Gestionar Equipos
           </Button>
-          <Button colorScheme="purple" onClick={() => navigate("/admin/entrenadores")}>
+          <Button colorScheme="purple" onClick={() => navigate("/club/entrenadores")}>
             Gestionar Entrenadores
           </Button>
-          <Button colorScheme="orange" onClick={() => navigate("/admin/club")}>
+          <Button colorScheme="orange" onClick={() => navigate("/club/info")}>
             Editar Información del Club
           </Button>
         </Stack>

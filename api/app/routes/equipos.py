@@ -455,35 +455,6 @@ def crear_jugador_partido_equipo(equipo_id: int, partido_id: int, jugador_partid
 #         raise HTTPException(status_code=404, detail="Equipo no encontrado")
 
 #     return {"message": "Equipo eliminado correctamente"}
-
-
-@router.put("/{id}")
-def actualizar_equipo(id: int, equipo: EquipoUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
-    if datos_token["rol"] != "admin":
-        raise HTTPException(status_code=403, detail="Solo administradores pueden actualizar equipos")
-    
-    # Verificar si el equipo pertenece al club del usuario
-    equipo_data = supabase.table("equipos").select("*").eq("id", id).execute()
-    if not equipo_data.data:
-        raise HTTPException(status_code=404, detail="Equipo no encontrado")
-    
-    if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
-        raise HTTPException(status_code=403, detail="No tienes permiso para actualizar este equipo")
-    
-    datos_actualizados = equipo.dict(exclude_unset=True)
-
-    if not datos_actualizados:
-        raise HTTPException(status_code=400, detail="No se proporcionaron datos para actualizar")
-    
-    equipo_existente = supabase.table("equipos").select("*").eq("id", id).execute()
-    if not equipo_existante.data or len(equipo_existente.data) == 0:
-        raise HTTPException(status_code=404, detail="Equipo no encontrado")
-    
-    try:
-        respuesta = supabase.table("equipos").update(datos_actualizados).eq("id", id).execute()
-        return {"mensaje": "Equipo actualizado correctamente", "datos_actualizados": respuesta.data}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al actualizar el equipo: {str(e)}")
     
 
 @router.put("{equipo_id}/jugador/{id}")
