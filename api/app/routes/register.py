@@ -1,9 +1,15 @@
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from app.models.usuario import UsuarioCreate, UsuarioOut
 from app.supabase_client import supabase
 from app.utils.hashing import hash_password
+from app.services.auth import generar_token  # debes tener esta función definida
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 router = APIRouter()
+
+GOOGLE_CLIENT_ID = "580062200389-hblem47late6qfggkg4iv8gnba20ih91.apps.googleusercontent.com"
 
 @router.post("/", response_model=UsuarioOut)
 def crear_usuario(usuario: UsuarioCreate):
@@ -13,7 +19,7 @@ def crear_usuario(usuario: UsuarioCreate):
         if usuario_existente.data and len(usuario_existente.data) > 0:
             raise HTTPException(status_code=400, detail="Ya existe un usuario registrado con ese email")
 
-        # 1. Crear el club ya que cada usuario que se registre tendra un club asociado
+        # Crear el club
         data_club = {"nombre": f"Club de {usuario.nombre}"}
         response_club = supabase.table("clubes").insert(data_club).execute()
 
@@ -22,10 +28,10 @@ def crear_usuario(usuario: UsuarioCreate):
 
         club_id = response_club.data[0]["id"]
 
-        # 2. Crear el usuario con el club_id
+        # Crear el usuario
         data_usuario = usuario.dict()
         data_usuario["password"] = hash_password(data_usuario["password"])
-        data_usuario["rol"] = "admin"  
+        data_usuario["rol"] = "admin"
         data_usuario["clubs_id"] = club_id
 
         response_user = supabase.table("usuarios").insert(data_usuario).execute()
@@ -38,3 +44,62 @@ def crear_usuario(usuario: UsuarioCreate):
     except Exception as e:
         print("Error en registro:", e)
         raise HTTPException(status_code=500, detail="Error al registrar el usuario")
+
+
+# -----------------------------------------
+# REGISTRO CON GOOGLE
+# -----------------------------------------
+
+class GoogleRegisterRequest(BaseModel):
+    credential: str
+
+@router.post("/google", response_model=UsuarioOut)
+def registrar_con_google(payload: GoogleRegisterRequest):
+    try:
+        idinfo = id_token.verify_oauth2_token(
+            payload.credential,
+            requests.Request(),
+            GOOGLE_CLIENT_ID
+        )
+
+        email = idinfo["email"]
+        nombre = idinfo.get("name", "Sin Nombre")
+
+        # Comprobar si ya existe
+        usuario_existente = supabase.table("usuarios").select("*").eq("email", email).execute()
+
+        if usuario_existente.data and len(usuario_existente.data) > 0:
+            usuario = usuario_existente.data[0]
+            return UsuarioOut(**usuario)
+
+        # Crear club
+        data_club = {"nombre": f"Club de {nombre}"}
+        response_club = supabase.table("clubes").insert(data_club).execute()
+
+        if not response_club.data:
+            raise HTTPException(status_code=500, detail="No se pudo crear el club")
+
+        club_id = response_club.data[0]["id"]
+
+        # Crear usuario
+        data_usuario = {
+            "nombre": nombre,
+            "email": email,
+            "password": "",  # vacío porque se autentica con Google
+            "rol": "admin",
+            "clubs_id": club_id
+        }
+
+        response_user = supabase.table("usuarios").insert(data_usuario).execute()
+
+        if not response_user.data:
+            raise HTTPException(status_code=500, detail="No se pudo crear el usuario")
+
+        return UsuarioOut(**response_user.data[0])
+    
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Token de Google inválido")
+    
+    except Exception as e:
+        print("Error en registro con Google:", e)
+        raise HTTPException(status_code=500, detail="Error al registrar con Google")
