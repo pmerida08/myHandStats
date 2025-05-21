@@ -340,28 +340,49 @@ def crear_partido(id_equipo: int, partido: PartidoCreate, datos_token: dict = De
     response = supabase.table("partidos").insert(data).execute()
     return response.data[0]
 
-
 @router.post("/{id_equipo}/jugador/", response_model=JugadorOut)
 def crear_jugador_equipo(id_equipo: int, jugador: JugadorCreate, datos_token: dict = Depends(obtener_info_desde_token)):
-
     equipo_data = supabase.table("equipos").select("*").eq("id", id_equipo).execute()
     if not equipo_data.data:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
     if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
         raise HTTPException(status_code=403, detail="No tienes permiso para crear jugadores para este equipo")
-    
-    # Convertir a diccionario y eliminar campos no enviados
-    jugador_dict = jugador.dict()
-    
-    # Convertir fecha a string en formato ISO (YYYY-MM-DD)
+
+    posiciones = jugador.posiciones
+    jugador_dict = jugador.dict(exclude={"posiciones"})
     jugador_dict["fecha_nac"] = jugador_dict["fecha_nac"].isoformat()
 
     response = supabase.table("jugadores").insert(jugador_dict).execute()
-
     if getattr(response, "error", None):
         raise HTTPException(status_code=400, detail=f"Error al crear el jugador: {response.error.message}")
 
-    return response.data[0]
+    nuevo_jugador_id = response.data[0]["id"]
+
+    if posiciones:
+        relacion_posiciones = [
+            {"jugador_id": nuevo_jugador_id, "posicion_id": pos_id}
+            for pos_id in posiciones
+        ]
+        resp_rel = supabase.table("jugador_posicion").insert(relacion_posiciones).execute()
+        if getattr(resp_rel, "error", None):
+            raise HTTPException(status_code=400, detail=f"Error al asignar posiciones: {resp_rel.error.message}")
+
+    jugador_completo = supabase.table("jugadores").select(
+        "*, jugador_posicion(posicion_id, posiciones!inner(*))"
+    ).eq("id", nuevo_jugador_id).execute()
+
+    if not jugador_completo.data:
+        return response.data[0]
+
+    jugador_raw = jugador_completo.data[0]
+    jugador_raw["posiciones"] = [
+        pos["posiciones"]
+        for pos in jugador_raw.get("jugador_posicion", [])
+        if pos.get("posiciones")
+    ]
+    jugador_raw.pop("jugador_posicion", None)
+
+    return jugador_raw
 
 
 @router.post("/{equipo_id}/entrenador/", response_model=EntrenadorOut)
