@@ -9,7 +9,7 @@ import {
   Text,
   Image,
 } from '@chakra-ui/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 
 const avatars = [
@@ -35,14 +35,13 @@ const Registrar = () => {
       return
     }
 
-    
     try {
-      const res = await fetch('https://localhost:8000/register', {
+      const res = await fetch('https://myhandstats.onrender.com/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ nombre, email, password, rol: "", clubs_id: "" }), 
+        body: JSON.stringify({ nombre, email, password, rol: "", clubs_id: "" }),
       })
 
       const data = await res.json()
@@ -53,16 +52,47 @@ const Registrar = () => {
       }
 
       alert('Usuario registrado con éxito')
+      navigate('/')
     } catch (error) {
       console.error(error)
       alert('Error de conexión con el servidor')
-      return
     }
-    
-
-    alert('Registro simulado con éxito')
-    navigate('/')
   }
+
+  const handleGoogleRegister = async (response) => {
+    try {
+      const googleToken = response.credential
+      const res = await fetch('https://myhandstats.onrender.com/register/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: googleToken }),
+      })
+
+      if (!res.ok) throw new Error('Error en registro con Google')
+
+      const data = await res.json()
+      localStorage.setItem('token', data.access_token)
+      navigate('/seleccionar-equipo')
+    } catch (error) {
+      alert(error.message || 'Error al registrarse con Google')
+    }
+  }
+
+  useEffect(() => {
+    const clientId = '580062200389-hblem47late6qfggkg4iv8gnba20ih91.apps.googleusercontent.com'
+
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleRegister,
+      })
+
+      window.google.accounts.id.renderButton(
+        document.getElementById('google-register-button'),
+        { theme: 'outline', size: 'large' }
+      )
+    }
+  }, [])
 
   return (
     <Box
@@ -74,18 +104,6 @@ const Registrar = () => {
       position="relative"
       overflow="hidden"
     >
-      <Box
-        position="absolute"
-        top="0"
-        left="0"
-        w="100%"
-        h="100%"
-        backgroundRepeat="no-repeat"
-        backgroundSize="cover"
-        backgroundPosition="center"
-        zIndex={0}
-      />
-
       <Container maxW="container.sm" zIndex={1}>
         <Box
           bg="white"
@@ -145,7 +163,9 @@ const Registrar = () => {
             </Stack>
           </form>
 
-          <Box>
+          <Box id="google-register-button" mt={4}></Box>
+
+          <Box mt={6}>
             <Text fontWeight="bold" fontSize="lg">
               Únete <Text as="span" color="#F43F5E">a</Text> MyHandStats
             </Text>
