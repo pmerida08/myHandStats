@@ -10,6 +10,8 @@ import ResumenPartido from "./views/ResumenPartido.jsx";
 import SeleccionarEquipo from "./views/SeleccionarEquipo.jsx";
 import LandingPage from "./views/LandingPage.jsx";
 import GestionClub from "./views/GestionClub.jsx";
+import GestionClubUsuarios from "./views/GestionClubUsuarios.jsx";
+
 import './index.css';
 function App() {
   return (
@@ -26,6 +28,7 @@ function App() {
         <Route path="/seleccionar-equipo" element={<SeleccionarEquipo />} />
         <Route path="/resumen-partido/:equipo_id/:partido_id" element={<ResumenPartido />} />
         <Route path="/club" element={<GestionClub />} />
+        <Route path="/club/usuarios" element={<GestionClubUsuarios />} />
       </Routes>
     </BrowserRouter>
   );

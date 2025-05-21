@@ -7,6 +7,8 @@ import {
 import { FaBars, FaPlus } from 'react-icons/fa';
 import Sidebar from '../components/Sidebar';
 import { useNavigate } from 'react-router-dom';
+import AuthWrapper from "../components/AuthWrapper";
+
 
 const Partidos = () => {
   const [partidos, setPartidos] = useState([]);
@@ -97,6 +99,7 @@ const Partidos = () => {
   };
 
   return (
+    <AuthWrapper requiredRole={null}>
     <Box p={4} minH="100vh" bg="white" position="relative">
       <Sidebar isOpen={isOpen} onClose={onClose} />
 
@@ -189,6 +192,7 @@ const Partidos = () => {
         </ModalContent>
       </Modal>
     </Box>
+    </AuthWrapper>
   );
 };
 

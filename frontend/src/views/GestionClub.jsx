@@ -5,6 +5,9 @@ import {
 } from "@chakra-ui/react";
 import { FaBars } from "react-icons/fa";
 import Sidebar from '../components/Sidebar';
+import AuthWrapper from "../components/AuthWrapper";
+
+
 
 const ClubAdminPanel = () => {
   const navigate = useNavigate();
@@ -45,32 +48,34 @@ const ClubAdminPanel = () => {
   if (!token) return null;
 
   return (
-    <Box p={6}>
-      <Sidebar isOpen={isOpen} onClose={onClose} />
+    <AuthWrapper requiredRole={null}>
+      <Box p={6}>
+        <Sidebar isOpen={isOpen} onClose={onClose} />
 
-      <Flex align="center" justify="space-between" mb={6}>
-        <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-        <Heading size="lg">Panel de Administración del Club</Heading>
-        <Box w="6" />
-      </Flex>
+        <Flex align="center" justify="space-between" mb={6}>
+          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
+          <Heading size="lg">Panel de Administración del Club</Heading>
+          <Box w="6" />
+        </Flex>
 
-      <Text mb={6}>Bienvenido, administrador. Aquí puedes gestionar tu club.</Text>
+        <Text mb={6}>Bienvenido, administrador. Aquí puedes gestionar tu club.</Text>
 
-      <Stack spacing={4}>
-        <Button colorScheme="blue" onClick={() => navigate("/admin/usuarios")}>
-          Gestionar Usuarios
-        </Button>
-        <Button colorScheme="green" onClick={() => navigate("/admin/equipos")}>
-          Gestionar Equipos
-        </Button>
-        <Button colorScheme="purple" onClick={() => navigate("/admin/entrenadores")}>
-          Gestionar Entrenadores
-        </Button>
-        <Button colorScheme="orange" onClick={() => navigate("/admin/club")}>
-          Editar Información del Club
-        </Button>
-      </Stack>
-    </Box>
+        <Stack spacing={4}>
+          <Button colorScheme="blue" onClick={() => navigate("/club/usuarios")}>
+            Gestionar Usuarios
+          </Button>
+          <Button colorScheme="green" onClick={() => navigate("/admin/equipos")}>
+            Gestionar Equipos
+          </Button>
+          <Button colorScheme="purple" onClick={() => navigate("/admin/entrenadores")}>
+            Gestionar Entrenadores
+          </Button>
+          <Button colorScheme="orange" onClick={() => navigate("/admin/club")}>
+            Editar Información del Club
+          </Button>
+        </Stack>
+      </Box>
+    </AuthWrapper>
   );
 };
 
