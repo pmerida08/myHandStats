@@ -182,7 +182,7 @@ def actualizar_equipo(equipo_id: int, equipo_data: EquipoCreate, datos_token: di
 
     return response.data[0]
 
-@router.put("usuario/{usuario_id}")
+@router.put("/usuario/{usuario_id}")
 def actualizar_usuario(usuario_id: int, usuario_data: UsuarioUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
     # Solo los administradores pueden actualizar el usuario
     if datos_token["rol"] != "admin":
