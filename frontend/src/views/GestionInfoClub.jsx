@@ -28,11 +28,18 @@ import { FaBars, FaEdit } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 import { useNavigate } from "react-router-dom";
+import { createClient } from "@supabase/supabase-js";
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://rdpazmfdbcundrogccsb.supabase.co";
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkcGF6bWZkYmN1bmRyb2djY3NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1MTA4MjksImV4cCI6MjA2MjA4NjgyOX0.sSfVgFsJvoFYnl-jc-wJabyYUisgwgDv1jwU9rpzsw4";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const ClubInfo = () => {
   const [clubInfo, setClubInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({});
+  const [logoFile, setLogoFile] = useState(null); // NUEVO
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,7 +51,6 @@ const ClubInfo = () => {
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       try {
-        // Decoding token for validation, but not using the decoded value
         JSON.parse(atob(storedToken.split(".")[1]));
         setToken(storedToken);
       } catch (error) {
@@ -61,23 +67,21 @@ const ClubInfo = () => {
     if (!token) return;
     setLoading(true);
     fetch("https://myhandstats.onrender.com/club/", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => {
         setClubInfo(data);
         setFormData(data);
       })
-      .catch((err) => {
+      .catch((err) =>
         toast({
           title: "Error al cargar información del club",
           status: "error",
           description: err.message,
           isClosable: true,
-        });
-      })
+        })
+      )
       .finally(() => setLoading(false));
   }, [token, toast]);
 
@@ -86,38 +90,68 @@ const ClubInfo = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const guardarCambios = () => {
-    fetch("https://myhandstats.onrender.com/club/", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Error al actualizar club");
-        return res.json();
-      })
-      .then(() => {
-        toast({
-          title: "Información actualizada correctamente",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        setClubInfo(formData);
-        setIsModalOpen(false);
-      })
-      .catch((err) => {
-        toast({
-          title: "Error al actualizar",
-          description: err.message,
-          status: "error",
-          duration: 4000,
-          isClosable: true,
-        });
+  const handleFileChange = (e) => {
+    setLogoFile(e.target.files[0]); // NUEVO
+  };
+
+  const subirLogo = async () => {
+    if (!logoFile) return null;
+    const fileExt = logoFile.name.split(".").pop();
+    const fileName = `club_${Date.now()}.${fileExt}`;
+    const { error } = await supabase.storage
+      .from("logos") // Asegúrate de tener este bucket
+      .upload(fileName, logoFile);
+
+    if (error) {
+      throw error;
+    }
+
+    const { data: urlData } = await supabase.storage
+      .from("logos")
+      .getPublicUrl(fileName);
+
+    return urlData.publicUrl;
+  };
+
+  const guardarCambios = async () => {
+    try {
+      let logoUrl = formData.logo;
+
+      if (logoFile) {
+        logoUrl = await subirLogo();
+      }
+
+      const bodyData = { ...formData, logo: logoUrl };
+
+      const res = await fetch("https://myhandstats.onrender.com/club/", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(bodyData),
       });
+
+      if (!res.ok) throw new Error("Error al actualizar club");
+
+      toast({
+        title: "Información actualizada correctamente",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+
+      setClubInfo(bodyData);
+      setIsModalOpen(false);
+    } catch (err) {
+      toast({
+        title: "Error al actualizar",
+        description: err.message,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+    }
   };
 
   if (isTokenLoading) {
@@ -130,7 +164,7 @@ const ClubInfo = () => {
 
   return (
     <AuthWrapper requiredRole={null}>
-      <Box p={4} position="relative">
+      <Box p={4}>
         <Sidebar isOpen={isOpen} onClose={onClose} />
         <Flex align="center" justify="space-between" mb={8}>
           <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
@@ -178,13 +212,7 @@ const ClubInfo = () => {
           <Text>No se encontró información del club.</Text>
         )}
 
-        {/* Modal de edición */}
-        <Modal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          isCentered
-          size="lg"
-        >
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} isCentered size="lg">
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>Editar Información del Club</ModalHeader>
@@ -192,62 +220,28 @@ const ClubInfo = () => {
             <ModalBody>
               <VStack spacing={4}>
                 <FormControl>
-                  <Input
-                    name="nombre"
-                    placeholder="Nombre del club"
-                    value={formData.nombre || ""}
-                    onChange={handleInputChange}
-                  />
+                  <Input name="nombre" placeholder="Nombre del club" value={formData.nombre || ""} onChange={handleInputChange} />
                 </FormControl>
                 <FormControl>
-                  <Textarea
-                    name="descripcion"
-                    placeholder="Descripción"
-                    value={formData.descripcion || ""}
-                    onChange={handleInputChange}
-                  />
+                  <Textarea name="descripcion" placeholder="Descripción" value={formData.descripcion || ""} onChange={handleInputChange} />
                 </FormControl>
                 <FormControl>
-                  <Input
-                    name="logo"
-                    placeholder="URL del logo"
-                    value={formData.logo || ""}
-                    onChange={handleInputChange}
-                  />
+                  <Input type="file" onChange={handleFileChange} accept="image/*" /> {/* NUEVO */}
                 </FormControl>
                 <FormControl>
-                  <Input
-                    name="tel_contacto"
-                    placeholder="Teléfono de contacto"
-                    value={formData.tel_contacto || ""}
-                    onChange={handleInputChange}
-                  />
+                  <Input name="tel_contacto" placeholder="Teléfono de contacto" value={formData.tel_contacto || ""} onChange={handleInputChange} />
                 </FormControl>
                 <FormControl>
-                  <Input
-                    name="suscripcion_at"
-                    placeholder="Tipo de suscripción"
-                    value={formData.suscripcion_at || ""}
-                    onChange={handleInputChange}
-                  />
+                  <Input name="suscripcion_at" placeholder="Tipo de suscripción" value={formData.suscripcion_at || ""} onChange={handleInputChange} />
                 </FormControl>
                 <FormControl>
-                  <Input
-                    name="fecha_suscrip"
-                    type="date"
-                    value={formData.fecha_suscrip || ""}
-                    onChange={handleInputChange}
-                  />
+                  <Input name="fecha_suscrip" type="date" value={formData.fecha_suscrip || ""} onChange={handleInputChange} />
                 </FormControl>
               </VStack>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme="teal" onClick={guardarCambios}>
-                Guardar
-              </Button>
-              <Button onClick={() => setIsModalOpen(false)} ml={3}>
-                Cancelar
-              </Button>
+              <Button colorScheme="teal" onClick={guardarCambios}>Guardar</Button>
+              <Button onClick={() => setIsModalOpen(false)} ml={3}>Cancelar</Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
