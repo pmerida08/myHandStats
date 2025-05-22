@@ -12,6 +12,7 @@ import {
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 
+
 const avatars = [
   'https://randomuser.me/api/portraits/women/65.jpg',
   'https://randomuser.me/api/portraits/women/75.jpg',
