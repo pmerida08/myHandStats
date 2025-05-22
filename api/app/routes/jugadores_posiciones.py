@@ -6,8 +6,8 @@ from app.supabase_client import supabase
 router = APIRouter()
 
 @router.get("/", response_model=List[JugadorPosicion])
-def get_jugadores_posiciones():
-    response = supabase.table("jugadores_posiciones").select("*, jugador_id:jugadores(nombre), posicion_id:posiciones(nombre)").execute()
+def get_jugador_posicion():
+    response = supabase.table("jugador_posicion").select("*, jugador_id:jugadores(nombre), posicion_id:posiciones(nombre)").execute()
 
     if getattr(response, "error", None):
         raise HTTPException(status_code=400, detail=f"Error al obtener los Jugadores y Posiciones: {response.error.message}")
@@ -16,7 +16,7 @@ def get_jugadores_posiciones():
 
 @router.get("/{jugador_id}", response_model=JugadorPosicionOut)
 def obtener_jugador_posicion(jugador_id: int):
-    response = supabase.table("jugadores_posiciones").select("*, jugador_id:jugadores(nombre), posicion_id:posiciones(nombre)").eq("jugador_id", jugador_id).execute()
+    response = supabase.table("jugador_posicion").select("*, jugador_id:jugadores(nombre), posicion_id:posiciones(nombre)").eq("jugador_id", jugador_id).execute()
 
     if not response.data or len(response.data) == 0:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
@@ -26,7 +26,7 @@ def obtener_jugador_posicion(jugador_id: int):
 
 @router.post("/", response_model=JugadorPosicionOut)
 def crear_jugador_posicion(jugador_posicion: JugadorPosicionCreate):
-    response = supabase.table("jugadores_posiciones").insert(jugador_posicion.dict()).execute()
+    response = supabase.table("jugador_posicion").insert(jugador_posicion.dict()).execute()
 
     if getattr(response, "error", None):
         raise HTTPException(status_code=400, detail=f"Error al crear la relación: {response.error.message}")
@@ -35,7 +35,7 @@ def crear_jugador_posicion(jugador_posicion: JugadorPosicionCreate):
 
 @router.delete("/{jugador_id}")
 def eliminar_jugador_posicion(jugador_id: int):
-    response = supabase.table("jugadores_posiciones").delete().eq("jugador_id", jugador_id).execute()
+    response = supabase.table("jugador_posicion").delete().eq("jugador_id", jugador_id).execute()
 
     if getattr(response, "error", None):
         raise HTTPException(status_code=400, detail=f"Error al eliminar la relación: {response.error.message}")
@@ -54,11 +54,11 @@ def actualizar_jugador_posicion(jugador_id: int, jugador_posicion: JugadorPosici
         raise HTTPException(status_code=400, detail="No se proporcionaron datos para actualizar")
 
     # Comprobamos si la relación existe
-    relacion_existente = supabase.table("jugadores_posiciones").select("jugador_id").eq("jugador_id", jugador_id).execute()
+    relacion_existente = supabase.table("jugador_posicion").select("jugador_id").eq("jugador_id", jugador_id).execute()
     if not relacion_existente.data:
         raise HTTPException(status_code=404, detail="Relación no encontrada")
 
-    response = supabase.table("jugadores_posiciones").update(datos_actualizados).eq("jugador_id", jugador_id).execute()
+    response = supabase.table("jugador_posicion").update(datos_actualizados).eq("jugador_id", jugador_id).execute()
 
     if getattr(response, "error", None):
         raise HTTPException(status_code=400, detail=f"Error al actualizar la relación: {response.error.message}")
