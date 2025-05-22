@@ -10,6 +10,7 @@ import {
   Image,
   Alert,
   AlertIcon,
+  Spinner,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -25,12 +26,13 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
- 
-  const handleLogin = async (email, password) => {
-    try {
-      setError(""); // Limpiar error anterior
 
+  const handleLogin = async (email, password) => {
+    setIsLoading(true);
+    setError("");
+    try {
       const response = await fetch("https://myhandstats.onrender.com/login", {
         method: "POST",
         headers: {
@@ -46,16 +48,41 @@ const Login = () => {
       const data = await response.json();
       console.log("Token recibido:", data.access_token);
 
-      // ✅ Guardar token en localStorage
       localStorage.setItem("token", data.access_token);
-
-      // ✅ Redirigir a otra vista tras login
-      navigate("/seleccionar-equipo"); // cámbialo por la ruta deseada
+      navigate("/seleccionar-equipo");
     } catch (error) {
       setError(error.message || "Error al iniciar sesión");
       console.error("Error al iniciar sesión:", error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    setError("");
+    try {
+      const response = await fetch("https://myhandstats.onrender.com/login/google", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Error al iniciar sesión con Google");
+      }
+      const data = await response.json();
+      console.log("Token de Google recibido:", data.access_token);
+      localStorage.setItem("token", data.access_token);
+      navigate("/seleccionar-equipo");
+    }
+    catch (error) {
+      setError(error.message || "Error al iniciar sesión con Google");
+      console.error("Error al iniciar sesión con Google:", error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <Box
@@ -67,6 +94,24 @@ const Login = () => {
       position="relative"
       overflow="hidden"
     >
+      {/* Spinner pantalla completa */}
+      {isLoading && (
+        <Box
+          position="fixed"
+          top="0"
+          left="0"
+          w="100vw"
+          h="100vh"
+          bg="rgba(255,255,255,0.7)"
+          zIndex="9999"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Spinner size="xl" thickness="4px" speed="0.65s" color="#F43F5E" />
+        </Box>
+      )}
+
       <Box
         position="absolute"
         top="0"
@@ -131,10 +176,26 @@ const Login = () => {
                   _placeholder={{ color: "gray.500" }}
                 />
               </FormControl>
-              <Button type="submit" bg="#F43F5E" color="white">
+              <Button
+                type="submit"
+                bg="#F43F5E"
+                color="white"
+                isLoading={isLoading}
+                loadingText="Iniciando sesión..."
+              >
                 Submit
               </Button>
             </Stack>
+            <Button
+              variant="outline"
+              colorScheme="red"
+              onClick={handleGoogleLogin}
+              isLoading={isLoading}
+              loadingText="Iniciando sesión..."
+              leftIcon={<Image src="/google-icon.svg" boxSize="20px" />}
+            >
+              Iniciar sesión con Google
+            </Button>
           </form>
 
           <Box mt={10}>

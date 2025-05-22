@@ -3,5 +3,6 @@ uvicorn
 python-dotenv
 passlib[bcrypt]
 supabase
+google-auth
 requests
 google-auth
