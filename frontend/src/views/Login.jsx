@@ -188,11 +188,10 @@ const Login = () => {
               </Stack>
             </form>
 
-            <Box mt={4}>
+            <Box mt={4} width="100%">
               <GoogleLogin
                 onSuccess={handleGoogleLogin}
                 onError={() => setError("Error al iniciar sesión con Google")}
-                width="100%"
                 locale="es"
                 text="signin_with"
                 shape="pill"
