@@ -97,6 +97,13 @@ const Jugadores = () => {
       invasion_area: 0,
       blocaje: 0,
       robo: 0,
+      gol_en_contra_ei: 0,
+      gol_en_contra_ed: 0,
+      gol_en_contra_li: 0,
+      gol_en_contra_c: 0,
+      gol_en_contra_ld: 0,
+      gol_en_contra_pi: 0,
+      gol_en_contra_7m: 0,
     };
 
     console.log("Cuerpo del jugador:", body);
