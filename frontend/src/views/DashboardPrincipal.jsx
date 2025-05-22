@@ -19,7 +19,7 @@ Chart.register(ArcElement, Tooltip, Legend);
 const DashboardPrincipal = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [userName, setUserName] = useState("");
-  const [club, setClub] = useState([]);
+  const [equipo, setEquipo] = useState([]);
   const [partido, setPartido] = useState("");
   const [jugador, setJugador] = useState("");
 
@@ -39,26 +39,40 @@ const DashboardPrincipal = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    // Supón que tienes el id del club del usuario en una variable clubIdUsuario
+    // Supón que tienes el id del club del usuario en una variable equipoIdUsuario
     // Si lo tienes en el perfil, puedes guardarlo en el estado al obtener el perfil
-    const clubIdUsuario = localStorage.getItem("club_id"); // o donde lo guardes
+    const equipoIdUsuario = localStorage.getItem("equipo_id"); // o donde lo guardes
 
-    fetch("https://myhandstats.onrender.com/club", {
+    console.log("ID del club del usuario:", equipoIdUsuario); // Para depuración
+
+    fetch("https://myhandstats.onrender.com/club/equipos", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
       .then((res) => res.json())
       .then((data) => {
-        // Asegúrate de que clubIdUsuario sea un número si los ids son numéricos
-        const clubData = data.info.find((club) => club.id === Number(clubIdUsuario));
-        if (clubData) {
-          setClub({ nombre: clubData.nombre, logo: clubData.logo });
+        // Asegúrate de que equipoIdUsuario sea un número si los ids son numéricos
+        const equipoData = data.info.find(
+          (equipo) => equipo.id == equipoIdUsuario
+        );
+        console.log("Datos del equipo:", equipoData); // Para depuración
+
+        if (equipoData) {
+          setEquipo({
+            nombre: equipoData.nombre,
+            categoria: equipoData.categoria,
+          });
         } else {
-          setClub({ nombre: "Club no encontrado", logo: "" });
+          setEquipo({
+            nombre: "Equipo no encontrado",
+            categoria: "Categoria no encontrada",
+          });
         }
       })
-      .catch(() => setClub({ nombre: "Club ejemplo", logo: "Logo ejemplo" }));
+      .catch(() =>
+        setEquipo({ nombre: "Equipo ejemplo", categoria: "Categoria ejemplo" })
+      );
   }, []);
 
   const golesData = {
@@ -84,9 +98,9 @@ const DashboardPrincipal = () => {
           <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
             Dashboard
           </Text>
-          <Avatar name={club.nombre} src={club.logo} />
+          <Avatar name={equipo.nombre} src={equipo.logo} />
           <Text fontSize="sm" color="gray.500">
-            {club.nombre}
+            {equipo.nombre}
           </Text>
         </Flex>
 

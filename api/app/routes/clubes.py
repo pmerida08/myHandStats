@@ -181,23 +181,3 @@ def actualizar_equipo(equipo_id: int, equipo_data: EquipoCreate, datos_token: di
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
 
     return response.data[0]
-
-@router.put("/usuario/{usuario_id}")
-def actualizar_usuario(usuario_id: int, usuario_data: UsuarioUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
-    # Solo los administradores pueden actualizar el usuario
-    if datos_token["rol"] != "admin":
-        raise HTTPException(status_code=403, detail="Solo los administradores pueden actualizar el usuario")
-    
-    # Comprobar si el usuario pertenece al club
-    usuario = supabase.table("usuarios").select("*").eq("id", usuario_id).eq("clubs_id", datos_token["clubs_id"]).execute()
-    if not usuario.data or len(usuario.data) == 0:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado o no pertenece al club")
-
-    # Actualizar el usuario con el id_club del token
-    data = usuario_data.dict(exclude_unset=True)
-    response = supabase.table("usuarios").update(data).eq("id", usuario_id).execute()
-
-    if not response.data:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-
-    return response.data[0]

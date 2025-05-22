@@ -4,12 +4,24 @@ import {
   DrawerBody, Flex, Icon, Text
 } from '@chakra-ui/react';
 import {
-  FaTachometerAlt, FaUser, FaFutbol, FaPlusCircle, FaChartBar
+  FaTachometerAlt, FaUser, FaFutbol, FaPlusCircle, FaChartBar, FaBuilding
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+
+  // Obtener el token y decodificar el rol
+  let isAdmin = false;
+  try {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      isAdmin = payload.rol === 'admin';
+    }
+  } catch {
+    isAdmin = false;
+  }
 
   const handleNavigate = (path) => {
     onClose();
@@ -26,9 +38,11 @@ const Sidebar = ({ isOpen, onClose }) => {
             <MenuItem icon={FaTachometerAlt} label="Dashboard" onClick={() => handleNavigate('/dashboard')} />
             <MenuItem icon={FaUser} label="Jugadores" onClick={() => handleNavigate('/jugadores')} />
             <MenuItem icon={FaFutbol} label="Partidos" onClick={() => handleNavigate('/partidos')} />
-            <MenuItem icon={FaPlusCircle} label="Nuevo Partido" onClick={() => handleNavigate('/nuevo-partido')} />
-            <MenuItem icon={FaChartBar} label="Estadísticas avanzadas" onClick={() => handleNavigate('/estadisticas')} />
             <MenuItem icon={FaUser} label="Seleccionar Equipo" onClick={() => handleNavigate('/seleccionar-equipo')} />
+            {isAdmin && (
+              <MenuItem icon={FaBuilding} label="Club" onClick={() => handleNavigate('/club')} />
+            )}
+            <MenuItem icon={FaChartBar} label="Estadísticas avanzadas" onClick={() => handleNavigate('/estadisticas')} />
           </Flex>
         </DrawerBody>
       </DrawerContent>
