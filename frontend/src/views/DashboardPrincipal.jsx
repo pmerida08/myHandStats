@@ -31,6 +31,7 @@ const DashboardPrincipal = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [userName, setUserName] = useState("");
   const [club, setClub] = useState({ nombre: "", logo: "" });
+  const [equipo, setEquipo] = useState({ nombre: "", logo: "" });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -82,6 +83,33 @@ const DashboardPrincipal = () => {
       );
   }, []);
 
+  useEffect(() => {
+    const equipoId = localStorage.getItem("id_equipo");
+    if (!equipoId) {
+      setEquipo({ nombre: "Equipo no encontrado", logo: "" });
+      return;
+    }
+
+    fetch(`https://myhandstats.onrender.com/equipo/${equipoId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data) {
+          setEquipo({
+            nombre: data.nombre,
+          });
+        } else {
+          setEquipo({ nombre: "Equipo no encontrado", logo: "" });
+        }
+      })
+      .catch(() =>
+        setEquipo({ nombre: "Equipo ejemplo", logo: "" })
+      );
+  }, []);
+
   const golesData = {
     labels: ["Goles a favor", "Goles en contra"],
     datasets: [
@@ -107,7 +135,7 @@ const DashboardPrincipal = () => {
           </Text>
           <Avatar name={club.nombre} src={club.logo} />
           <Text fontSize="sm" color="gray.500">
-            {club.nombre}
+            {equipo.nombre}
           </Text>
         </Flex>
 
