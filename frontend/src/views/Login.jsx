@@ -58,6 +58,32 @@ const Login = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    setError("");
+    try {
+      const response = await fetch("https://myhandstats.onrender.com/login/google", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Error al iniciar sesión con Google");
+      }
+      const data = await response.json();
+      console.log("Token de Google recibido:", data.access_token);
+      localStorage.setItem("token", data.access_token);
+      navigate("/seleccionar-equipo");
+    }
+    catch (error) {
+      setError(error.message || "Error al iniciar sesión con Google");
+      console.error("Error al iniciar sesión con Google:", error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <Box
       minH="100vh"
@@ -160,6 +186,16 @@ const Login = () => {
                 Submit
               </Button>
             </Stack>
+            <Button
+              variant="outline"
+              colorScheme="red"
+              onClick={handleGoogleLogin}
+              isLoading={isLoading}
+              loadingText="Iniciando sesión..."
+              leftIcon={<Image src="/google-icon.svg" boxSize="20px" />}
+            >
+              Iniciar sesión con Google
+            </Button>
           </form>
 
           <Box mt={10}>

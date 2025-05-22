@@ -93,7 +93,7 @@ const Registrar = () => {
         { theme: 'outline', size: 'large' }
       )
     }
-  }, [])
+  })
 
   return (
     <Box
