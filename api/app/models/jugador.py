@@ -47,6 +47,13 @@ class Jugador(BaseModel):
     invasion_area: int
     blocaje: int
     robo: int
+    gol_en_contra_ei: int
+    gol_en_contra_ed: int
+    gol_en_contra_li: int
+    gol_en_contra_c: int
+    gol_en_contra_ld: int
+    gol_en_contra_pi: int
+    gol_en_contra_7m: int
 
     class Config:
         orm_mode = True
@@ -92,6 +99,13 @@ class JugadorCreate(BaseModel):
     invasion_area: Optional[int] = 0
     blocaje: Optional[int] = 0
     robo: Optional[int] = 0
+    gol_en_contra_ei: Optional[int] = 0
+    gol_en_contra_ed: Optional[int] = 0
+    gol_en_contra_li: Optional[int] = 0
+    gol_en_contra_c: Optional[int] = 0
+    gol_en_contra_ld: Optional[int] = 0
+    gol_en_contra_pi: Optional[int] = 0
+    gol_en_contra_7m: Optional[int] = 0
 
     class Config:
         orm_mode = True
@@ -136,6 +150,13 @@ class JugadorUpdate(BaseModel):
     invasion_area: Optional[int] = None
     blocaje: Optional[int] = None
     robo: Optional[int] = None
+    gol_en_contra_ei: Optional[int] = None
+    gol_en_contra_ed: Optional[int] = None
+    gol_en_contra_li: Optional[int] = None
+    gol_en_contra_c: Optional[int] = None
+    gol_en_contra_ld: Optional[int] = None
+    gol_en_contra_pi: Optional[int] = None
+    gol_en_contra_7m: Optional[int] = None
 
     class Config:
         orm_mode = True
@@ -184,6 +205,13 @@ class JugadorOut(BaseModel):
     invasion_area: int
     blocaje: int
     robo: int
+    gol_en_contra_ei: int
+    gol_en_contra_ed: int
+    gol_en_contra_li: int
+    gol_en_contra_c: int
+    gol_en_contra_ld: int
+    gol_en_contra_pi: int
+    gol_en_contra_7m: int
 
     class Config:
         orm_mode = True
