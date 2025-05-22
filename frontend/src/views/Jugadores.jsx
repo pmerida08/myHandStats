@@ -62,6 +62,7 @@ const Jugadores = () => {
       foto: "foto.jpg", // Implementa la subida real si lo necesitas
       dorsal: parseInt(nuevoJugador.dorsal),
       equipos_id: parseInt(equipoSeleccionado),
+      posiciones: nuevoJugador.posicion ? [nuevoJugador.posicion] : [],
       golesei: 0,
       golesli: 0,
       golesld: 0,
@@ -98,6 +99,8 @@ const Jugadores = () => {
       robo: 0,
     };
 
+    console.log("Cuerpo del jugador:", body);
+
     try {
       const res = await fetch(
         `https://myhandstats.onrender.com/equipo/${equipoSeleccionado}/jugador/`,
@@ -113,23 +116,7 @@ const Jugadores = () => {
 
       if (!res.ok) throw new Error("No se pudo crear el jugador");
 
-      const data = await res.json();
-
-      if (nuevoJugador.posicion) {
-        await fetch(
-          `https://myhandstats.onrender.com/jugador/${data.id}/posiciones`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              posicion_id: parseInt(nuevoJugador.posicion),
-            }),
-          }
-        );
-      }
+      // const data = await res.json(); // Si necesitas la data para algo, la puedes usar aquí.
 
       setIsModalOpen(false);
       setNuevoJugador({
@@ -141,7 +128,7 @@ const Jugadores = () => {
       });
       cargarJugadores();
     } catch (err) {
-      console.error("Error al crear jugador o asociar posición:", err);
+      console.error("Error al crear jugador:", err);
     }
   };
 
@@ -339,15 +326,16 @@ const Jugadores = () => {
                 </FormControl>
               </VStack>
             </ModalBody>
+
             <ModalFooter>
               <Button
-                colorScheme="teal"
-                mr={3}
+                bg="#014C4C"
+                color="white"
+                _hover={{ bg: "#013C3C" }}
                 onClick={crearJugador}
               >
-                Crear
+                Crear Jugador
               </Button>
-              <Button onClick={() => setIsModalOpen(false)}>Cancelar</Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
