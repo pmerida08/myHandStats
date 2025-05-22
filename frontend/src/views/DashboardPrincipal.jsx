@@ -16,15 +16,24 @@ import { Doughnut } from "react-chartjs-2";
 import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
 Chart.register(ArcElement, Tooltip, Legend);
 
+// Función para decodificar el token JWT y extraer el id del club
+function getClubIdFromToken(token) {
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.club_id || payload.club || payload.id || null;
+  } catch {
+    return null;
+  }
+}
+
 const DashboardPrincipal = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [userName, setUserName] = useState("");
-  const [equipo, setEquipo] = useState([]);
-  const [partido, setPartido] = useState("");
-  const [jugador, setJugador] = useState("");
+  const [club, setClub] = useState({ nombre: "", logo: "" });
 
   useEffect(() => {
-    const token = localStorage.getItem("token"); // o donde guardes tu token
+    const token = localStorage.getItem("token");
     fetch("https://myhandstats.onrender.com/usuario/perfil", {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -39,39 +48,37 @@ const DashboardPrincipal = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    // Supón que tienes el id del club del usuario en una variable equipoIdUsuario
-    // Si lo tienes en el perfil, puedes guardarlo en el estado al obtener el perfil
-    const equipoIdUsuario = localStorage.getItem("equipo_id"); // o donde lo guardes
+    const clubId = getClubIdFromToken(token);
 
-    console.log("ID del club del usuario:", equipoIdUsuario); // Para depuración
+    if (!clubId) {
+      setClub({ nombre: "Club no encontrado", logo: "" });
+      return;
+    }
 
-    fetch("https://myhandstats.onrender.com/club/equipos", {
+    fetch("https://myhandstats.onrender.com/club", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
       .then((res) => res.json())
       .then((data) => {
-        // Asegúrate de que equipoIdUsuario sea un número si los ids son numéricos
-        const equipoData = data.info.find(
-          (equipo) => equipo.id == equipoIdUsuario
-        );
-        console.log("Datos del equipo:", equipoData); // Para depuración
-
-        if (equipoData) {
-          setEquipo({
-            nombre: equipoData.nombre,
-            categoria: equipoData.categoria,
+        let clubData = null;
+        if (Array.isArray(data.info)) {
+          clubData = data.find((c) => c.id == clubId);
+        } else {
+          clubData = data;
+        }
+        if (clubData) {
+          setClub({
+            nombre: clubData.nombre,
+            logo: clubData.logo,
           });
         } else {
-          setEquipo({
-            nombre: "Equipo no encontrado",
-            categoria: "Categoria no encontrada",
-          });
+          setClub({ nombre: "Club no encontrado", logo: "" });
         }
       })
       .catch(() =>
-        setEquipo({ nombre: "Equipo ejemplo", categoria: "Categoria ejemplo" })
+        setClub({ nombre: "Club ejemplo", logo: "" })
       );
   }, []);
 
@@ -98,9 +105,9 @@ const DashboardPrincipal = () => {
           <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
             Dashboard
           </Text>
-          <Avatar name={equipo.nombre} src={equipo.logo} />
+          <Avatar name={club.nombre} src={club.logo} />
           <Text fontSize="sm" color="gray.500">
-            {equipo.nombre}
+            {club.nombre}
           </Text>
         </Flex>
 
