@@ -54,7 +54,6 @@ class Jugador(BaseModel):
 class JugadorCreate(BaseModel):
     fecha_nac: date
     nombre: str
-    posiciones: List[int]
     foto: Optional[str] = None
     golesei: Optional[int] = 0
     golesli: Optional[int] = 0
