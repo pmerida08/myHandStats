@@ -31,7 +31,9 @@ const DashboardPrincipal = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [userName, setUserName] = useState("");
   const [club, setClub] = useState({ nombre: "", logo: "" });
-  const [equipo, setEquipo] = useState({ nombre: "", logo: "" });
+  const [equipo, setEquipo] = useState({ id: "", nombre: "", logo: "" });
+  const [golesFavor, setGolesFavor] = useState(0);
+  const [golesContra, setGolesContra] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -65,7 +67,7 @@ const DashboardPrincipal = () => {
       .then((data) => {
         let clubData = null;
         if (Array.isArray(data.info)) {
-          clubData = data.find((c) => c.id == clubId);
+          clubData = data.info.find((c) => c.id == clubId);
         } else {
           clubData = data;
         }
@@ -78,9 +80,7 @@ const DashboardPrincipal = () => {
           setClub({ nombre: "Club no encontrado", logo: "" });
         }
       })
-      .catch(() =>
-        setClub({ nombre: "Club ejemplo", logo: "" })
-      );
+      .catch(() => setClub({ nombre: "Club ejemplo", logo: "" }));
   }, []);
 
   useEffect(() => {
@@ -99,22 +99,60 @@ const DashboardPrincipal = () => {
       .then((data) => {
         if (data) {
           setEquipo({
+            id: data.id,
             nombre: data.nombre,
+            logo: data.logo,
           });
         } else {
           setEquipo({ nombre: "Equipo no encontrado", logo: "" });
         }
       })
-      .catch(() =>
-        setEquipo({ nombre: "Equipo ejemplo", logo: "" })
-      );
+      .catch(() => setEquipo({ nombre: "Equipo ejemplo", logo: "" }));
   }, []);
+
+  // Obtener goles de los jugadores del equipo cuando equipo.id esté disponible
+  useEffect(() => {
+    if (!equipo.id) return;
+    const token = localStorage.getItem("token");
+    fetch(`https://myhandstats.onrender.com/equipo/${equipo.id}/jugadores`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Jugadores del equipo:", data); // <-- Añade esta línea
+        if (Array.isArray(data)) {
+          // Suma todos los goles a favor (golest)
+          const totalGolesFavor = data.reduce(
+            (acc, jugador) => acc + (jugador.golest || 0),
+            0
+          );
+          setGolesFavor(totalGolesFavor);
+
+          // Calcula goles en contra (ejemplo: puedes poner un valor fijo o una lógica propia)
+          const totalGolesContra = data.reduce(
+            (acc, jugador) => acc + (jugador.gol_en_contra_ei + jugador.gol_en_contra_ed + jugador.gol_en_contra_li + jugador.gol_en_contra_ld + jugador.gol_en_contra_c + jugador.gol_en_contra_pi + jugador.gol_en_contra_7m || 0),
+            0
+          );
+          // Aquí lo dejamos como 0, pero puedes cambiarlo si tienes otra fuente
+          setGolesContra(totalGolesContra);
+        } else {
+          setGolesFavor(0);
+          setGolesContra(0);
+        }
+      })
+      .catch(() => {
+        setGolesFavor(0);
+        setGolesContra(0);
+      });
+  }, [equipo.id]);
 
   const golesData = {
     labels: ["Goles a favor", "Goles en contra"],
     datasets: [
       {
-        data: [12, 8], // Reemplaza con tus datos reales
+        data: [golesFavor, golesContra],
         backgroundColor: ["#014C4C", "#e2e8f0"],
         borderWidth: 1,
       },
