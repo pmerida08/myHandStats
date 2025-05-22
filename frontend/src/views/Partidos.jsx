@@ -120,11 +120,17 @@ const Partidos = () => {
                   {new Date(partido.fecha).toLocaleDateString()}
                 </Text>
                 <Flex align="center" justify="center" gap={6}>
-                  <Text fontSize="xl" fontWeight="bold">{partido.goles_local}</Text>
+                  <Text fontSize="xl" fontWeight="bold">
+                    {partido.goles_local ?? partido.goles_id_equipo ?? 0}
+                  </Text>
                   <Circle size="50px" bg="white" color="#006666" />
-                  <Text fontSize="xl" fontWeight="bold">{partido.goles_visitante}</Text>
+                  <Text fontSize="xl" fontWeight="bold">
+                    {partido.goles_visitante ?? partido.goles_id_equiporival ?? 0}
+                  </Text>
                 </Flex>
-                <Text fontSize="sm">{partido.equipo_local} vs {partido.equipo_visitante}</Text>
+                <Text fontSize="sm">
+                  { (partido.equipo_visitante ?? partido.equiporival_id)}
+                </Text>
                 <Button
                   mt={2}
                   size="sm"
