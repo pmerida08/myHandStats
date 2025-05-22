@@ -6,10 +6,14 @@ from app.utils.hashing import hash_password
 from app.services.auth import generar_token  # debes tener esta función definida
 from google.oauth2 import id_token
 from google.auth.transport import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 router = APIRouter()
 
-GOOGLE_CLIENT_ID = "580062200389-hblem47late6qfggkg4iv8gnba20ih91.apps.googleusercontent.com"
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 
 @router.post("/", response_model=UsuarioOut)
 def crear_usuario(usuario: UsuarioCreate):
