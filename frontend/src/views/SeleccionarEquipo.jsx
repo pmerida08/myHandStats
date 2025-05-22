@@ -13,8 +13,13 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaBars } from 'react-icons/fa';
 import Sidebar from '../components/Sidebar';
+import AuthWrapper from "../components/AuthWrapper";
+
+
 
 const SeleccionEquipo = () => {
+
+
   const [equipos, setEquipos] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -52,6 +57,7 @@ const SeleccionEquipo = () => {
   };
 
   return (
+    <AuthWrapper requiredRole={null}>
     <Box p={6} minH="100vh" bg="white">
       {/* Sidebar desplegable */}
       <Sidebar isOpen={isOpen} onClose={onClose} />
@@ -95,6 +101,7 @@ const SeleccionEquipo = () => {
         </SimpleGrid>
       )}
     </Box>
+    </AuthWrapper>
   );
 };
 

@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, date
+from app.models.posicion import PosicionOut
+from typing import List
 
 class Jugador(BaseModel):
     id: int 
@@ -52,6 +54,7 @@ class Jugador(BaseModel):
 class JugadorCreate(BaseModel):
     fecha_nac: date
     nombre: str
+    posiciones: List[int]
     foto: Optional[str] = None
     golesei: Optional[int] = 0
     golesli: Optional[int] = 0
@@ -141,6 +144,7 @@ class JugadorOut(BaseModel):
     id: int
     fecha_nac: date
     nombre: str
+    posiciones: List[PosicionOut]
     foto: str
     created_at: datetime
     updated_at: datetime

@@ -25,6 +25,8 @@ import {
 import { useEffect, useState } from "react";
 import { FaPlus, FaUser, FaBars } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
+import AuthWrapper from "../components/AuthWrapper";
+
 
 const Jugadores = () => {
   const gridCols = useBreakpointValue({ base: 1, sm: 2, md: 3, lg: 4 });
@@ -179,6 +181,7 @@ const Jugadores = () => {
   };
 
   return (
+    <AuthWrapper requiredRole={null}>
     <Box p={4} position="relative">
       <Sidebar isOpen={isOpen} onClose={onClose} />
       <Flex align="center" justify="space-between" mb={8}>
@@ -331,6 +334,7 @@ const Jugadores = () => {
         </ModalContent>
       </Modal>
     </Box>
+    </AuthWrapper>
   );
 };
 
