@@ -129,13 +129,12 @@ const DashboardPrincipal = () => {
             0
           );
           setGolesFavor(totalGolesFavor);
-
-          // Calcula goles en contra (ejemplo: puedes poner un valor fijo o una lógica propia)
+       
           const totalGolesContra = data.reduce(
-            (acc, jugador) => acc + (jugador.gol_en_contra_ei + jugador.gol_en_contra_ed + jugador.gol_en_contra_li + jugador.gol_en_contra_ld + jugador.gol_en_contra_c + jugador.gol_en_contra_pi + jugador.gol_en_contra_7m || 0),
+            (acc, jugador) => acc + (jugador.gol_en_contra_t || 0),
             0
           );
-          // Aquí lo dejamos como 0, pero puedes cambiarlo si tienes otra fuente
+          
           setGolesContra(totalGolesContra);
         } else {
           setGolesFavor(0);
