@@ -43,6 +43,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               <MenuItem icon={FaBuilding} label="Club" onClick={() => handleNavigate('/club')} />
             )}
             <MenuItem icon={FaChartBar} label="Estadísticas avanzadas" onClick={() => handleNavigate('/estadisticas')} />
+            <MenuItem icon={FaUser} label="Perfil" onClick={() => handleNavigate('/perfil')} />
             <MenuItem icon={FaPlusCircle} label="Cerrar sesión" onClick={() => {
               localStorage.removeItem('token');
               onClose();
