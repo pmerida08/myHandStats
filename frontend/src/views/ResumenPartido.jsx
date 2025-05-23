@@ -1,19 +1,26 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { FaPlus, FaUser, FaBars } from "react-icons/fa";
 import {
   Box,
   Flex,
   Text,
+  useDisclosure,
   SimpleGrid,
   CircularProgress,
   CircularProgressLabel,
+  Icon,
 } from "@chakra-ui/react";
 import Sidebar from '../components/Sidebar';
 import axios from "axios";
 
+
+
 const ResumenPartido = () => {
   const { equipo_id, partido_id } = useParams();
   const [datos, setDatos] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  
 
   useEffect(() => {
     axios
@@ -37,9 +44,11 @@ const ResumenPartido = () => {
 
   return (
     <Flex>
-      <Sidebar />
 
       <Box flex="1" bg="white" p={6}>
+        <Sidebar isOpen={isOpen} onClose={onClose} />
+        <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
+        
         {/* Cabecera */}
         <Box textAlign="center" mb={6}>
           <Text fontSize="xl" fontWeight="bold">Estadísticas Del Partido</Text>
