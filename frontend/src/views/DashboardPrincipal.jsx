@@ -220,25 +220,49 @@ const DashboardPrincipal = () => {
         {/* Primera fila: Goles últimos partidos y Fases del Juego */}
         <GridItem>
           <Box borderWidth="1px" borderRadius="md" p={4} minH="320px" display="flex" flexDirection="column" justifyContent="center">
-            <Flex justify="space-between" mb={2}>
-              <Text fontWeight="bold">Goles últimos partidos</Text>
+            <Flex justify="space-between" mb={2} align="center">
+              <Flex align="center" gap={2}>
+                <Text fontWeight="bold">Goles totales</Text>
+              </Flex>
             </Flex>
             <Box h="200px" w="100%" maxW="320px" mx="auto">
               <Doughnut data={golesData} />
             </Box>
-            <Divider my={4} />
-            <Flex gap={4} justify="center">
-              <Box h={2} w={2} borderRadius="full" bg="#014C4C" />
-              <Text fontSize="xs">Goles a favor</Text>
-              <Box h={2} w={2} borderRadius="full" bg="gray.300" />
-              <Text fontSize="xs">Goles en contra</Text>
+            {/* Mostrar los valores numéricos debajo del gráfico */}
+            <Flex justify="center" align="center" gap={6} mt={2}>
+              <Flex align="center" gap={1}>
+                <Box h={2} w={2} borderRadius="full" bg="#014C4C" />
+                <Text fontSize="sm" fontWeight="bold" color="#014C4C">
+                  {golesFavor}
+                </Text>
+                <Text fontSize="xs" color="gray.600" ml={1}>
+                  a favor
+                </Text>
+              </Flex>
+              <Flex align="center" gap={1}>
+                <Box h={2} w={2} borderRadius="full" bg="gray.300" />
+                <Text fontSize="sm" fontWeight="bold" color="gray.600">
+                  {golesContra}
+                </Text>
+                <Text fontSize="xs" color="gray.600" ml={1}>
+                  en contra
+                </Text>
+              </Flex>
             </Flex>
+            <Divider my={4} />
+
           </Box>
         </GridItem>
         <GridItem>
           <Box borderWidth="1px" borderRadius="md" p={4} minH="320px" display="flex" flexDirection="column" justifyContent="center">
             <Flex justify="space-between" mb={2} align="center">
-              <Text fontWeight="bold">Comparativa últimos partidos</Text>
+              <Flex align="center" gap={2}>
+                <Text fontWeight="bold">Comparativa últimos partidos</Text>
+                {/* Mostrar resultado del partido actual */}
+                <Text fontSize="md" color="gray.600" fontWeight="semibold">
+                  {(partidoActual.goles_id_equipo ?? 0)} - {(partidoActual.goles_id_equiporival ?? 0)}
+                </Text>
+              </Flex>
               <Flex gap={2}>
                 <Button
                   size="xs"
