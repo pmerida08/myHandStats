@@ -464,52 +464,12 @@ const DashboardPrincipal = () => {
                         <th style={{ textAlign: "right", padding: "4px" }}>Resultado</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {/* Top 5 partidos siempre visibles */}
-                      {ultimosPartidos
-                        .slice()
-                        .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-                        .slice(0, 5)
-                        .map((partido) => {
-                          const golesFavor = partido.goles_id_equipo ?? 0;
-                          const golesContra = partido.goles_id_equiporival ?? 0;
-                          let bgColor = "";
-                          if (golesFavor > golesContra) bgColor = "#d1fae5";
-                          else if (golesFavor < golesContra) bgColor = "#fee2e2";
-
-                          return (
-                            <tr
-                              key={partido.id}
-                              style={{ borderBottom: "1px solid #e2e8f0" }}
-                            >
-                              <td style={{ padding: "4px" }}>
-                                {partido.equiporival_id || "Desconocido"}
-                              </td>
-                              <td style={{ padding: "4px" }}>
-                                {partido.fecha
-                                  ? new Date(partido.fecha).toLocaleDateString()
-                                  : "Sin fecha"}
-                              </td>
-                              <td
-                                style={{
-                                  textAlign: "center",
-                                  padding: "4px",
-                                  backgroundColor: bgColor,
-                                  borderRadius: "6px",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                {golesFavor} - {golesContra}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      {/* Filas adicionales con animación: el Collapse envuelve SOLO las filas extra */}
-                      <Collapse in={mostrarTodosPartidos} style={{ display: "contents" }}>
+                    
+                      <tbody>
                         {ultimosPartidos
                           .slice()
                           .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-                          .slice(5)
+                          .slice(0, mostrarTodosPartidos ? ultimosPartidos.length : 5)
                           .map((partido) => {
                             const golesFavor = partido.goles_id_equipo ?? 0;
                             const golesContra = partido.goles_id_equiporival ?? 0;
@@ -544,7 +504,7 @@ const DashboardPrincipal = () => {
                               </tr>
                             );
                           })}
-                      </Collapse>
+                     
                     </tbody>
                   </table>
                 </Box>
