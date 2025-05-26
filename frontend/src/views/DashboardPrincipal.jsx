@@ -465,9 +465,11 @@ const DashboardPrincipal = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {/* Últimos 5 partidos siempre visibles */}
+                      {/* Ordena los partidos por fecha descendente antes de mostrar */}
                       {ultimosPartidos
-                        .slice(-5)
+                        .slice() // copia para no mutar el estado
+                        .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+                        .slice(0, 5)
                         .map((partido) => {
                           const golesFavor = partido.goles_id_equipo ?? 0;
                           const golesContra = partido.goles_id_equiporival ?? 0;
@@ -505,7 +507,9 @@ const DashboardPrincipal = () => {
                       {/* Filas adicionales con animación */}
                       <Collapse in={mostrarTodosPartidos} style={{ display: "contents" }}>
                         {ultimosPartidos
-                          .slice(0, ultimosPartidos.length - 5)
+                          .slice()
+                          .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+                          .slice(5)
                           .map((partido) => {
                             const golesFavor = partido.goles_id_equipo ?? 0;
                             const golesContra = partido.goles_id_equiporival ?? 0;
