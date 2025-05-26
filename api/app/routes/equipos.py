@@ -587,10 +587,14 @@ def actualizar_posicion_jugador(
     if not jugador.data:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
 
-    if jugador.data[0]["clubs_id"] != datos_token["clubs_id"]:
+    equipo = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
+    if not equipo.data:
+        raise HTTPException(status_code=404, detail="Equipo no encontrado")
+
+    if equipo.data[0]["clubs_id"] != datos_token["clubs_id"]:
         raise HTTPException(status_code=403, detail="No tienes permiso para editar a este jugador")
 
-    datos_update = datos_posicion.dict(exclude_unset=True)
+    datos_update = datos_posicion.model_dump(exclude_unset=True)
     if not datos_update:
         raise HTTPException(status_code=400, detail="No se enviaron campos para actualizar")
 
