@@ -465,9 +465,9 @@ const DashboardPrincipal = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {/* Ordena los partidos por fecha descendente antes de mostrar */}
+                      {/* Top 5 partidos siempre visibles */}
                       {ultimosPartidos
-                        .slice() // copia para no mutar el estado
+                        .slice()
                         .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
                         .slice(0, 5)
                         .map((partido) => {
@@ -504,7 +504,7 @@ const DashboardPrincipal = () => {
                             </tr>
                           );
                         })}
-                      {/* Filas adicionales con animación */}
+                      {/* Filas adicionales con animación: el Collapse envuelve SOLO las filas extra */}
                       <Collapse in={mostrarTodosPartidos} style={{ display: "contents" }}>
                         {ultimosPartidos
                           .slice()
