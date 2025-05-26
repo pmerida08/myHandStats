@@ -15,9 +15,9 @@ import {
 } from "@chakra-ui/react";
 import { FaBars, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
-import { Doughnut } from "react-chartjs-2";
-import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
-Chart.register(ArcElement, Tooltip, Legend);
+import { Doughnut, Bar } from "react-chartjs-2";
+import { Chart, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from "chart.js";
+Chart.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 // Función para decodificar el token JWT y extraer el id del club
 function getClubIdFromToken(token) {
@@ -43,6 +43,7 @@ const DashboardPrincipal = () => {
   const [mostrarTodosLanzadores, setMostrarTodosLanzadores] = useState(false);
   const [mostrarTodosPartidos, setMostrarTodosPartidos] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [partidoIndex, setPartidoIndex] = useState(0);
 
   // Carga todos los datos principales y muestra el spinner mientras loading sea true
   useEffect(() => {
@@ -73,13 +74,7 @@ const DashboardPrincipal = () => {
       }).then((res) => res.json()),
     ])
       .then(
-        ( [
-          usuarioData,
-          clubData,
-          equipoData,
-          jugadoresData,
-          partidosData,
-        ]) => {
+        ([usuarioData, clubData, equipoData, jugadoresData, partidosData]) => {
           setUserName(usuarioData.info?.nombre || "Usuario");
           // Club
           let clubObj = null;
@@ -147,9 +142,48 @@ const DashboardPrincipal = () => {
     totalPartidos > 0 ? Math.round((partidosGanados / totalPartidos) * 100) : 0;
   const esPorcentajeAlto = porcentajeGanados >= 50;
 
+  // Prepara los datos para el gráfico de barras
+  const partidosOrdenados = ultimosPartidos
+    .slice()
+    .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
+    .slice(-5); // últimos 5 partidos
+
+  const partidoActual = partidosOrdenados[partidoIndex] || {};
+
+  const barData = {
+    labels: ["Goles a favor", "Goles en contra"],
+    datasets: [
+      {
+        label: partidoActual.equiporival_id || "Rival",
+        data: [
+          partidoActual.goles_id_equipo,
+          partidoActual.goles_id_equiporival,
+        ],
+        backgroundColor: ["#319795", "#CBD5E1"],
+      },
+    ],
+  };
+
+  const barOptions = {
+    indexAxis: "y",
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      title: { display: false },
+    },
+    scales: {
+      x: { beginAtZero: true, min: 0, max: 10, ticks: { stepSize: 5 } },
+    },
+  };
+
   if (loading) {
     return (
-      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
+      <Box
+        minH="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
         <Spinner size="xl" color="teal.600" thickness="4px" speed="0.7s" />
       </Box>
     );
@@ -185,11 +219,11 @@ const DashboardPrincipal = () => {
       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4}>
         {/* Primera fila: Goles últimos partidos y Fases del Juego */}
         <GridItem>
-          <Box borderWidth="1px" borderRadius="md" p={4}>
+          <Box borderWidth="1px" borderRadius="md" p={4} minH="320px" display="flex" flexDirection="column" justifyContent="center">
             <Flex justify="space-between" mb={2}>
               <Text fontWeight="bold">Goles últimos partidos</Text>
             </Flex>
-            <Box h="200px" w="200px" mx="auto">
+            <Box h="200px" w="100%" maxW="320px" mx="auto">
               <Doughnut data={golesData} />
             </Box>
             <Divider my={4} />
@@ -202,14 +236,48 @@ const DashboardPrincipal = () => {
           </Box>
         </GridItem>
         <GridItem>
-          <Box borderWidth="1px" borderRadius="md" p={4}>
-            <Flex justify="space-between" mb={2}>
-              <Text fontWeight="bold">Fases del Juego últimos partidos</Text>
-              <Button size="sm" variant="ghost" isDisabled>
-                View Report
-              </Button>
+          <Box borderWidth="1px" borderRadius="md" p={4} minH="320px" display="flex" flexDirection="column" justifyContent="center">
+            <Flex justify="space-between" mb={2} align="center">
+              <Text fontWeight="bold">Comparativa últimos partidos</Text>
+              <Flex gap={2}>
+                <Button
+                  size="xs"
+                  onClick={() => setPartidoIndex((i) => Math.max(i - 1, 0))}
+                  isDisabled={partidoIndex === 0}
+                >
+                  {"<"}
+                </Button>
+                <Button
+                  size="xs"
+                  onClick={() =>
+                    setPartidoIndex((i) =>
+                      Math.min(i + 1, partidosOrdenados.length - 1)
+                    )
+                  }
+                  isDisabled={partidoIndex === partidosOrdenados.length - 1}
+                >
+                  {">"}
+                </Button>
+              </Flex>
             </Flex>
-            <Text fontSize="sm">Aún no hay registros</Text>
+            {partidosOrdenados.length > 0 ? (
+              <>
+                <Text fontSize="sm" mb={2}>
+                  Rival: <b>{partidoActual.equiporival_id || "Rival"}</b> <br />
+                  Fecha:{" "}
+                  <b>
+                    {partidoActual.fecha
+                      ? new Date(partidoActual.fecha).toLocaleDateString()
+                      : "Sin fecha"}
+                  </b>
+                </Text>
+                <Box h="200px" w="100%" maxW="320px" mx="auto">
+                  <Bar data={barData} options={barOptions} />
+                </Box>
+              </>
+            ) : (
+              <Text fontSize="sm">Aún no hay registros</Text>
+            )}
           </Box>
         </GridItem>
 
@@ -252,13 +320,20 @@ const DashboardPrincipal = () => {
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr>
-                        <th style={{ textAlign: "left", padding: "4px" }}>Jugador</th>
-                        <th style={{ textAlign: "right", padding: "4px" }}>Lanzamientos 7m</th>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Jugador
+                        </th>
+                        <th style={{ textAlign: "right", padding: "4px" }}>
+                          Lanzamientos 7m
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {jugadores
-                        .sort((a, b) => (b.lanzamiento_7m || 0) - (a.lanzamiento_7m || 0))
+                        .sort(
+                          (a, b) =>
+                            (b.lanzamiento_7m || 0) - (a.lanzamiento_7m || 0)
+                        )
                         .slice(0, mostrarTodosLanzadores ? jugadores.length : 5)
                         .map((jugador) => (
                           <tr key={jugador.id}>
@@ -313,8 +388,12 @@ const DashboardPrincipal = () => {
                   >
                     <thead>
                       <tr>
-                        <th style={{ textAlign: "left", padding: "4px" }}>Jugador</th>
-                        <th style={{ textAlign: "right", padding: "4px" }}>Goles</th>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Jugador
+                        </th>
+                        <th style={{ textAlign: "right", padding: "4px" }}>
+                          Goles
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -379,22 +458,32 @@ const DashboardPrincipal = () => {
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr>
-                        <th style={{ textAlign: "left", padding: "4px" }}>Rival</th>
-                        <th style={{ textAlign: "left", padding: "4px" }}>Fecha</th>
-                        <th style={{ textAlign: "right", padding: "4px" }}>Resultado</th>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Rival
+                        </th>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Fecha
+                        </th>
+                        <th style={{ textAlign: "right", padding: "4px" }}>
+                          Resultado
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {ultimosPartidos
                         .slice()
                         .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-                        .slice(0, mostrarTodosPartidos ? ultimosPartidos.length : 5)
+                        .slice(
+                          0,
+                          mostrarTodosPartidos ? ultimosPartidos.length : 5
+                        )
                         .map((partido) => {
                           const golesFavor = partido.goles_id_equipo ?? 0;
                           const golesContra = partido.goles_id_equiporival ?? 0;
                           let bgColor = "";
                           if (golesFavor > golesContra) bgColor = "#d1fae5";
-                          else if (golesFavor < golesContra) bgColor = "#fee2e2";
+                          else if (golesFavor < golesContra)
+                            bgColor = "#fee2e2";
 
                           return (
                             <tr
