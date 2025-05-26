@@ -13,6 +13,7 @@ import GestionClub from "./views/GestionClub.jsx";
 import GestionClubUsuarios from "./views/GestionClubUsuarios.jsx";
 import GestionEquiposClub from "./views/GestionEquiposClub.jsx";
 import GestionInfoClub from "./views/GestionInfoClub.jsx";
+import EditarPerfil  from "./views/Perfil.jsx";
 
 import './index.css';
 function App() {
@@ -33,6 +34,7 @@ function App() {
         <Route path="/club/usuarios" element={<GestionClubUsuarios />} />
         <Route path="/club/equipos" element={<GestionEquiposClub />} /> 
         <Route path="/club/info" element={<GestionInfoClub />} />
+        <Route path="/perfil" element={<EditarPerfil />} />
       </Routes>
     </BrowserRouter>
   );

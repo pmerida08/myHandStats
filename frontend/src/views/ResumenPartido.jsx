@@ -12,43 +12,55 @@ import {
   Icon,
 } from "@chakra-ui/react";
 import Sidebar from '../components/Sidebar';
-import axios from "axios";
-
-
 
 const ResumenPartido = () => {
-  const { equipo_id, partido_id } = useParams();
-  const [datos, setDatos] = useState(null);
+  const {partido_id } = useParams();
+  const equipo_id = localStorage.getItem("id_equipo");
+  const [partido, setPartido] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  
+
+  console.log("ID del equipo:", equipo_id);
+  console.log("ID del partido:", partido_id);
 
   useEffect(() => {
-    axios
-      .get(`https://myhandstats.onrender.com/equipo/${equipo_id}/partido/${partido_id}`)
+    const token = localStorage.getItem("token");
+    fetch(`https://myhandstats.onrender.com/equipo/${equipo_id}/partido/${partido_id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((response) => {
-        setDatos(response.data);
+        if (!response.ok) {
+          throw new Error("Error al obtener los datos del partido");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setPartido(data);
       })
       .catch((error) => {
         console.error("Error al obtener los datos del partido:", error);
       });
   }, [equipo_id, partido_id]);
 
-  const partido = datos ?? {
+  // Valores por defecto si aún no hay datos
+  const datosPartido = partido ?? {
     fecha: "2025-05-20T00:00:00",
     goles_id_equipo: 0,
     goles_id_equiporival: 0,
     equiporival_id: "Rival",
   };
 
-  const fechaFormateada = new Date(partido.fecha).toLocaleDateString("es-ES");
+  // console.log("Datos del partido:", datosPartido);
+
+  const fechaFormateada = new Date(datosPartido.fecha).toLocaleDateString("es-ES");
 
   return (
     <Flex>
-
       <Box flex="1" bg="white" p={6}>
         <Sidebar isOpen={isOpen} onClose={onClose} />
         <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-        
+
         {/* Cabecera */}
         <Box textAlign="center" mb={6}>
           <Text fontSize="xl" fontWeight="bold">Estadísticas Del Partido</Text>
@@ -63,14 +75,14 @@ const ResumenPartido = () => {
           <Box textAlign="center">
             <Text fontSize="sm" color="gray.600">Tú Equipo</Text>
             <Box bg="teal.600" color="white" px={4} py={2} rounded="sm" fontWeight="bold">
-              {partido.goles_id_equipo}
+              {datosPartido.goles_id_equipo}
             </Box>
           </Box>
           <Text fontWeight="bold" fontSize="lg">vs</Text>
           <Box textAlign="center">
-            <Text fontSize="sm" color="gray.600">{partido.equiporival_id}</Text>
+            <Text fontSize="sm" color="gray.600">{datosPartido.equiporival_id}</Text>
             <Box bg="red.400" color="white" px={4} py={2} rounded="sm" fontWeight="bold">
-              {partido.goles_id_equiporival}
+              {datosPartido.goles_id_equiporival}
             </Box>
           </Box>
         </Flex>
