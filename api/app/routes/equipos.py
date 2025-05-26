@@ -575,39 +575,29 @@ def actualizar_jugador_partido_equipo(equipo_id: int, partido_id: int, jugador_p
         raise HTTPException(status_code=500, detail=f"Error al actualizar el jugador del partido: {str(e)}")
     
 
-@router.put("/{equipo_id}/jugador/{jugador_id}/posicion/", response_model=List[JugadorPosicionOut])
-def actualizar_posicion_jugador_equipo(
+@router.put("/{equipo_id}/jugador/{jugador_id}/posicion", response_model=JugadorPosicionOut)
+def actualizar_posicion_jugador(
     equipo_id: int,
     jugador_id: int,
-    jugador_update: JugadorUpdate,
+    datos_posicion: JugadorPosicionUpdate,
     datos_token: dict = Depends(obtener_info_desde_token)
 ):
-    # 1. Verifica que el equipo existe y pertenece al club
-    equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
-    if not equipo_data.data:
-        raise HTTPException(status_code=404, detail="Equipo no encontrado")
-
-    if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
-        raise HTTPException(status_code=403, detail="No tienes permiso para editar jugadores de este equipo")
-
-    # 2. Verifica que el jugador pertenece al equipo
-    jugador_data = supabase.table("jugadores").select("*").eq("id", jugador_id).eq("equipos_id", equipo_id).execute()
-    if not jugador_data.data:
+    # Verificar que el jugador pertenece al equipo y club
+    jugador = supabase.table("jugadores").select("*").eq("id", jugador_id).eq("equipos_id", equipo_id).execute()
+    if not jugador.data:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
 
-    # 3. Extrae las posiciones (si se enviaron)
-    posiciones = jugador_update.posiciones
-    if posiciones is None:
-        raise HTTPException(status_code=400, detail="No se proporcionaron nuevas posiciones para actualizar")
+    if jugador.data[0]["clubs_id"] != datos_token["clubs_id"]:
+        raise HTTPException(status_code=403, detail="No tienes permiso para editar a este jugador")
+
+    datos_update = datos_posicion.dict(exclude_unset=True)
+    if not datos_update:
+        raise HTTPException(status_code=400, detail="No se enviaron campos para actualizar")
 
     try:
-        # 4. Elimina las posiciones actuales del jugador
-        supabase.table("jugador_posicion").delete().eq("jugador_id", jugador_id).execute()
-
-        # 5. Inserta las nuevas posiciones
-        nuevas_posiciones = [{"jugador_id": jugador_id, "posiciones_id": pos.id} for pos in posiciones]
-        respuesta = supabase.table("jugador_posicion").insert(nuevas_posiciones).execute()
-
-        return respuesta.data
+        respuesta = supabase.table("jugador_posicion").update(datos_update).eq("jugador_id", jugador_id).execute()
+        if not respuesta.data:
+            raise HTTPException(status_code=404, detail="No existe relación de posición para este jugador")
+        return respuesta.data[0]
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al actualizar las posiciones del jugador: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al actualizar la posición: {str(e)}")
