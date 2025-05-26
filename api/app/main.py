@@ -12,7 +12,8 @@ app.add_middleware(
         "http://localhost:5173",
         "http://localhost:5174",
         "https://myhandstats.netlify.app/",
-        "https://myhandstats.netlify.app"  
+        "https://myhandstats.netlify.app",
+        "http://172.16.24.69:5173"
     ],
     allow_credentials=True,
     allow_methods=["*"],
