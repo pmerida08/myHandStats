@@ -11,6 +11,7 @@ import {
   Avatar,
   GridItem,
   Collapse,
+  Spinner,
 } from "@chakra-ui/react";
 import { FaBars, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
@@ -41,119 +42,89 @@ const DashboardPrincipal = () => {
   const [mostrarTodosGoleadores, setMostrarTodosGoleadores] = useState(false);
   const [mostrarTodosLanzadores, setMostrarTodosLanzadores] = useState(false);
   const [mostrarTodosPartidos, setMostrarTodosPartidos] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    fetch("https://myhandstats.onrender.com/usuario/perfil", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setUserName(data.info.nombre);
-      })
-      .catch(() => setUserName("Usuario"));
-  }, []);
-
+  // Carga todos los datos principales y muestra el spinner mientras loading sea true
   useEffect(() => {
     const token = localStorage.getItem("token");
     const clubId = getClubIdFromToken(token);
-
-    if (!clubId) {
-      setClub({ nombre: "Club no encontrado", logo: "" });
-      return;
-    }
-
-    fetch("https://myhandstats.onrender.com/club", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        let clubData = null;
-        if (Array.isArray(data.info)) {
-          clubData = data.info.find((c) => c.id == clubId);
-        } else {
-          clubData = data;
-        }
-        if (clubData) {
-          setClub({
-            nombre: clubData.nombre,
-            logo: clubData.logo,
-          });
-        } else {
-          setClub({ nombre: "Club no encontrado", logo: "" });
-        }
-      })
-      .catch(() => setClub({ nombre: "Club ejemplo", logo: "" }));
-  }, []);
-
-  useEffect(() => {
     const equipoId = localStorage.getItem("id_equipo");
-    if (!equipoId) {
-      setEquipo({ nombre: "Equipo no encontrado", logo: "" });
+
+    if (!clubId || !equipoId) {
+      setLoading(false);
       return;
     }
 
-    fetch(`https://myhandstats.onrender.com/equipo/${equipoId}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data) {
-          setEquipo({
-            id: data.id,
-            nombre: data.nombre,
-            logo: data.logo,
+    Promise.all([
+      fetch("https://myhandstats.onrender.com/usuario/perfil", {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((res) => res.json()),
+      fetch("https://myhandstats.onrender.com/club", {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((res) => res.json()),
+      fetch(`https://myhandstats.onrender.com/equipo/${equipoId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((res) => res.json()),
+      fetch(`https://myhandstats.onrender.com/equipo/${equipoId}/jugadores`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((res) => res.json()),
+      fetch(`https://myhandstats.onrender.com/equipo/${equipoId}/partidos/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((res) => res.json()),
+    ])
+      .then(
+        ( [
+          usuarioData,
+          clubData,
+          equipoData,
+          jugadoresData,
+          partidosData,
+        ]) => {
+          setUserName(usuarioData.info?.nombre || "Usuario");
+          // Club
+          let clubObj = null;
+          if (Array.isArray(clubData.info)) {
+            clubObj = clubData.info.find((c) => c.id == clubId);
+          } else {
+            clubObj = clubData;
+          }
+          setClub({
+            nombre: clubObj?.nombre || "Club no encontrado",
+            logo: clubObj?.logo || "",
           });
-        } else {
-          setEquipo({ nombre: "Equipo no encontrado", logo: "" });
+          // Equipo
+          setEquipo({
+            id: equipoData?.id || "",
+            nombre: equipoData?.nombre || "Equipo no encontrado",
+            logo: equipoData?.logo || "",
+          });
+          // Jugadores y goles
+          if (Array.isArray(jugadoresData)) {
+            setJugadores(jugadoresData);
+            const totalGolesFavor = jugadoresData.reduce(
+              (acc, jugador) => acc + (jugador.golest || 0),
+              0
+            );
+            setGolesFavor(totalGolesFavor);
+            const totalGolesContra = jugadoresData.reduce(
+              (acc, jugador) => acc + (jugador.gol_en_contra_t || 0),
+              0
+            );
+            setGolesContra(totalGolesContra);
+          } else {
+            setJugadores([]);
+            setGolesFavor(0);
+            setGolesContra(0);
+          }
+          // Partidos
+          setUltimosPartidos(Array.isArray(partidosData) ? partidosData : []);
+          setLoading(false);
         }
-      })
-      .catch(() => setEquipo({ nombre: "Equipo ejemplo", logo: "" }));
-  }, []);
-
-  // Obtener goles de los jugadores del equipo cuando equipo.id esté disponible
-  useEffect(() => {
-    if (!equipo.id) return;
-    const token = localStorage.getItem("token");
-    fetch(`https://myhandstats.onrender.com/equipo/${equipo.id}/jugadores`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Jugadores del equipo:", data); // <-- Añade esta línea
-        if (Array.isArray(data)) {
-          setJugadores(data);
-          // Suma todos los goles a favor (golest)
-          const totalGolesFavor = data.reduce(
-            (acc, jugador) => acc + (jugador.golest || 0),
-            0
-          );
-          setGolesFavor(totalGolesFavor);
-
-          const totalGolesContra = data.reduce(
-            (acc, jugador) => acc + (jugador.gol_en_contra_t || 0),
-            0
-          );
-
-          setGolesContra(totalGolesContra);
-        } else {
-          setGolesFavor(0);
-          setGolesContra(0);
-        }
-      })
+      )
       .catch(() => {
-        setGolesFavor(0);
-        setGolesContra(0);
+        setLoading(false);
       });
-  }, [equipo.id]);
+  }, []);
 
   const golesData = {
     labels: ["Goles a favor", "Goles en contra"],
@@ -166,23 +137,6 @@ const DashboardPrincipal = () => {
     ],
   };
 
-  useEffect(() => {
-    if (!equipo.id) return; // Solo ejecuta si hay id de equipo
-    const token = localStorage.getItem("token");
-    fetch(`https://myhandstats.onrender.com/equipo/${equipo.id}/partidos/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setUltimosPartidos(data);
-        }
-      })
-      .catch(() => setUltimosPartidos([]));
-  }, [equipo.id]);
-
   // Calcular porcentaje de partidos ganados
   const totalPartidos = ultimosPartidos.length;
   const partidosGanados = ultimosPartidos.filter(
@@ -192,6 +146,14 @@ const DashboardPrincipal = () => {
   const porcentajeGanados =
     totalPartidos > 0 ? Math.round((partidosGanados / totalPartidos) * 100) : 0;
   const esPorcentajeAlto = porcentajeGanados >= 50;
+
+  if (loading) {
+    return (
+      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
+        <Spinner size="xl" color="teal.600" thickness="4px" speed="0.7s" />
+      </Box>
+    );
+  }
 
   return (
     <Box p={4} minH="100vh" bg="white">
@@ -297,7 +259,7 @@ const DashboardPrincipal = () => {
                     <tbody>
                       {jugadores
                         .sort((a, b) => (b.lanzamiento_7m || 0) - (a.lanzamiento_7m || 0))
-                        .slice(0, 5)
+                        .slice(0, mostrarTodosLanzadores ? jugadores.length : 5)
                         .map((jugador) => (
                           <tr key={jugador.id}>
                             <td style={{ padding: "4px" }}>{jugador.nombre}</td>
@@ -308,23 +270,6 @@ const DashboardPrincipal = () => {
                         ))}
                     </tbody>
                   </table>
-                  <Collapse in={mostrarTodosLanzadores}>
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                      <tbody>
-                        {jugadores
-                          .sort((a, b) => (b.lanzamiento_7m || 0) - (a.lanzamiento_7m || 0))
-                          .slice(5)
-                          .map((jugador) => (
-                            <tr key={jugador.id}>
-                              <td style={{ padding: "4px" }}>{jugador.nombre}</td>
-                              <td style={{ textAlign: "right", padding: "4px" }}>
-                                {jugador.lanzamiento_7m || 0}
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </Collapse>
                 </Box>
               ) : (
                 <Text fontSize="sm">Aún no hay registros</Text>
@@ -359,7 +304,6 @@ const DashboardPrincipal = () => {
               </Text>
               {Array.isArray(jugadores) && jugadores.length > 0 ? (
                 <Box overflowX="auto">
-                  {/* Top 5 siempre visible */}
                   <table
                     style={{
                       width: "100%",
@@ -376,7 +320,7 @@ const DashboardPrincipal = () => {
                     <tbody>
                       {jugadores
                         .sort((a, b) => (b.golest || 0) - (a.golest || 0))
-                        .slice(0, 5)
+                        .slice(0, mostrarTodosGoleadores ? jugadores.length : 5)
                         .map((jugador) => (
                           <tr key={jugador.id}>
                             <td style={{ padding: "4px" }}>{jugador.nombre}</td>
@@ -387,30 +331,6 @@ const DashboardPrincipal = () => {
                         ))}
                     </tbody>
                   </table>
-                  {/* Resto animado con Collapse */}
-                  <Collapse in={mostrarTodosGoleadores}>
-                    <table
-                      style={{
-                        width: "100%",
-                        borderCollapse: "collapse",
-                        transition: "all 0.3s",
-                      }}
-                    >
-                      <tbody>
-                        {jugadores
-                          .sort((a, b) => (b.golest || 0) - (a.golest || 0))
-                          .slice(5)
-                          .map((jugador) => (
-                            <tr key={jugador.id}>
-                              <td style={{ padding: "4px" }}>{jugador.nombre}</td>
-                              <td style={{ textAlign: "right", padding: "4px" }}>
-                                {jugador.golest || 0}
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </Collapse>
                 </Box>
               ) : (
                 <Text fontSize="sm">Aún no hay registros</Text>
@@ -464,47 +384,45 @@ const DashboardPrincipal = () => {
                         <th style={{ textAlign: "right", padding: "4px" }}>Resultado</th>
                       </tr>
                     </thead>
-                    
-                      <tbody>
-                        {ultimosPartidos
-                          .slice()
-                          .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-                          .slice(0, mostrarTodosPartidos ? ultimosPartidos.length : 5)
-                          .map((partido) => {
-                            const golesFavor = partido.goles_id_equipo ?? 0;
-                            const golesContra = partido.goles_id_equiporival ?? 0;
-                            let bgColor = "";
-                            if (golesFavor > golesContra) bgColor = "#d1fae5";
-                            else if (golesFavor < golesContra) bgColor = "#fee2e2";
+                    <tbody>
+                      {ultimosPartidos
+                        .slice()
+                        .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+                        .slice(0, mostrarTodosPartidos ? ultimosPartidos.length : 5)
+                        .map((partido) => {
+                          const golesFavor = partido.goles_id_equipo ?? 0;
+                          const golesContra = partido.goles_id_equiporival ?? 0;
+                          let bgColor = "";
+                          if (golesFavor > golesContra) bgColor = "#d1fae5";
+                          else if (golesFavor < golesContra) bgColor = "#fee2e2";
 
-                            return (
-                              <tr
-                                key={partido.id}
-                                style={{ borderBottom: "1px solid #e2e8f0" }}
+                          return (
+                            <tr
+                              key={partido.id}
+                              style={{ borderBottom: "1px solid #e2e8f0" }}
+                            >
+                              <td style={{ padding: "4px" }}>
+                                {partido.equiporival_id || "Desconocido"}
+                              </td>
+                              <td style={{ padding: "4px" }}>
+                                {partido.fecha
+                                  ? new Date(partido.fecha).toLocaleDateString()
+                                  : "Sin fecha"}
+                              </td>
+                              <td
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                  backgroundColor: bgColor,
+                                  borderRadius: "6px",
+                                  fontWeight: "bold",
+                                }}
                               >
-                                <td style={{ padding: "4px" }}>
-                                  {partido.equiporival_id || "Desconocido"}
-                                </td>
-                                <td style={{ padding: "4px" }}>
-                                  {partido.fecha
-                                    ? new Date(partido.fecha).toLocaleDateString()
-                                    : "Sin fecha"}
-                                </td>
-                                <td
-                                  style={{
-                                    textAlign: "center",
-                                    padding: "4px",
-                                    backgroundColor: bgColor,
-                                    borderRadius: "6px",
-                                    fontWeight: "bold",
-                                  }}
-                                >
-                                  {golesFavor} - {golesContra}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                     
+                                {golesFavor} - {golesContra}
+                              </td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </table>
                 </Box>
