@@ -10,6 +10,7 @@ import {
   useDisclosure,
   Avatar,
   GridItem,
+  Collapse,
 } from "@chakra-ui/react";
 import { FaBars, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
@@ -37,6 +38,7 @@ const DashboardPrincipal = () => {
   const [golesFavor, setGolesFavor] = useState(0);
   const [golesContra, setGolesContra] = useState(0);
   const [jugadores, setJugadores] = useState([]);
+  const [mostrarTodosGoleadores, setMostrarTodosGoleadores] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -302,27 +304,50 @@ const DashboardPrincipal = () => {
 
             {/* Goleadores */}
             <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
-              <Text fontWeight="bold">Goleadores</Text>
+              <Flex justify="space-between" align="center" mb={2}>
+                <Text fontWeight="bold">Goleadores</Text>
+                {jugadores.length > 5 && (
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    onClick={() => setMostrarTodosGoleadores((v) => !v)}
+                    transition="all 0.2s"
+                    _active={{
+                      transform: "scale(0.95)",
+                      bg: "#e6fffa",
+                    }}
+                    _hover={{
+                      bg: "#f0fdfa",
+                      transform: "scale(1.05)",
+                    }}
+                  >
+                    {mostrarTodosGoleadores ? "Ver top 5" : "Ver todos"}
+                  </Button>
+                )}
+              </Flex>
               <Text fontSize="xs" color="gray.500" mb={2}>
                 Los máximos goleadores del equipo
               </Text>
               {Array.isArray(jugadores) && jugadores.length > 0 ? (
                 <Box overflowX="auto">
-                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  {/* Top 5 siempre visible */}
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "collapse",
+                      transition: "all 0.3s",
+                    }}
+                  >
                     <thead>
                       <tr>
-                        <th style={{ textAlign: "left", padding: "4px" }}>
-                          Jugador
-                        </th>
-                        <th style={{ textAlign: "right", padding: "4px" }}>
-                          Goles
-                        </th>
+                        <th style={{ textAlign: "left", padding: "4px" }}>Jugador</th>
+                        <th style={{ textAlign: "right", padding: "4px" }}>Goles</th>
                       </tr>
                     </thead>
                     <tbody>
                       {jugadores
                         .sort((a, b) => (b.golest || 0) - (a.golest || 0))
-                        .slice(0, 5) // Solo los 5 primeros
+                        .slice(0, 5)
                         .map((jugador) => (
                           <tr key={jugador.id}>
                             <td style={{ padding: "4px" }}>{jugador.nombre}</td>
@@ -333,6 +358,30 @@ const DashboardPrincipal = () => {
                         ))}
                     </tbody>
                   </table>
+                  {/* Resto animado con Collapse */}
+                  <Collapse in={mostrarTodosGoleadores}>
+                    <table
+                      style={{
+                        width: "100%",
+                        borderCollapse: "collapse",
+                        transition: "all 0.3s",
+                      }}
+                    >
+                      <tbody>
+                        {jugadores
+                          .sort((a, b) => (b.golest || 0) - (a.golest || 0))
+                          .slice(5)
+                          .map((jugador) => (
+                            <tr key={jugador.id}>
+                              <td style={{ padding: "4px" }}>{jugador.nombre}</td>
+                              <td style={{ textAlign: "right", padding: "4px" }}>
+                                {jugador.golest || 0}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </Collapse>
                 </Box>
               ) : (
                 <Text fontSize="sm">Aún no hay registros</Text>
