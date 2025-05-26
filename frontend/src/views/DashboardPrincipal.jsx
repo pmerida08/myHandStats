@@ -39,6 +39,8 @@ const DashboardPrincipal = () => {
   const [golesContra, setGolesContra] = useState(0);
   const [jugadores, setJugadores] = useState([]);
   const [mostrarTodosGoleadores, setMostrarTodosGoleadores] = useState(false);
+  const [mostrarTodosLanzadores, setMostrarTodosLanzadores] = useState(false);
+  const [mostrarTodosPartidos, setMostrarTodosPartidos] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -224,9 +226,6 @@ const DashboardPrincipal = () => {
           <Box borderWidth="1px" borderRadius="md" p={4}>
             <Flex justify="space-between" mb={2}>
               <Text fontWeight="bold">Goles últimos partidos</Text>
-              <Button size="sm" variant="outline">
-                View Report
-              </Button>
             </Flex>
             <Box h="200px" w="200px" mx="auto">
               <Doughnut data={golesData} />
@@ -262,7 +261,27 @@ const DashboardPrincipal = () => {
           >
             {/* Lanzamientos 7m */}
             <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
-              <Text fontWeight="bold">Lanzamientos 7m</Text>
+              <Flex justify="space-between" align="center" mb={2}>
+                <Text fontWeight="bold">Lanzamientos 7m</Text>
+                {jugadores.length > 5 && (
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    onClick={() => setMostrarTodosLanzadores((v) => !v)}
+                    transition="all 0.2s"
+                    _active={{
+                      transform: "scale(0.95)",
+                      bg: "#e6fffa",
+                    }}
+                    _hover={{
+                      bg: "#f0fdfa",
+                      transform: "scale(1.05)",
+                    }}
+                  >
+                    {mostrarTodosLanzadores ? "Ver top 5" : "Ver todos"}
+                  </Button>
+                )}
+              </Flex>
               <Text fontSize="xs" color="gray.500" mb={2}>
                 Los máximos lanzadores de 7 metros del equipo
               </Text>
@@ -271,21 +290,14 @@ const DashboardPrincipal = () => {
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr>
-                        <th style={{ textAlign: "left", padding: "4px" }}>
-                          Jugador
-                        </th>
-                        <th style={{ textAlign: "right", padding: "4px" }}>
-                          Lanzamientos 7m
-                        </th>
+                        <th style={{ textAlign: "left", padding: "4px" }}>Jugador</th>
+                        <th style={{ textAlign: "right", padding: "4px" }}>Lanzamientos 7m</th>
                       </tr>
                     </thead>
                     <tbody>
                       {jugadores
-                        .sort(
-                          (a, b) =>
-                            (b.lanzamiento_7m || 0) - (a.lanzamiento_7m || 0)
-                        )
-                        .slice(0, 5) // Solo los 5 primeros
+                        .sort((a, b) => (b.lanzamiento_7m || 0) - (a.lanzamiento_7m || 0))
+                        .slice(0, 5)
                         .map((jugador) => (
                           <tr key={jugador.id}>
                             <td style={{ padding: "4px" }}>{jugador.nombre}</td>
@@ -296,6 +308,23 @@ const DashboardPrincipal = () => {
                         ))}
                     </tbody>
                   </table>
+                  <Collapse in={mostrarTodosLanzadores}>
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                      <tbody>
+                        {jugadores
+                          .sort((a, b) => (b.lanzamiento_7m || 0) - (a.lanzamiento_7m || 0))
+                          .slice(5)
+                          .map((jugador) => (
+                            <tr key={jugador.id}>
+                              <td style={{ padding: "4px" }}>{jugador.nombre}</td>
+                              <td style={{ textAlign: "right", padding: "4px" }}>
+                                {jugador.lanzamiento_7m || 0}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </Collapse>
                 </Box>
               ) : (
                 <Text fontSize="sm">Aún no hay registros</Text>
@@ -390,11 +419,26 @@ const DashboardPrincipal = () => {
 
             {/* Historial de partidos */}
             <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
-              <Flex justify="space-between" mb={2}>
+              <Flex justify="space-between" mb={2} align="center">
                 <Text fontWeight="bold">Historial de partidos</Text>
-                <Button size="sm" variant="outline">
-                  View Report
-                </Button>
+                {ultimosPartidos.length > 5 && (
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    onClick={() => setMostrarTodosPartidos((v) => !v)}
+                    transition="all 0.2s"
+                    _active={{
+                      transform: "scale(0.95)",
+                      bg: "#e6fffa",
+                    }}
+                    _hover={{
+                      bg: "#f0fdfa",
+                      transform: "scale(1.05)",
+                    }}
+                  >
+                    {mostrarTodosPartidos ? "Ver últimos 5" : "Ver todos"}
+                  </Button>
+                )}
               </Flex>
               <Flex align="center" gap={2} mb={2}>
                 <Text fontSize={"sm"}>Porcentaje de victorias:</Text>
@@ -415,20 +459,15 @@ const DashboardPrincipal = () => {
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr>
-                        <th style={{ textAlign: "left", padding: "4px" }}>
-                          Rival
-                        </th>
-                        <th style={{ textAlign: "left", padding: "4px" }}>
-                          Fecha
-                        </th>
-                        <th style={{ textAlign: "right", padding: "4px" }}>
-                          Resultado
-                        </th>
+                        <th style={{ textAlign: "left", padding: "4px" }}>Rival</th>
+                        <th style={{ textAlign: "left", padding: "4px" }}>Fecha</th>
+                        <th style={{ textAlign: "right", padding: "4px" }}>Resultado</th>
                       </tr>
                     </thead>
-                    <tbody style={{ fontSize: "sm", color: "#4A5568" }}>
+                    <tbody>
+                      {/* Últimos 5 partidos siempre visibles */}
                       {ultimosPartidos
-                        .slice(-5) // Los 5 últimos (si están en orden cronológico)
+                        .slice(-5)
                         .map((partido) => {
                           const golesFavor = partido.goles_id_equipo ?? 0;
                           const golesContra = partido.goles_id_equiporival ?? 0;
@@ -463,6 +502,45 @@ const DashboardPrincipal = () => {
                             </tr>
                           );
                         })}
+                      {/* Filas adicionales con animación */}
+                      <Collapse in={mostrarTodosPartidos} style={{ display: "contents" }}>
+                        {ultimosPartidos
+                          .slice(0, ultimosPartidos.length - 5)
+                          .map((partido) => {
+                            const golesFavor = partido.goles_id_equipo ?? 0;
+                            const golesContra = partido.goles_id_equiporival ?? 0;
+                            let bgColor = "";
+                            if (golesFavor > golesContra) bgColor = "#d1fae5";
+                            else if (golesFavor < golesContra) bgColor = "#fee2e2";
+
+                            return (
+                              <tr
+                                key={partido.id}
+                                style={{ borderBottom: "1px solid #e2e8f0" }}
+                              >
+                                <td style={{ padding: "4px" }}>
+                                  {partido.equiporival_id || "Desconocido"}
+                                </td>
+                                <td style={{ padding: "4px" }}>
+                                  {partido.fecha
+                                    ? new Date(partido.fecha).toLocaleDateString()
+                                    : "Sin fecha"}
+                                </td>
+                                <td
+                                  style={{
+                                    textAlign: "center",
+                                    padding: "4px",
+                                    backgroundColor: bgColor,
+                                    borderRadius: "6px",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  {golesFavor} - {golesContra}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                      </Collapse>
                     </tbody>
                   </table>
                 </Box>
