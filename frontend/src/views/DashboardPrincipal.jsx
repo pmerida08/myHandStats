@@ -9,6 +9,7 @@ import {
   Divider,
   useDisclosure,
   Avatar,
+  GridItem,
 } from "@chakra-ui/react";
 import { FaBars, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
@@ -181,9 +182,11 @@ const DashboardPrincipal = () => {
   // Calcular porcentaje de partidos ganados
   const totalPartidos = ultimosPartidos.length;
   const partidosGanados = ultimosPartidos.filter(
-    (partido) => (partido.goles_id_equipo ?? 0) > (partido.goles_id_equiporival ?? 0)
+    (partido) =>
+      (partido.goles_id_equipo ?? 0) > (partido.goles_id_equiporival ?? 0)
   ).length;
-  const porcentajeGanados = totalPartidos > 0 ? Math.round((partidosGanados / totalPartidos) * 100) : 0;
+  const porcentajeGanados =
+    totalPartidos > 0 ? Math.round((partidosGanados / totalPartidos) * 100) : 0;
   const esPorcentajeAlto = porcentajeGanados >= 50;
 
   return (
@@ -213,189 +216,213 @@ const DashboardPrincipal = () => {
       </Flex>
 
       {/* Grid principal */}
-      <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
-        {/* Goles últimos partidos */}
-        <Box borderWidth="1px" borderRadius="md" p={4}>
-          <Flex justify="space-between" mb={2}>
-            <Text fontWeight="bold">Goles últimos partidos</Text>
-            <Button size="sm" variant="outline">
-              View Report
-            </Button>
-          </Flex>
-          <Box h="200px" w="200px" mx="auto">
-            <Doughnut data={golesData} />
+      <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4}>
+        {/* Primera fila: Goles últimos partidos y Fases del Juego */}
+        <GridItem>
+          <Box borderWidth="1px" borderRadius="md" p={4}>
+            <Flex justify="space-between" mb={2}>
+              <Text fontWeight="bold">Goles últimos partidos</Text>
+              <Button size="sm" variant="outline">
+                View Report
+              </Button>
+            </Flex>
+            <Box h="200px" w="200px" mx="auto">
+              <Doughnut data={golesData} />
+            </Box>
+            <Divider my={4} />
+            <Flex gap={4} justify="center">
+              <Box h={2} w={2} borderRadius="full" bg="#014C4C" />
+              <Text fontSize="xs">Goles a favor</Text>
+              <Box h={2} w={2} borderRadius="full" bg="gray.300" />
+              <Text fontSize="xs">Goles en contra</Text>
+            </Flex>
           </Box>
-          <Divider my={4} />
-          <Flex gap={4} justify="center">
-            <Box h={2} w={2} borderRadius="full" bg="#014C4C" />
-            <Text fontSize="xs">Goles a favor</Text>
-            <Box h={2} w={2} borderRadius="full" bg="gray.300" />
-            <Text fontSize="xs">Goles en contra</Text>
-          </Flex>
-        </Box>
+        </GridItem>
+        <GridItem>
+          <Box borderWidth="1px" borderRadius="md" p={4}>
+            <Flex justify="space-between" mb={2}>
+              <Text fontWeight="bold">Fases del Juego últimos partidos</Text>
+              <Button size="sm" variant="ghost" isDisabled>
+                View Report
+              </Button>
+            </Flex>
+            <Text fontSize="sm">Aún no hay registros</Text>
+          </Box>
+        </GridItem>
 
-        {/* Fases del Juego */}
-        <Box borderWidth="1px" borderRadius="md" p={4}>
-          <Flex justify="space-between" mb={2}>
-            <Text fontWeight="bold">Fases del Juego últimos partidos</Text>
-            <Button size="sm" variant="ghost" isDisabled>
-              View Report
-            </Button>
-          </Flex>
-          <Text fontSize="sm">Aún no hay registros</Text>
-        </Box>
-
-        {/* Lanzamientos 7m */}
-        <Box borderWidth="1px" borderRadius="md" p={4}>
-          <Text fontWeight="bold">Lanzamientos 7m</Text>
-          <Text fontSize="xs" color="gray.500" mb={2}>
-            Los máximos lanzadores de 7 metros del equipo
-          </Text>
-          {Array.isArray(jugadores) && jugadores.length > 0 ? (
-            <Box overflowX="auto">
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr>
-                    <th style={{ textAlign: "left", padding: "4px" }}>
-                      Jugador
-                    </th>
-                    <th style={{ textAlign: "right", padding: "4px" }}>
-                      Lanzamientos 7m
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {jugadores
-                    .sort((a, b) => (b.lanzamiento_7m || 0) - (a.lanzamiento_7m || 0))
-                    .slice(0, 5) // Solo los 5 primeros
-                    .map((jugador) => (
-                      <tr key={jugador.id}>
-                        <td style={{ padding: "4px" }}>{jugador.nombre}</td>
-                        <td style={{ textAlign: "right", padding: "4px" }}>
-                          {jugador.lanzamiento_7m || 0}
-                        </td>
+        {/* Segunda fila: Lanzamientos 7m, Goleadores, Historial de partidos */}
+        <GridItem colSpan={2}>
+          <Flex
+            gap={4}
+            mb={2}
+            flexDirection={{ base: "column", md: "row" }}
+            justify="space-between"
+          >
+            {/* Lanzamientos 7m */}
+            <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
+              <Text fontWeight="bold">Lanzamientos 7m</Text>
+              <Text fontSize="xs" color="gray.500" mb={2}>
+                Los máximos lanzadores de 7 metros del equipo
+              </Text>
+              {Array.isArray(jugadores) && jugadores.length > 0 ? (
+                <Box overflowX="auto">
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Jugador
+                        </th>
+                        <th style={{ textAlign: "right", padding: "4px" }}>
+                          Lanzamientos 7m
+                        </th>
                       </tr>
-                    ))}
-                </tbody>
-              </table>
+                    </thead>
+                    <tbody>
+                      {jugadores
+                        .sort(
+                          (a, b) =>
+                            (b.lanzamiento_7m || 0) - (a.lanzamiento_7m || 0)
+                        )
+                        .slice(0, 5) // Solo los 5 primeros
+                        .map((jugador) => (
+                          <tr key={jugador.id}>
+                            <td style={{ padding: "4px" }}>{jugador.nombre}</td>
+                            <td style={{ textAlign: "right", padding: "4px" }}>
+                              {jugador.lanzamiento_7m || 0}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </Box>
+              ) : (
+                <Text fontSize="sm">Aún no hay registros</Text>
+              )}
             </Box>
-          ) : (
-            <Text fontSize="sm">Aún no hay registros</Text>
-          )}
-        </Box>
 
-        {/* Goleadores */}
-        <Box borderWidth="1px" borderRadius="md" p={4}>
-          <Text fontWeight="bold">Goleadores</Text>
-          <Text fontSize="xs" color="gray.500" mb={2}>
-            Los máximos goleadores del equipo
-          </Text>
-          {Array.isArray(jugadores) && jugadores.length > 0 ? (
-            <Box overflowX="auto">
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr>
-                    <th style={{ textAlign: "left", padding: "4px" }}>
-                      Jugador
-                    </th>
-                    <th style={{ textAlign: "right", padding: "4px" }}>
-                      Goles
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {jugadores
-                    .sort((a, b) => (b.golest || 0) - (a.golest || 0))
-                    .slice(0, 5) // Solo los 5 primeros
-                    .map((jugador) => (
-                      <tr key={jugador.id}>
-                        <td style={{ padding: "4px" }}>{jugador.nombre}</td>
-                        <td style={{ textAlign: "right", padding: "4px" }}>
-                          {jugador.golest || 0}
-                        </td>
+            {/* Goleadores */}
+            <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
+              <Text fontWeight="bold">Goleadores</Text>
+              <Text fontSize="xs" color="gray.500" mb={2}>
+                Los máximos goleadores del equipo
+              </Text>
+              {Array.isArray(jugadores) && jugadores.length > 0 ? (
+                <Box overflowX="auto">
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Jugador
+                        </th>
+                        <th style={{ textAlign: "right", padding: "4px" }}>
+                          Goles
+                        </th>
                       </tr>
-                    ))}
-                </tbody>
-              </table>
+                    </thead>
+                    <tbody>
+                      {jugadores
+                        .sort((a, b) => (b.golest || 0) - (a.golest || 0))
+                        .slice(0, 5) // Solo los 5 primeros
+                        .map((jugador) => (
+                          <tr key={jugador.id}>
+                            <td style={{ padding: "4px" }}>{jugador.nombre}</td>
+                            <td style={{ textAlign: "right", padding: "4px" }}>
+                              {jugador.golest || 0}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </Box>
+              ) : (
+                <Text fontSize="sm">Aún no hay registros</Text>
+              )}
             </Box>
-          ) : (
-            <Text fontSize="sm">Aún no hay registros</Text>
-          )}
-        </Box>
 
-        {/* Partidos */}
-        <Box borderWidth="1px" borderRadius="md" p={4}>
-          <Flex justify="space-between" mb={2}>
-            <Text fontWeight="bold">Historial de partidos</Text>
-            <Button size="sm" variant="outline">
-              View Report
-            </Button>
-          </Flex>
-          <Flex align="center" gap={2} mb={2}>
-            <Text fontSize={"sm"}>Porcentaje de victorias:</Text>
-            <Text color={esPorcentajeAlto ? "green.600" : "red.600"} fontWeight="bold">
-              {porcentajeGanados}%
-            </Text>
-            <Icon
-              as={esPorcentajeAlto ? FaArrowUp : FaArrowDown}
-              color={esPorcentajeAlto ? "green.600" : "red.600"}
-              boxSize={4}
-            />
-          </Flex>
-          {Array.isArray(ultimosPartidos) && ultimosPartidos.length > 0 ? (
-            <Box overflowX="auto">
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr>
-                    <th style={{ textAlign: "left", padding: "4px" }}>Rival</th>
-                    <th style={{ textAlign: "left", padding: "4px" }}>Fecha</th>
-                    <th style={{ textAlign: "right", padding: "4px" }}>
-                      Resultado
-                    </th>
-                  </tr>
-                </thead>
-                <tbody style={{ fontSize: "sm", color: "#4A5568" }}>
-                  {ultimosPartidos
-                    .slice(-5) // Los 5 últimos (si están en orden cronológico)
-                    .map((partido) => {
-                      const golesFavor = partido.goles_id_equipo ?? 0;
-                      const golesContra = partido.goles_id_equiporival ?? 0;
-                      let bgColor = "";
-                      if (golesFavor > golesContra)
-                        bgColor = "#d1fae5";
-                      else if (golesFavor < golesContra) bgColor = "#fee2e2";
+            {/* Historial de partidos */}
+            <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
+              <Flex justify="space-between" mb={2}>
+                <Text fontWeight="bold">Historial de partidos</Text>
+                <Button size="sm" variant="outline">
+                  View Report
+                </Button>
+              </Flex>
+              <Flex align="center" gap={2} mb={2}>
+                <Text fontSize={"sm"}>Porcentaje de victorias:</Text>
+                <Text
+                  color={esPorcentajeAlto ? "green.600" : "red.600"}
+                  fontWeight="bold"
+                >
+                  {porcentajeGanados}%
+                </Text>
+                <Icon
+                  as={esPorcentajeAlto ? FaArrowUp : FaArrowDown}
+                  color={esPorcentajeAlto ? "green.600" : "red.600"}
+                  boxSize={4}
+                />
+              </Flex>
+              {Array.isArray(ultimosPartidos) && ultimosPartidos.length > 0 ? (
+                <Box overflowX="auto">
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Rival
+                        </th>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Fecha
+                        </th>
+                        <th style={{ textAlign: "right", padding: "4px" }}>
+                          Resultado
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody style={{ fontSize: "sm", color: "#4A5568" }}>
+                      {ultimosPartidos
+                        .slice(-5) // Los 5 últimos (si están en orden cronológico)
+                        .map((partido) => {
+                          const golesFavor = partido.goles_id_equipo ?? 0;
+                          const golesContra = partido.goles_id_equiporival ?? 0;
+                          let bgColor = "";
+                          if (golesFavor > golesContra) bgColor = "#d1fae5";
+                          else if (golesFavor < golesContra) bgColor = "#fee2e2";
 
-                      return (
-                        <tr key={partido.id} style={{ borderBottom: "1px solid #e2e8f0" }}>
-                          <td style={{ padding: "4px" }}>
-                            {partido.equiporival_id || "Desconocido"}
-                          </td>
-                          <td style={{ padding: "4px" }}>
-                            {partido.fecha
-                              ? new Date(partido.fecha).toLocaleDateString()
-                              : "Sin fecha"}
-                          </td>
-                          <td
-                            style={{
-                              textAlign: "center",
-                              padding: "4px",
-                              backgroundColor: bgColor,
-                              borderRadius: "6px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            {golesFavor} - {golesContra}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
+                          return (
+                            <tr
+                              key={partido.id}
+                              style={{ borderBottom: "1px solid #e2e8f0" }}
+                            >
+                              <td style={{ padding: "4px" }}>
+                                {partido.equiporival_id || "Desconocido"}
+                              </td>
+                              <td style={{ padding: "4px" }}>
+                                {partido.fecha
+                                  ? new Date(partido.fecha).toLocaleDateString()
+                                  : "Sin fecha"}
+                              </td>
+                              <td
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                  backgroundColor: bgColor,
+                                  borderRadius: "6px",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                {golesFavor} - {golesContra}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </Box>
+              ) : (
+                <Text fontSize="sm">Aún no hay registros</Text>
+              )}
             </Box>
-          ) : (
-            <Text fontSize="sm">Aún no hay registros</Text>
-          )}
-        </Box>
+          </Flex>
+        </GridItem>
       </Grid>
     </Box>
   );
