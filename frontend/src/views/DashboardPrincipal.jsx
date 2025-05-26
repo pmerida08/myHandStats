@@ -266,10 +266,8 @@ const DashboardPrincipal = () => {
                 </thead>
                 <tbody>
                   {jugadores
-                    .sort(
-                      (a, b) =>
-                        (b.lanzamiento_7m || 0) - (a.lanzamiento_7m || 0)
-                    )
+                    .sort((a, b) => (b.lanzamiento_7m || 0) - (a.lanzamiento_7m || 0))
+                    .slice(0, 5) // Solo los 5 primeros
                     .map((jugador) => (
                       <tr key={jugador.id}>
                         <td style={{ padding: "4px" }}>{jugador.nombre}</td>
@@ -308,6 +306,7 @@ const DashboardPrincipal = () => {
                 <tbody>
                   {jugadores
                     .sort((a, b) => (b.golest || 0) - (a.golest || 0))
+                    .slice(0, 5) // Solo los 5 primeros
                     .map((jugador) => (
                       <tr key={jugador.id}>
                         <td style={{ padding: "4px" }}>{jugador.nombre}</td>
@@ -356,38 +355,40 @@ const DashboardPrincipal = () => {
                   </tr>
                 </thead>
                 <tbody style={{ fontSize: "sm", color: "#4A5568" }}>
-                  {ultimosPartidos.map((partido) => {
-                    const golesFavor = partido.goles_id_equipo ?? 0;
-                    const golesContra = partido.goles_id_equiporival ?? 0;
-                    let bgColor = "";
-                    if (golesFavor > golesContra)
-                      bgColor = "#d1fae5";
-                    else if (golesFavor < golesContra) bgColor = "#fee2e2";
+                  {ultimosPartidos
+                    .slice(-5) // Los 5 últimos (si están en orden cronológico)
+                    .map((partido) => {
+                      const golesFavor = partido.goles_id_equipo ?? 0;
+                      const golesContra = partido.goles_id_equiporival ?? 0;
+                      let bgColor = "";
+                      if (golesFavor > golesContra)
+                        bgColor = "#d1fae5";
+                      else if (golesFavor < golesContra) bgColor = "#fee2e2";
 
-                    return (
-                      <tr key={partido.id} style={{ borderBottom: "1px solid #e2e8f0" }}>
-                        <td style={{ padding: "4px" }}>
-                          {partido.equiporival_id || "Desconocido"}
-                        </td>
-                        <td style={{ padding: "4px" }}>
-                          {partido.fecha
-                            ? new Date(partido.fecha).toLocaleDateString()
-                            : "Sin fecha"}
-                        </td>
-                        <td
-                          style={{
-                            textAlign: "center",
-                            padding: "4px",
-                            backgroundColor: bgColor,
-                            borderRadius: "6px",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {golesFavor} - {golesContra}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                      return (
+                        <tr key={partido.id} style={{ borderBottom: "1px solid #e2e8f0" }}>
+                          <td style={{ padding: "4px" }}>
+                            {partido.equiporival_id || "Desconocido"}
+                          </td>
+                          <td style={{ padding: "4px" }}>
+                            {partido.fecha
+                              ? new Date(partido.fecha).toLocaleDateString()
+                              : "Sin fecha"}
+                          </td>
+                          <td
+                            style={{
+                              textAlign: "center",
+                              padding: "4px",
+                              backgroundColor: bgColor,
+                              borderRadius: "6px",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {golesFavor} - {golesContra}
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
             </Box>
