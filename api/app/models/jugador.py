@@ -113,10 +113,9 @@ class JugadorCreate(BaseModel):
         orm_mode = True
 
 class JugadorUpdate(BaseModel):
-    fecha_nac: Optional[date] = None
+    fecha_nac: Optional[str] = None
     nombre: Optional[str] = None
     foto: Optional[str] = None
-    posiciones: Optional[List[int]] = None
     golesei: Optional[int] = None
     golesli: Optional[int] = None
     golesld: Optional[int] = None

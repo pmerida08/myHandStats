@@ -59,7 +59,7 @@ const Jugadores = () => {
       nombre: jugador.nombre || "",
       fecha_nacimiento: jugador.fecha_nac || "",
       dorsal: jugador.dorsal?.toString() || "",
-      posicion: jugador.posiciones?.[0]?.id || "",
+      posicion: jugador.posiciones?.[0]?.id?.toString() || "",
       foto: null,
     });
     setEditandoJugadorId(jugador.id);
@@ -74,7 +74,7 @@ const Jugadores = () => {
       foto: "foto.jpg",
       dorsal: parseInt(jugadorForm.dorsal),
       equipos_id: parseInt(equipoSeleccionado),
-      posiciones: jugadorForm.posicion ? [jugadorForm.posicion] : [],
+      posiciones: jugadorForm.posicion ? [parseInt(jugadorForm.posicion)] : [],
       golesei: 0,
       golesli: 0,
       golesld: 0,
@@ -149,16 +149,15 @@ const Jugadores = () => {
 
   const editarJugador = async () => {
     const token = localStorage.getItem("token");
-    // Solo los campos básicos para editar
     const body = {
       nombre: jugadorForm.nombre,
       fecha_nac: jugadorForm.fecha_nacimiento,
       foto: "foto.jpg",
       dorsal: parseInt(jugadorForm.dorsal),
-      posiciones: jugadorForm.posicion ? [jugadorForm.posicion] : [],
+      posiciones: jugadorForm.posicion ? [parseInt(jugadorForm.posicion)] : [],
+
     };
 
-    console.log("Editando jugador:", body);
 
     try {
       const res = await fetch(
@@ -187,6 +186,25 @@ const Jugadores = () => {
       cargarJugadores();
     } catch (err) {
       console.error("Error al editar jugador:", err);
+    }
+
+    // Si se está editando la posición, hacer la petición aparte
+    if (jugadorForm.posicion) {
+      try {
+      await fetch(
+        `https://myhandstats.onrender.com/equipo/${equipoSeleccionado}/jugador/${editandoJugadorId}/posicion`,
+        {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ posicion_id: jugadorForm.posicion[0] }),
+        }
+      );
+      } catch (err) {
+      console.error("Error al actualizar la posición:", err);
+      }
     }
   };
 
@@ -389,7 +407,7 @@ const Jugadores = () => {
                     onChange={(e) =>
                       setJugadorForm((prev) => ({
                         ...prev,
-                        posicion: parseInt(e.target.value),
+                        posicion: e.target.value,
                       }))
                     }
                   >
