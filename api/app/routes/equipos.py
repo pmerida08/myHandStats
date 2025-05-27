@@ -140,7 +140,24 @@ def obtener_jugador_equipo(equipo_id: int, jugador_id: int, datos_token: dict = 
     if not jugador_data.data or len(jugador_data.data) == 0:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
 
-    return jugador_data.data[0]
+    jugador = jugador_data.data[0]
+
+    # Obtener posiciones del jugador
+    posiciones_resp = supabase.table("jugador_posicion").select("*").eq("jugador_id", jugador_id).execute()
+    posiciones = posiciones_resp.data if posiciones_resp.data else []
+
+    # Obtener los nombres de las posiciones
+    if posiciones:
+        posicion_ids = [pos["posicion_id"] for pos in posiciones]
+        posiciones_nombres_resp = supabase.table("posiciones").select("*").in_("id", posicion_ids).execute()
+        posiciones_nombres = posiciones_nombres_resp.data if posiciones_nombres_resp.data else []
+        # Mapear id de posición a objeto
+        id_a_posicion = {p["id"]: {"id": p["id"], "nombre": p["nombre"]} for p in posiciones_nombres}
+        jugador["posiciones"] = [id_a_posicion.get(pos["posicion_id"]) for pos in posiciones if id_a_posicion.get(pos["posicion_id"])]
+    else:
+        jugador["posiciones"] = []
+
+    return jugador
 
 
 @router.get("/{equipo_id}/partido/{partido_id}", response_model=PartidoOut)
