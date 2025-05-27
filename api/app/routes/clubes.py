@@ -43,9 +43,7 @@ def obtener_usuarios_club(datos_token: dict = Depends(obtener_info_desde_token))
 
 @router.get("/equipos/", response_model=List[EquipoOut])
 def obtener_equipos_club(datos_token: dict = Depends(obtener_info_desde_token)):
-    if datos_token["rol"] not in ["admin", "entrenador"]:
-        raise HTTPException(status_code=403, detail="Solo los administradores o entrenadores pueden ver los equipos del club")
-
+  
     response = supabase.table("equipos").select("*").eq("clubs_id", datos_token["clubs_id"]).execute()
 
     if getattr(response, "error", None):
