@@ -15,3 +15,4 @@ class PosicionOut(BaseModel):
 
     class Config:
         orm_mode = True
+

@@ -166,6 +166,8 @@ const UsuariosClubAdmin = () => {
       ...(nuevoUsuario.contraseña && { password: nuevoUsuario.contraseña }),
     };
 
+    console.log("Usuario editado:", usuarioEditado);
+
     fetch(`https://myhandstats.onrender.com/club/usuario/${usuarioSeleccionado.id}`, {
       method: "PUT",
       headers: {

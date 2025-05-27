@@ -23,7 +23,7 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { FaPlus, FaUser, FaBars } from "react-icons/fa";
+import { FaPlus, FaUser, FaBars, FaUserEdit } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 
@@ -31,12 +31,13 @@ const Jugadores = () => {
   const gridCols = useBreakpointValue({ base: 1, sm: 2, md: 3, lg: 4 });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editandoJugadorId, setEditandoJugadorId] = useState(null);
   const [equipoSeleccionado, setEquipoSeleccionado] = useState("");
   const [jugadores, setJugadores] = useState([]);
   const [loading, setLoading] = useState(false);
   const [posiciones, setPosiciones] = useState([]);
 
-  const [nuevoJugador, setNuevoJugador] = useState({
+  const [jugadorForm, setJugadorForm] = useState({
     nombre: "",
     fecha_nacimiento: "",
     dorsal: "",
@@ -46,23 +47,34 @@ const Jugadores = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNuevoJugador((prev) => ({ ...prev, [name]: value }));
+    setJugadorForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
-    setNuevoJugador((prev) => ({ ...prev, foto: e.target.files[0] }));
+    setJugadorForm((prev) => ({ ...prev, foto: e.target.files[0] }));
+  };
+
+  const abrirModalEditar = (jugador) => {
+    setJugadorForm({
+      nombre: jugador.nombre || "",
+      fecha_nacimiento: jugador.fecha_nac || "",
+      dorsal: jugador.dorsal?.toString() || "",
+      posicion: jugador.posiciones?.[0]?.id?.toString() || "",
+      foto: null,
+    });
+    setEditandoJugadorId(jugador.id);
+    setIsModalOpen(true);
   };
 
   const crearJugador = async () => {
     const token = localStorage.getItem("token");
-
     const body = {
-      nombre: nuevoJugador.nombre,
-      fecha_nac: nuevoJugador.fecha_nacimiento,
-      foto: "foto.jpg", // Implementa la subida real si lo necesitas
-      dorsal: parseInt(nuevoJugador.dorsal),
+      nombre: jugadorForm.nombre,
+      fecha_nac: jugadorForm.fecha_nacimiento,
+      foto: "foto.jpg",
+      dorsal: parseInt(jugadorForm.dorsal),
       equipos_id: parseInt(equipoSeleccionado),
-      posiciones: nuevoJugador.posicion ? [nuevoJugador.posicion] : [],
+      posiciones: jugadorForm.posicion ? [parseInt(jugadorForm.posicion)] : [],
       golesei: 0,
       golesli: 0,
       golesld: 0,
@@ -106,8 +118,6 @@ const Jugadores = () => {
       gol_en_contra_7m: 0,
     };
 
-    console.log("Cuerpo del jugador:", body);
-
     try {
       const res = await fetch(
         `https://myhandstats.onrender.com/equipo/${equipoSeleccionado}/jugador/`,
@@ -123,10 +133,8 @@ const Jugadores = () => {
 
       if (!res.ok) throw new Error("No se pudo crear el jugador");
 
-      // const data = await res.json(); // Si necesitas la data para algo, la puedes usar aquí.
-
       setIsModalOpen(false);
-      setNuevoJugador({
+      setJugadorForm({
         nombre: "",
         fecha_nacimiento: "",
         dorsal: "",
@@ -136,6 +144,67 @@ const Jugadores = () => {
       cargarJugadores();
     } catch (err) {
       console.error("Error al crear jugador:", err);
+    }
+  };
+
+  const editarJugador = async () => {
+    const token = localStorage.getItem("token");
+    const body = {
+      nombre: jugadorForm.nombre,
+      fecha_nac: jugadorForm.fecha_nacimiento,
+      foto: "foto.jpg",
+      dorsal: parseInt(jugadorForm.dorsal),
+      posiciones: jugadorForm.posicion ? [parseInt(jugadorForm.posicion)] : [],
+
+    };
+
+
+    try {
+      const res = await fetch(
+        `https://myhandstats.onrender.com/equipo/${equipoSeleccionado}/jugador/${editandoJugadorId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(body),
+        }
+      );
+
+      if (!res.ok) throw new Error("No se pudo actualizar el jugador");
+
+      setIsModalOpen(false);
+      setEditandoJugadorId(null);
+      setJugadorForm({
+        nombre: "",
+        fecha_nacimiento: "",
+        dorsal: "",
+        posicion: "",
+        foto: null,
+      });
+      cargarJugadores();
+    } catch (err) {
+      console.error("Error al editar jugador:", err);
+    }
+
+    // Si se está editando la posición, hacer la petición aparte
+    if (jugadorForm.posicion) {
+      try {
+      await fetch(
+        `https://myhandstats.onrender.com/equipo/${equipoSeleccionado}/jugador/${editandoJugadorId}/posicion`,
+        {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ posicion_id: jugadorForm.posicion[0] }),
+        }
+      );
+      } catch (err) {
+      console.error("Error al actualizar la posición:", err);
+      }
     }
   };
 
@@ -224,7 +293,18 @@ const Jugadores = () => {
                   boxShadow: "xl",
                   bg: "#d3f0f0",
                 }}
+                position="relative"
               >
+                <IconButton
+                  icon={<FaUserEdit />}
+                  size="sm"
+                  position="absolute"
+                  top={2}
+                  right={2}
+                  colorScheme="teal"
+                  aria-label="Editar jugador"
+                  onClick={() => abrirModalEditar(jugador)}
+                />
                 <Avatar icon={<FaUser />} size="2xl" bg="#a8dadc" mb={4} />
                 <Text fontWeight="bold" fontSize="lg" color="#014C4C" mb={1}>
                   {jugador.nombre}
@@ -272,18 +352,25 @@ const Jugadores = () => {
           aria-label="Añadir jugador"
           boxShadow="lg"
           _hover={{ bg: "#013C3C" }}
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setEditandoJugadorId(null);
+            setJugadorForm({
+              nombre: "",
+              fecha_nacimiento: "",
+              dorsal: "",
+              posicion: "",
+              foto: null,
+            });
+            setIsModalOpen(true);
+          }}
         />
 
-        <Modal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          isCentered
-          size="lg"
-        >
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} isCentered size="lg">
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Creación de Jugador</ModalHeader>
+            <ModalHeader>
+              {editandoJugadorId ? "Editar Jugador" : "Crear Jugador"}
+            </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <VStack spacing={4}>
@@ -291,7 +378,7 @@ const Jugadores = () => {
                   <Input
                     name="nombre"
                     placeholder="Nombre del Jugador"
-                    value={nuevoJugador.nombre}
+                    value={jugadorForm.nombre}
                     onChange={handleInputChange}
                   />
                 </FormControl>
@@ -300,7 +387,7 @@ const Jugadores = () => {
                     name="fecha_nacimiento"
                     type="date"
                     placeholder="Fecha Nacimiento"
-                    value={nuevoJugador.fecha_nacimiento}
+                    value={jugadorForm.fecha_nacimiento}
                     onChange={handleInputChange}
                   />
                 </FormControl>
@@ -308,7 +395,7 @@ const Jugadores = () => {
                   <Input
                     name="dorsal"
                     placeholder="Dorsal"
-                    value={nuevoJugador.dorsal}
+                    value={jugadorForm.dorsal}
                     onChange={handleInputChange}
                   />
                 </FormControl>
@@ -316,11 +403,11 @@ const Jugadores = () => {
                   <Select
                     name="posicion"
                     placeholder="Selecciona una posición"
-                    value={nuevoJugador.posicion}
+                    value={jugadorForm.posicion}
                     onChange={(e) =>
-                      setNuevoJugador((prev) => ({
+                      setJugadorForm((prev) => ({
                         ...prev,
-                        posicion: parseInt(e.target.value),
+                        posicion: e.target.value,
                       }))
                     }
                   >
@@ -339,9 +426,9 @@ const Jugadores = () => {
                 bg="#014C4C"
                 color="white"
                 _hover={{ bg: "#013C3C" }}
-                onClick={crearJugador}
+                onClick={editandoJugadorId ? editarJugador : crearJugador}
               >
-                Crear Jugador
+                {editandoJugadorId ? "Guardar Cambios" : "Crear Jugador"}
               </Button>
             </ModalFooter>
           </ModalContent>
