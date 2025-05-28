@@ -136,13 +136,14 @@ function StatsJugador() {
           </Flex>
 
           <Card
-            maxW="4xl"
-            mx="auto"
+            // maxW="4xl"   // Elimina esta línea para que ocupe el 100%
+            w="100%"       // Añade esta línea para que ocupe todo el ancho disponible
+            mx={0}         // Elimina el centrado horizontal
             p={{ base: 4, md: 8 }}
             borderRadius="xl"
             shadow="md"
             bg={chartBoxBg}
-            >
+          >
             <Flex
               align="center"
               mb={8}
