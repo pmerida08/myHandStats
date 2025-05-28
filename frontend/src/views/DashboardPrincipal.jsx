@@ -199,11 +199,11 @@ const DashboardPrincipal = () => {
         <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
         <Flex align="center" gap={3}>
           <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
-            Dashboard
+            {equipo.nombre}
           </Text>
           <Avatar name={club.nombre} src={club.logo} />
           <Text fontSize="sm" color="gray.500">
-            {equipo.nombre}
+            Dashboard
           </Text>
         </Flex>
 
@@ -225,7 +225,7 @@ const DashboardPrincipal = () => {
                 <Text fontWeight="bold">Goles totales</Text>
               </Flex>
             </Flex>
-            <Box h="200px" w="100%" maxW="320px" mx="auto">
+            <Box h="200px" maxW="320px" mx="auto">
               <Doughnut data={golesData} />
             </Box>
             {/* Mostrar los valores numéricos debajo del gráfico */}
