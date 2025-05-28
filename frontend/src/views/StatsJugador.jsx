@@ -26,6 +26,7 @@ import {
   Legend,
 } from "chart.js";
 import Sidebar from "../components/Sidebar";
+import AuthWrapper from "../components/AuthWrapper";
 
 ChartJS.register(
   BarElement,
@@ -105,7 +106,6 @@ function StatsJugador() {
     { label: "EI", value: jugador.golesei || 0 },
     { label: "ED", value: jugador.golesed || 0 },
     { label: "C", value: jugador.golesc || 0 },
-    { label: "T", value: jugador.golest || 0 },
     { label: "PI", value: jugador.golespi || 0 },
     { label: "7m", value: jugador.goles7m || 0 },
   ];
@@ -122,217 +122,270 @@ function StatsJugador() {
   ];
 
   return (
-      <Box minH="100vh" bg="gray.50">
-      {/* Contenido principal */}
-    <Sidebar isOpen={isOpen} onClose={onClose} />
-      <Box>
-        {/* Header mejor alineado */}
-        <Flex align="center" mb={8} p={{ base: 4, md: 8 }}>
-          <Icon
-            as={FaBars}
-            boxSize={6}
-            onClick={onOpen}
-            cursor="pointer"
-            display={{ base: "block", md: "none" }}
-            mr={2}
-          />
-          <Heading
-            size="lg"
-            color="#014C4C"
-            flex="1"
-            textAlign="center"
-          >
-            Estadísticas del Jugador
-          </Heading>
-        </Flex>
-
-        <Card
-          maxW="4xl"
-          mx="auto"
-          p={{ base: 4, md: 8 }}
-          borderRadius="xl"
-          shadow="md"
-          bg={chartBoxBg}
-        >
-          <Flex
-            align="center"
-            mb={8}
-            direction={{ base: "column", md: "row" }}
-          >
-            <Image
-              src={jugador.foto}
-              alt={jugador.nombre}
-              boxSize="110px"
-              borderRadius="full"
-              objectFit="cover"
-              mr={{ md: 8 }}
-              mb={{ base: 4, md: 0 }}
-              border="3px solid #014C4C"
-              bg="white"
-            />
-            <Box textAlign={{ base: "center", md: "left" }}>
-              <Heading size="lg" color="#014C4C">
-                {jugador.nombre}
-              </Heading>
-              <Text
-                fontSize="lg"
-                color="gray.600"
-                fontWeight="bold"
-                mt={2}
-                display="flex"
-                alignItems="center"
-                justifyContent={{ base: "center", md: "flex-start" }}
-              >
-                Dorsal:
-                <Box as="span" color="#014C4C" ml={2}>
-                  {jugador.dorsal}
-                </Box>
-              </Text>
-              <Text
-                fontSize="md"
-                color="gray.600"
-                display="flex"
-                alignItems="center"
-                justifyContent={{ base: "center", md: "flex-start" }}
-              >
-                Posición:
-                <Box as="span" color="#014C4C" ml={2}>
-                  {jugador.posiciones?.[0]?.nombre || "Sin posición"}
-                </Box>
-              </Text>
-            </Box>
+    <AuthWrapper requiredRole={null}>
+      <Box p={4} position="relative">
+        <Sidebar isOpen={isOpen} onClose={onClose} />
+        <Box>
+          {/* Header mejor alineado */}
+          <Flex align="center" justify="space-between" mb={8}>
+            <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
+            <Text fontSize="2xl" fontWeight="bold" color="#014C4C">
+              Estadísticas del Jugador
+            </Text>
+            <Box w="6" />
           </Flex>
 
-          <Divider mb={8} />
-
-          <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={8}>
-            <Card bg={chartBoxBg} p={4} shadow="sm">
-              <Heading
-                size="sm"
-                mb={4}
-                textAlign="center"
-                color="#014C4C"
-                fontWeight="bold"
+          <Card
+           
+            w="100%"       
+            mx={0}         
+            p={{ base: 4, md: 8 }}
+            borderRadius="xl"
+            shadow="md"
+            bg={chartBoxBg}
+          >
+            <Flex
+              align="center"
+              mb={8}
+              direction={{ base: "column", md: "row" }}
               >
-                Eficacia de Lanzamientos Totales
-              </Heading>
-              <Box h="260px">
-                <Doughnut
-                  data={{
-                    labels: ["Goles", "Fallos"],
-                    datasets: [
-                      {
-                        data: [totalGoles, totalLanzamientos - totalGoles],
-                        backgroundColor: ["#38A169", "#E53E3E"],
-                      },
-                    ],
-                  }}
-                  options={{ responsive: true, maintainAspectRatio: false }}
+              <Image
+                src={jugador.foto}
+                alt={jugador.nombre}
+                boxSize="110px"
+                borderRadius="full"
+                objectFit="cover"
+                mr={{ md: 8 }}
+                mb={{ base: 4, md: 0 }}
+                border="3px solid #014C4C"
+                bg="white"
                 />
+              <Box textAlign={{ base: "center", md: "left" }}>
+                <Heading size="lg" color="#014C4C">
+                  {jugador.nombre}
+                </Heading>
+                <Text
+                  fontSize="lg"
+                  color="gray.600"
+                  fontWeight="bold"
+                  mt={2}
+                  display="flex"
+                  alignItems="center"
+                  justifyContent={{ base: "center", md: "flex-start" }}
+                  >
+                  Dorsal:
+                  <Box as="span" color="#014C4C" ml={2}>
+                    {jugador.dorsal}
+                  </Box>
+                </Text>
+                <Text
+                  fontSize="md"
+                  color="gray.600"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent={{ base: "center", md: "flex-start" }}
+                >
+                  Posición:
+                  <Box as="span" color="#014C4C" ml={2}>
+                    {jugador.posiciones?.[0]?.nombre || "Sin posición"}
+                  </Box>
+                </Text>
               </Box>
-            </Card>
+            </Flex>
 
-            <Card bg={chartBoxBg} p={4} shadow="sm">
-              <Heading
-                size="sm"
-                mb={4}
-                textAlign="center"
-                color="#014C4C"
-                fontWeight="bold"
-              >
-                Goles por Zona
-              </Heading>
-              <Box h="260px">
-                <Bar
-                  data={{
-                    labels: golesPorZona.map((z) => z.label),
-                    datasets: [
-                      {
-                        label: "Goles",
-                        data: golesPorZona.map((z) => z.value),
-                        backgroundColor: "#3182CE",
-                        borderRadius: 6,
-                      },
-                    ],
-                  }}
-                  options={{ responsive: true, maintainAspectRatio: false }}
-                />
-              </Box>
-            </Card>
+            <Divider mb={8} />
 
-            {!isPortero && (
-              <Card
-                bg={chartBoxBg}
-                p={4}
-                shadow="sm"
-                gridColumn={{ md: "span 2" }}
-              >
+            <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={8}>
+              <Card bg={chartBoxBg} p={4} shadow="sm">
                 <Heading
                   size="sm"
                   mb={4}
                   textAlign="center"
                   color="#014C4C"
                   fontWeight="bold"
-                >
-                  7m y Amonestaciones / Fallos
+                  >
+                  Eficacia de Lanzamientos Totales
                 </Heading>
                 <Box h="260px">
-                  <Bar
+                  <Doughnut
                     data={{
-                      labels: estadisticasNegativas.map((e) => e.label),
+                      labels: ["Goles", "Fallos"],
                       datasets: [
                         {
-                          label: "Cantidad",
-                          data: estadisticasNegativas.map((e) => e.value),
-                          backgroundColor: "#DD6B20",
-                          borderRadius: 6,
+                          data: [totalGoles, totalLanzamientos - totalGoles],
+                          backgroundColor: ["#38A169", "#E53E3E"],
                         },
                       ],
                     }}
                     options={{ responsive: true, maintainAspectRatio: false }}
-                  />
+                    />
                 </Box>
               </Card>
-            )}
 
-            {isPortero && (
-              <Card
-                bg={chartBoxBg}
-                p={4}
-                shadow="sm"
-                gridColumn={{ md: "span 2" }}
-              >
+              <Card bg={chartBoxBg} p={4} shadow="sm">
                 <Heading
                   size="sm"
                   mb={4}
                   textAlign="center"
                   color="#014C4C"
                   fontWeight="bold"
-                >
-                  Goles en Contra por Zona
+                  >
+                  Goles por Zona
                 </Heading>
                 <Box h="260px">
                   <Bar
                     data={{
-                      labels: golesEnContra.map((z) => z.label),
+                      labels: golesPorZona.map((z) => z.label),
                       datasets: [
                         {
-                          label: "Goles en contra",
-                          data: golesEnContra.map((z) => z.value),
-                          backgroundColor: "#E53E3E",
+                          label: "Goles",
+                          data: golesPorZona.map((z) => z.value),
+                          backgroundColor: "#3182CE",
                           borderRadius: 6,
                         },
                       ],
                     }}
                     options={{ responsive: true, maintainAspectRatio: false }}
-                  />
+                    />
                 </Box>
               </Card>
-            )}
-          </Grid>
-        </Card>
+
+              {!isPortero && (
+                <>
+                  <Card
+                    bg={chartBoxBg}
+                    p={4}
+                    shadow="sm"
+                    gridColumn={{ md: "span 2" }}
+                  >
+                    <Heading
+                      size="sm"
+                      mb={4}
+                      textAlign="center"
+                      color="#014C4C"
+                      fontWeight="bold"
+                    >
+                      Pérdidas y Fallos
+                    </Heading>
+                    <Box h="260px">
+                      <Bar
+                        data={{
+                          labels: [
+                            "Pérdidas",
+                            "Fallo pase",
+                            "Fallo recepción",
+                            "Dobles",
+                            "Pasos",
+                            "Invasión área",
+                            "Falta ataque",
+                          ],
+                          datasets: [
+                            {
+                              label: "Cantidad",
+                              data: [
+                                jugador.perdidas || 0,
+                                jugador.fallo_pase || 0,
+                                jugador.fallo_recepcion || 0,
+                                jugador.dobles || 0,
+                                jugador.pasos || 0,
+                                jugador.invasion_area || 0,
+                                jugador.falta_en_ataque || 0,
+                              ],
+                              backgroundColor: "#DD6B20",
+                              borderRadius: 6,
+                            },
+                          ],
+                        }}
+                        options={{ responsive: true, maintainAspectRatio: false }}
+                      />
+                    </Box>
+                  </Card>
+                  <Card
+                    bg={chartBoxBg}
+                    p={4}
+                    shadow="sm"
+                    gridColumn={{ md: "span 2" }}
+                  >
+                    <Heading
+                      size="sm"
+                      mb={4}
+                      textAlign="center"
+                      color="#014C4C"
+                      fontWeight="bold"
+                    >
+                      Amonestaciones y Exclusiones
+                    </Heading>
+                    <Box h="260px">
+                      <Bar
+                        data={{
+                          labels: [
+                            "Exclusiones",
+                            "2 Min",
+                            "Amarillas",
+                            "Rojas",
+                            "Azules",
+                          ],
+                          datasets: [
+                            {
+                              label: "Cantidad",
+                              data: [
+                                jugador.exclusiones || 0,
+                                jugador.exclusion_2_min || 0,
+                                jugador.tarjetas_amarillas || 0,
+                                jugador.tarjetas_rojas || 0,
+                                jugador.tarjetas_azules || 0,
+                              ],
+                              backgroundColor: "#E53E3E",
+                              borderRadius: 6,
+                            },
+                          ],
+                        }}
+                        options={{ responsive: true, maintainAspectRatio: false }}
+                      />
+                    </Box>
+                  </Card>
+                </>
+              )}
+
+              {isPortero && (
+                <Card
+                bg={chartBoxBg}
+                p={4}
+                shadow="sm"
+                gridColumn={{ md: "span 2" }}
+                >
+                  <Heading
+                    size="sm"
+                    mb={4}
+                    textAlign="center"
+                    color="#014C4C"
+                    fontWeight="bold"
+                    >
+                    Goles en Contra por Zona
+                  </Heading>
+                  <Box h="260px">
+                    <Bar
+                      data={{
+                        labels: golesEnContra.map((z) => z.label),
+                        datasets: [
+                          {
+                            label: "Goles en contra",
+                            data: golesEnContra.map((z) => z.value),
+                            backgroundColor: "#E53E3E",
+                            borderRadius: 6,
+                          },
+                        ],
+                      }}
+                      options={{ responsive: true, maintainAspectRatio: false }}
+                      />
+                  </Box>
+                </Card>
+              )}
+            </Grid>
+          </Card>
+        </Box>
       </Box>
-    </Box>
+    </AuthWrapper>
   );
 }
 
