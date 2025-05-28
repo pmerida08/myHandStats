@@ -24,6 +24,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FaPlus, FaUser, FaBars, FaUserEdit } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 
@@ -36,6 +37,7 @@ const Jugadores = () => {
   const [jugadores, setJugadores] = useState([]);
   const [loading, setLoading] = useState(false);
   const [posiciones, setPosiciones] = useState([]);
+  const navigate = useNavigate();
 
   const [jugadorForm, setJugadorForm] = useState({
     nombre: "",
@@ -155,9 +157,7 @@ const Jugadores = () => {
       foto: "foto.jpg",
       dorsal: parseInt(jugadorForm.dorsal),
       posiciones: jugadorForm.posicion ? [parseInt(jugadorForm.posicion)] : [],
-
     };
-
 
     try {
       const res = await fetch(
@@ -191,19 +191,19 @@ const Jugadores = () => {
     // Si se está editando la posición, hacer la petición aparte
     if (jugadorForm.posicion) {
       try {
-      await fetch(
-        `https://myhandstats.onrender.com/equipo/${equipoSeleccionado}/jugador/${editandoJugadorId}/posicion`,
-        {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ posicion_id: jugadorForm.posicion[0] }),
-        }
-      );
+        await fetch(
+          `https://myhandstats.onrender.com/equipo/${equipoSeleccionado}/jugador/${editandoJugadorId}/posicion`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ posicion_id: jugadorForm.posicion[0] }),
+          }
+        );
       } catch (err) {
-      console.error("Error al actualizar la posición:", err);
+        console.error("Error al actualizar la posición:", err);
       }
     }
   };
@@ -332,6 +332,7 @@ const Jugadores = () => {
                   borderRadius="lg"
                   _hover={{ bg: "#013C3C" }}
                   px={6}
+                  onClick={() => navigate(`/jugador/${jugador.id}/stats`)}
                 >
                   Ver Stats
                 </Button>
