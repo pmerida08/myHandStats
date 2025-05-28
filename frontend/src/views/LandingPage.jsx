@@ -16,12 +16,16 @@ import {
   Spacer,
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-import { FaChartBar, FaClock, FaUsers, FaCheckCircle } from 'react-icons/fa';
+import { FaChartBar, FaClock, FaUsers, FaCheckCircle, FaEnvelope, FaCircle } from 'react-icons/fa';
 import { motion, useAnimation } from 'framer-motion';
 import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import wireframe from '../assets/pruebaWireframe2.png';
 import wireframe2 from '../assets/pruebaWireframe3.png';
+import fase1 from '../assets/fase1wireframe.png';
+import fase2 from '../assets/fase2wireframe.png';
+import fase4 from '../assets/fase4wireframe.png';
+import prueba from '../assets/dashboardwireframe.png';
 
 const primaryColor = '#014C4C';
 const primaryColorHover = '#013838';
@@ -132,7 +136,7 @@ const LandingPage = () => {
                 Estadísticas en tiempo real. Gestión profesional. Visualización brutal.
               </Text>
               <Text fontSize="md" fontWeight="semibold" color="gray.600">
-                 ¡Ahorra tiempo y mejora el rendimiento de tu equipo hoy mismo!
+                ¡Ahorra tiempo y mejora el rendimiento de tu equipo hoy mismo!
               </Text>
               <Stack direction="row" spacing={4}>
                 <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }}>
@@ -224,7 +228,7 @@ const LandingPage = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <Image
-              src={wireframe2}
+              src={prueba}
               alt="Mockup app"
               maxW="400px"
               borderRadius="xl"
@@ -253,20 +257,153 @@ const LandingPage = () => {
         </Container>
       </MotionBox>
 
-      {/* Contacto */}
-      <Box id="contact" bg="white" py={20}>
+
+      <MotionBox py={20} bg="gray.50" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn} transition={{ duration: 0.8 }}>
         <Container maxW="6xl">
-          <Heading textAlign="center" mb={6} color={primaryColor}>Contacto</Heading>
-          <Text textAlign="center" fontSize="lg" mb={4}>
-            ¿Tienes dudas o sugerencias? Escríbenos a <strong>soporte@myhandstats.com</strong>
-          </Text>
-          <Flex justify="center" mt={6}>
-            <Button colorScheme="teal" as="a" href="mailto:soporte@myhandstats.com">
-              Enviar correo
-            </Button>
+          <Flex direction={{ base: 'column', md: 'row' }} align="center" justify="space-between">
+            <Box flex={1} pr={{ md: 10 }}>
+              <Heading size="lg" mb={4} color={primaryColor}>Fase 1: Crea Tus Equipos</Heading>
+              <Text mb={6}>Antes de que empieces a registrar tus estadísticas, necesitamos que el administrador cree los equipos y los entrenadores.</Text>
+              <Text fontWeight="bold">Qué incluye:</Text>
+              <List spacing={3} mt={3}>
+                <ListItem><ListIcon as={FaCircle} color={primaryColor} /> Creación de equipos por Club</ListItem>
+                <ListItem><ListIcon as={FaCircle} color={primaryColor} /> Sin máximo de equipos</ListItem>
+                <ListItem><ListIcon as={FaCircle} color={primaryColor} /> Creación de los entrenadores</ListItem>
+              </List>
+            </Box>
+            <Box flex={1} mt={{ base: 10, md: 0 }}>
+              <Image
+                src={fase1}
+                alt="Fase de Aprendizaje"
+                borderRadius="lg"
+                boxShadow="md"
+              />
+            </Box>
           </Flex>
         </Container>
-      </Box>
+      </MotionBox>
+
+      {/* Nueva Sección de Guía - Fase 2 */}
+      <MotionBox py={20} bg="white" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn} transition={{ duration: 0.8 }}>
+        <Container maxW="6xl">
+          <Flex direction={{ base: 'column-reverse', md: 'row' }} align="center" justify="space-between">
+            <Box flex={1} mt={{ base: 10, md: 0 }}>
+              <Image
+                src={fase2}
+                alt="Fase de Recolección"
+                borderRadius="lg"
+                boxShadow="md"
+              />
+            </Box>
+            <Box flex={1} pl={{ md: 10 }}>
+              <Heading size="lg" mb={4} color={primaryColor}>Fase 2: Equipos</Heading>
+              <Text mb={6}>Antes de crear los partidos, deberás de crear tus jugadores y tus listas de convocados.</Text>
+              <Text fontWeight="bold">Qué incluye:</Text>
+              <List spacing={3} mt={3}>
+                <ListItem><ListIcon as={FaCircle} color={primaryColor} /> Creación de jugadores</ListItem>
+                <ListItem><ListIcon as={FaCircle} color={primaryColor} /> Personalización de tus jugadores</ListItem>
+                <ListItem><ListIcon as={FaCircle} color={primaryColor} /> Creación de partidos</ListItem>
+              </List>
+            </Box>
+          </Flex>
+        </Container>
+      </MotionBox>
+
+      <MotionBox py={20} bg="gray.50" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn} transition={{ duration: 0.8 }}>
+        <Container maxW="6xl">
+          <Flex direction={{ base: 'column', md: 'row' }} align="center" justify="space-between">
+            <Box flex={1} pr={{ md: 10 }}>
+              <Heading size="lg" mb={4} color={primaryColor}>Fase 3: Crea Tus Partidos</Heading>
+              <Text mb={6}>Empieza a crear tus partidos a tiempo real</Text>
+              <Text fontWeight="bold">Qué incluye:</Text>
+              <List spacing={3} mt={3}>
+                <ListItem><ListIcon as={FaCircle} color={primaryColor} /> Creación de partidos</ListItem>
+                <ListItem><ListIcon as={FaCircle} color={primaryColor} /> Diferentes fases de juego</ListItem>
+                <ListItem><ListIcon as={FaCircle} color={primaryColor} /> Introducir acciones teniendo en cuenta la fase de juego</ListItem>
+              </List>
+            </Box>
+            <Box flex={1} mt={{ base: 10, md: 0 }}>
+              <Image
+                src={wireframe2}
+                alt="Fase de Aprendizaje"
+                borderRadius="lg"
+                boxShadow="md"
+              />
+            </Box>
+          </Flex>
+        </Container>
+      </MotionBox>
+
+      <MotionBox py={20} bg="white" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn} transition={{ duration: 0.8 }}>
+        <Container maxW="6xl">
+          <Flex direction={{ base: 'column-reverse', md: 'row' }} align="center" justify="space-between">
+            <Box flex={1} mt={{ base: 10, md: 0 }}>
+              <Image
+                src={fase4}
+                alt="Fase de Recolección"
+                borderRadius="lg"
+                boxShadow="md"
+              />
+            </Box>
+            <Box flex={1} pl={{ md: 10 }}>
+              <Heading size="lg" mb={4} color={primaryColor}>Fase 4: Estadísticas</Heading>
+              <Text mb={6}>Después de los partidos, podrás consultar estadísticas sobre ellas, para poder hacer un análisis profundo para que tu equipo progrese.</Text>
+              <Text fontWeight="bold">Qué incluye:</Text>
+              <List spacing={3} mt={3}>
+                <ListItem><ListIcon as={FaCheckCircle} color={primaryColor} /> Consulta de estadísticas por partido</ListItem>
+                <ListItem><ListIcon as={FaCheckCircle} color={primaryColor} /> Estudio de estadísticas por jugador</ListItem>
+                <ListItem><ListIcon as={FaCheckCircle} color={primaryColor} /> Visualización individual por partido</ListItem>
+              </List>
+            </Box>
+          </Flex>
+        </Container>
+      </MotionBox>
+
+      {/* Contacto */}
+      <MotionBox
+        id="contact"
+        bg="white"
+        py={20}
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+      >
+        <Container maxW="6xl">
+          <Flex
+            direction="column"
+            align="center"
+            bg="gray.100"
+            p={10}
+            borderRadius="xl"
+            boxShadow="lg"
+            maxW="lg"
+            mx="auto"
+          >
+            <Heading size="lg" mb={4} color={primaryColor}>
+              ¿Hablamos?
+            </Heading>
+            <Text mb={4} textAlign="center" fontSize="lg">
+              ¿Tienes dudas o sugerencias? Escríbenos a <strong>soporte@myhandstats.com</strong>
+            </Text>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+            >
+              <Button
+                leftIcon={<FaEnvelope />}
+                as="a"
+                href="mailto:soporte@myhandstats.com"
+                colorScheme="teal"
+                variant="solid"
+              >
+                Enviar correo
+              </Button>
+            </motion.div>
+          </Flex>
+        </Container>
+      </MotionBox>
     </Box>
   );
 };
