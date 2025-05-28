@@ -209,7 +209,7 @@ const DashboardPrincipal = () => {
 
         {/* Avatar de usuario */}
         <Flex align="center" gap={2}>
-          <Text fontSize="sm" color="#014C4C">
+          <Text fontSize="m" fontWeight={"medium"} color="#014C4C">
             {userName}
           </Text>
         </Flex>
