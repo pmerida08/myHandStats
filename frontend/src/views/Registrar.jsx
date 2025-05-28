@@ -100,7 +100,7 @@ const Registrar = () => {
             p={{ base: 6, md: 10 }}
             textAlign="center"
           >
-            <Heading mb={2} fontSize="2xl" color="#F43F5E">
+            <Heading mb={2} fontSize="2xl" color="#014C4C">
               Crea tu cuenta
             </Heading>
             <Text fontSize="sm" mb={6} color="gray.600">
@@ -145,7 +145,7 @@ const Registrar = () => {
                     bg="gray.100"
                   />
                 </FormControl>
-                <Button type="submit" colorScheme="red" bg="#F43F5E" color="white">
+                <Button type="submit" colorScheme="red" bg="#014C4C" color="white">
                   Registrarse
                 </Button>
               </Stack>
@@ -166,7 +166,7 @@ const Registrar = () => {
 
             <Box mt={6}>
               <Text fontWeight="bold" fontSize="lg">
-                Únete <Text as="span" color="#F43F5E">a</Text> MyHandStats
+                Únete <Text as="span" color="#014C4C">a</Text> MyHandStats
               </Text>
               <Stack direction="row" justify="center" mt={3} spacing={-2}>
                 {avatars.map((src, index) => (
@@ -202,7 +202,7 @@ const Registrar = () => {
                 as={Link}
                 to="/"
                 variant="link"
-                color="#F43F5E"
+                color="#014C4C"
                 fontWeight="bold"
                 size="md"
               >

@@ -108,7 +108,7 @@ const Login = () => {
             alignItems="center"
             justifyContent="center"
           >
-            <Spinner size="xl" thickness="4px" speed="0.65s" color="#F43F5E" />
+            <Spinner size="xl" thickness="4px" speed="0.65s" color="#014C4C" />
           </Box>
         )}
 
@@ -133,7 +133,7 @@ const Login = () => {
             p={{ base: 6, md: 10 }}
             textAlign="center"
           >
-            <Heading mb={2} fontSize="2xl" color="#F43F5E">
+            <Heading mb={2} fontSize="2xl" color="#014C4C">
               Inicia Sesión
             </Heading>
             <Text fontSize="sm" mb={6} color="gray.600">
@@ -178,7 +178,7 @@ const Login = () => {
                 </FormControl>
                 <Button
                   type="submit"
-                  bg="#F43F5E"
+                  bg="#014C4C"
                   color="white"
                   isLoading={isLoading}
                   loadingText="Iniciando sesión..."
@@ -203,7 +203,7 @@ const Login = () => {
             <Box mt={10}>
               <Text fontWeight="bold" fontSize="lg">
                 Únete{" "}
-                <Text as="span" color="#F43F5E">
+                <Text as="span" color="#014C4C">
                   a
                 </Text>{" "}
                 MyHandStats
