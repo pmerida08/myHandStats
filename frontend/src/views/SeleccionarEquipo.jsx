@@ -8,9 +8,7 @@ import {
   Flex,
   Icon,
   useDisclosure,
-  Image,
-  useToast,
-  Input,
+  Center,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -19,24 +17,21 @@ import {
   ModalFooter,
   ModalCloseButton,
   FormControl,
-  FormLabel,
+  Input,
+  VStack,
+  useToast,
+  Image,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
+import AuthWrapper from "../components/AuthWrapper";
 
 const SeleccionEquipo = () => {
   const [club, setClub] = useState({});
   const [equipos, setEquipos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [esAdmin, setEsAdmin] = useState(false);
-  const [nuevoEquipo, setNuevoEquipo] = useState({
-    nombre: "",
-    categoria: "",
-    descripcion: "",
-  });
-
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
@@ -65,7 +60,7 @@ const SeleccionEquipo = () => {
         return res.json();
       })
       .then((data) => {
-        setClub(data.info ? data.info[0] : data);
+        setClub(data.info ? data.info[0] : data); // Ajusta según tu API
       })
       .catch((err) => {
         console.error(
@@ -85,6 +80,7 @@ const SeleccionEquipo = () => {
         return res.json();
       })
       .then((data) => {
+        console.log('Datos recibidos de equipos:', data); 
         if (Array.isArray(data)) {
           setEquipos(data);
         } else {
@@ -106,8 +102,13 @@ const SeleccionEquipo = () => {
       console.error("Error al decodificar el token", error);
       navigate("/login");
     }
-    // eslint-disable-next-line
   }, [token, navigate]);
+
+  const [nuevoEquipo, setNuevoEquipo] = useState({
+    nombre: "",
+    categoria: "",
+    descripcion: "",
+  });
 
   const handleSeleccion = (equipo) => {
     localStorage.setItem("id_equipo", equipo.id);
@@ -169,18 +170,79 @@ const SeleccionEquipo = () => {
       });
   };
 
+  const EquipoCard = ({ equipo }) => (
+    <Box
+      p={6}
+      borderWidth="1px"
+      borderRadius="xl"
+      boxShadow="md"
+      _hover={{ boxShadow: "lg", transform: "translateY(-2px)" }}
+      transition="0.2s"
+      bg="white"
+    >
+      <Image
+        src={equipo.logo || club.logo}
+        alt={equipo.nombre}
+        borderRadius="full"
+        boxSize="100px"
+        mb={4}
+        objectFit="cover"
+      />
+      <Text fontSize="xl" fontWeight="bold" color="#014C4C" mb={4}>
+        {equipo.nombre}
+      </Text>
+      <Text fontSize="l" fontWeight="bold" color="#014C4C" mb={4}>
+        {club.nombre}
+      </Text>
+
+      {equipo.descripcion && equipo.categoria && (
+        <Text color="gray.600" mb={4}>
+          {equipo.categoria} - {equipo.descripcion}
+        </Text>
+      )}
+
+      <Button colorScheme="teal" onClick={() => handleSeleccion(equipo)}>
+        Seleccionar
+      </Button>
+    </Box>
+  );
+
+  const CrearEquipoCard = () => (
+    <Box
+      p={6}
+      borderWidth="1px"
+      borderRadius="xl"
+      boxShadow="md"
+      cursor="pointer"
+      _hover={{ boxShadow: "lg", transform: "translateY(-2px)", bg: "gray.50" }}
+      transition="0.2s"
+      bg="white"
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      onClick={onModalOpen}
+      textAlign="center"
+    >
+      <Text fontSize="2xl" fontWeight="bold" color="teal.600" mb={2}>
+        + Crear nuevo equipo
+      </Text>
+      <Text color="gray.500">Haz clic para añadir tu primer equipo</Text>
+    </Box>
+  );
+
   return (
     <Box p={6} minH="100vh" bg="white">
       {/* Sidebar desplegable */}
       <Sidebar isOpen={isOpen} onClose={onClose} />
 
-      <Flex justify="space-between" align="center" mb={6}>
-        <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-        <Heading size="lg" color="#014C4C">
-          Selecciona tu equipo
-        </Heading>
-        <Box w="6" />
-      </Flex>
+        <Flex justify="space-between" align="center" mb={6}>
+          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
+          <Heading size="lg" color="#014C4C">
+            Selecciona tu equipo
+          </Heading>
+          <Box w="6" />
+        </Flex>
 
       {/* Contenido principal */}
       {loading ? (
@@ -196,33 +258,25 @@ const SeleccionEquipo = () => {
               borderWidth="1px"
               borderRadius="xl"
               boxShadow="md"
-              _hover={{ boxShadow: "lg", transform: "translateY(-2px)" }}
+              _hover={{ boxShadow: 'lg', transform: 'translateY(-2px)' }}
               transition="0.2s"
-              bg="white"
             >
-              <Image
-                src={equipo.logo || club.logo}
-                alt={equipo.nombre}
-                borderRadius="full"
-                boxSize="100px"
-                mb={4}
-                objectFit="cover"
-              />
               <Text fontSize="xl" fontWeight="bold" color="#014C4C" mb={1}>
                 {equipo.nombre}
               </Text>
               <Text fontSize="md" color="gray.600" mb={1}>
                 <Box as="span" fontWeight="bold" color="#014C4C">
                   Categoría:
-                </Box>{" "}
-                {equipo.categoria || "No especificada"}
+                </Box>{' '}
+                {equipo.categoria || 'No especificada'}
               </Text>
               <Text fontSize="sm" color="gray.500" mb={3}>
                 <Box as="span" fontWeight="bold" color="#014C4C">
                   Descripción:
-                </Box>{" "}
-                {equipo.descripcion || "Sin descripción"}
+                </Box>{' '}
+                {equipo.descripcion || 'Sin descripción'}
               </Text>
+
               <Button
                 colorScheme="teal"
                 variant="solid"
@@ -232,81 +286,8 @@ const SeleccionEquipo = () => {
               </Button>
             </Box>
           ))}
-          {esAdmin && (
-            <Box
-              p={6}
-              borderWidth="1px"
-              borderRadius="xl"
-              boxShadow="md"
-              cursor="pointer"
-              _hover={{
-                boxShadow: "lg",
-                transform: "translateY(-2px)",
-                bg: "gray.50",
-              }}
-              transition="0.2s"
-              bg="white"
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-              onClick={onModalOpen}
-              textAlign="center"
-            >
-              <Text fontSize="2xl" fontWeight="bold" color="teal.600" mb={2}>
-                + Crear nuevo equipo
-              </Text>
-              <Text color="gray.500">Haz clic para añadir tu primer equipo</Text>
-            </Box>
-          )}
         </SimpleGrid>
       )}
-
-      {/* Modal para crear equipo */}
-      <Modal isOpen={isModalOpen} onClose={onModalClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Crear nuevo equipo</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl mb={3}>
-              <FormLabel>Nombre</FormLabel>
-              <Input
-                name="nombre"
-                value={nuevoEquipo.nombre}
-                onChange={handleInputChange}
-                placeholder="Nombre del equipo"
-              />
-            </FormControl>
-            <FormControl mb={3}>
-              <FormLabel>Categoría</FormLabel>
-              <Input
-                name="categoria"
-                value={nuevoEquipo.categoria}
-                onChange={handleInputChange}
-                placeholder="Categoría"
-              />
-            </FormControl>
-            <FormControl mb={3}>
-              <FormLabel>Descripción</FormLabel>
-              <Input
-                name="descripcion"
-                value={nuevoEquipo.descripcion}
-                onChange={handleInputChange}
-                placeholder="Descripción"
-              />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="teal" mr={3} onClick={guardarEquipo}>
-              Guardar
-            </Button>
-            <Button variant="ghost" onClick={onModalClose}>
-              Cancelar
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </Box>
   );
 };
