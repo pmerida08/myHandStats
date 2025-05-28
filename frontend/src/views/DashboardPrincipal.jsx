@@ -12,6 +12,7 @@ import {
   GridItem,
   Collapse,
   Spinner,
+  Image,
 } from "@chakra-ui/react";
 import { FaBars, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
@@ -196,7 +197,17 @@ const DashboardPrincipal = () => {
 
       {/* Header con título y hamburguesa */}
       <Flex align="center" justify="space-between" mb={8}>
-        <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
+        <Flex align="center" gap={3}>
+          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
+          {/* Logo de la aplicación al lado del icono de hamburguesa */}
+          <Image
+            src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/sign/imagenes/logo.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzUwNmYzZWZkLTg5ZDktNGI0YS1hZjMwLTdjYzQyY2Q0MjcyMCJ9.eyJ1cmwiOiJpbWFnZW5lcy9sb2dvLnBuZyIsImlhdCI6MTc0ODQxODA1OCwiZXhwIjoyMzc5MTM4MDU4fQ.P1k167Q5lOLNPH_COkQdv8FCca2cSVSmwnrE1PXUPPk"
+            alt="Logo aplicación"
+            boxSize="60px"
+            borderRadius="full"
+            objectFit="cover"
+          />
+        </Flex>
         <Flex align="center" gap={3}>
           <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
             {equipo.nombre}
@@ -225,8 +236,20 @@ const DashboardPrincipal = () => {
                 <Text fontWeight="bold">Goles totales</Text>
               </Flex>
             </Flex>
-            <Box h="200px" maxW="320px" mx="auto">
+            <Box h="200px" maxW="320px" mx="auto" position="relative">
               <Doughnut data={golesData} />
+              {/* Mostrar los valores numéricos sobre el gráfico */}
+              <Flex
+                position="absolute"
+                top="50%"
+                left="50%"
+                transform="translate(-50%, -50%)"
+                flexDirection="column"
+                align="center"
+                pointerEvents="none"
+                zIndex={1}
+              >
+              </Flex>
             </Box>
             {/* Mostrar los valores numéricos debajo del gráfico */}
             <Flex justify="center" align="center" gap={6} mt={2}>
