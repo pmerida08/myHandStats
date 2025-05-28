@@ -32,6 +32,8 @@ const SeleccionEquipo = () => {
   const [club, setClub] = useState({});
   const [equipos, setEquipos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [esAdmin, setEsAdmin] = useState(false);
+
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
@@ -80,7 +82,6 @@ const SeleccionEquipo = () => {
         return res.json();
       })
       .then((data) => {
-        console.log('Datos recibidos de equipos:', data); 
         if (Array.isArray(data)) {
           setEquipos(data);
         } else {
@@ -232,9 +233,9 @@ const SeleccionEquipo = () => {
   );
 
   return (
-    <Box p={6} minH="100vh" bg="white">
-      {/* Sidebar desplegable */}
-      <Sidebar isOpen={isOpen} onClose={onClose} />
+    <AuthWrapper requiredRole={null}>
+      <Box p={6} minH="100vh" bg="white">
+        <Sidebar isOpen={isOpen} onClose={onClose} />
 
         <Flex justify="space-between" align="center" mb={6}>
           <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
@@ -244,51 +245,71 @@ const SeleccionEquipo = () => {
           <Box w="6" />
         </Flex>
 
-      {/* Contenido principal */}
-      {loading ? (
-        <Box textAlign="center" mt={10}>
-          <Spinner size="xl" color="teal.600" />
-        </Box>
-      ) : (
-        <SimpleGrid columns={[1, 2, 3]} spacing={6}>
-          {equipos.map((equipo) => (
-            <Box
-              key={equipo.id}
-              p={6}
-              borderWidth="1px"
-              borderRadius="xl"
-              boxShadow="md"
-              _hover={{ boxShadow: 'lg', transform: 'translateY(-2px)' }}
-              transition="0.2s"
-            >
-              <Text fontSize="xl" fontWeight="bold" color="#014C4C" mb={1}>
-                {equipo.nombre}
-              </Text>
-              <Text fontSize="md" color="gray.600" mb={1}>
-                <Box as="span" fontWeight="bold" color="#014C4C">
-                  Categoría:
-                </Box>{' '}
-                {equipo.categoria || 'No especificada'}
-              </Text>
-              <Text fontSize="sm" color="gray.500" mb={3}>
-                <Box as="span" fontWeight="bold" color="#014C4C">
-                  Descripción:
-                </Box>{' '}
-                {equipo.descripcion || 'Sin descripción'}
-              </Text>
+        {loading ? (
+          <Center mt={10}>
+            <Spinner size="xl" color="teal.600" />
+          </Center>
+        ) : equipos.length === 0 ? (
+          <Center flexDirection="column" mt={10}>
+            <Text fontSize="xl" mb={4} color="gray.600">
+              No hay equipos disponibles.
+            </Text>
+            {esAdmin && <CrearEquipoCard />}
+          </Center>
+        ) : (
+          <SimpleGrid columns={[1, 2, 3]} spacing={6}>
+            {equipos.map((equipo) => (
+              <EquipoCard key={equipo.id} equipo={equipo} />
+            ))}
+          </SimpleGrid>
+        )}
 
-              <Button
-                colorScheme="teal"
-                variant="solid"
-                onClick={() => handleSeleccion(equipo)}
-              >
-                Seleccionar
+        {/* Modal para crear nuevo equipo */}
+        <Modal isOpen={isModalOpen} onClose={onModalClose} isCentered size="lg">
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Crear Nuevo Equipo</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <VStack spacing={4}>
+                <FormControl>
+                  <Input
+                    name="nombre"
+                    placeholder="Nombre del equipo"
+                    value={nuevoEquipo.nombre}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+                <FormControl>
+                  <Input
+                    name="categoria"
+                    placeholder="Categoría"
+                    value={nuevoEquipo.categoria}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+                <FormControl>
+                  <Input
+                    name="descripcion"
+                    placeholder="Descripción"
+                    value={nuevoEquipo.descripcion}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+              </VStack>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="teal" mr={3} onClick={guardarEquipo}>
+                Crear Equipo
               </Button>
-            </Box>
-          ))}
-        </SimpleGrid>
-      )}
-    </Box>
+              <Button variant="ghost" onClick={onModalClose}>
+                Cancelar
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </Box>
+    </AuthWrapper>
   );
 };
 
