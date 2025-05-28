@@ -17,15 +17,54 @@ import {
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { FaChartBar, FaClock, FaUsers, FaCheckCircle } from 'react-icons/fa';
-import { motion } from 'framer-motion';
-import wireframe from '../assets/pruebaWireframe-removebg-preview.png';
-import wireframe2 from '../assets/705shots_so-removebg-preview.png';
+import { motion, useAnimation } from 'framer-motion';
+import { useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
+import wireframe from '../assets/pruebaWireframe2.png';
+import wireframe2 from '../assets/pruebaWireframe3.png';
 
 const primaryColor = '#014C4C';
 const primaryColorHover = '#013838';
 
 const MotionBox = motion(Box);
 const MotionHeading = motion(Heading);
+const MotionFlex = motion(Flex);
+const MotionText = motion(Text);
+
+const fadeInVariant = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0 },
+};
+const fadeIn = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const Feature = ({ icon, title }) => {
+  const controls = useAnimation();
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.2 });
+
+  useEffect(() => {
+    if (inView) {
+      controls.start('visible');
+    }
+  }, [controls, inView]);
+
+  return (
+    <motion.div
+      ref={ref}
+      variants={fadeInVariant}
+      initial="hidden"
+      animate={controls}
+      transition={{ duration: 0.5 }}
+    >
+      <Flex direction="column" align="center" textAlign="center">
+        <Icon as={icon} boxSize={10} color={primaryColor} mb={2} />
+        <Text fontWeight="bold" fontSize="lg">{title}</Text>
+      </Flex>
+    </motion.div>
+  );
+};
 
 const LandingPage = () => {
   return (
@@ -73,8 +112,9 @@ const LandingPage = () => {
         id="hero"
         py={20}
         bgGradient="linear(to-r, #e0f7f7, #ffffff)"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial="hidden"
+        animate="visible"
+        variants={fadeInVariant}
         transition={{ duration: 0.8 }}
       >
         <Container maxW="6xl">
@@ -121,7 +161,14 @@ const LandingPage = () => {
               </Stack>
             </Stack>
 
-            <Box ml={{ md: 10 }} mt={{ base: 10, md: 0 }} maxW="500px">
+            <MotionBox
+              ml={{ md: 10 }}
+              mt={{ base: 10, md: 0 }}
+              maxW="500px"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.5 }}
+            >
               <Image
                 src={wireframe}
                 alt="Vista previa MyHandStats"
@@ -130,7 +177,7 @@ const LandingPage = () => {
                 height="auto"
                 objectFit="contain"
               />
-            </Box>
+            </MotionBox>
           </Flex>
         </Container>
       </MotionBox>
@@ -157,9 +204,25 @@ const LandingPage = () => {
       </Container>
 
       {/* Detalles */}
-      <Box bg="gray.50" py={20}>
+      <MotionBox
+        bg="gray.50"
+        py={20}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={fadeIn}
+        transition={{ duration: 0.8 }}
+      >
         <Container maxW="6xl">
-          <Flex direction={{ base: 'column', md: 'row' }} align="center">
+          <MotionFlex
+            direction={{ base: 'column', md: 'row' }}
+            align="center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeIn}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
             <Image
               src={wireframe2}
               alt="Mockup app"
@@ -170,17 +233,25 @@ const LandingPage = () => {
               boxShadow="md"
             />
             <Box>
-              <Heading mb={4} color={primaryColor}>¿Qué puedes hacer con MyHandStats?</Heading>
+              <MotionHeading
+                mb={4}
+                color={primaryColor}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                ¿Qué puedes hacer con MyHandStats?
+              </MotionHeading>
               <List spacing={3}>
-                <ListItem><ListIcon as={FaCheckCircle} color={primaryColor} />Crear y seguir partidos en tiempo real</ListItem>
-                <ListItem><ListIcon as={FaCheckCircle} color={primaryColor} />Gestionar jugadores, equipos y roles</ListItem>
-                <ListItem><ListIcon as={FaCheckCircle} color={primaryColor} />Consultar estadísticas detalladas</ListItem>
-                <ListItem><ListIcon as={FaCheckCircle} color={primaryColor} />Integración con tu club</ListItem>
+                <MotionText as={ListItem} initial="hidden" whileInView="visible" variants={fadeIn} transition={{ duration: 0.4 }}><ListIcon as={FaCheckCircle} color={primaryColor} />Crear y seguir partidos en tiempo real</MotionText>
+                <MotionText as={ListItem} initial="hidden" whileInView="visible" variants={fadeIn} transition={{ duration: 0.4, delay: 0.1 }}><ListIcon as={FaCheckCircle} color={primaryColor} />Gestionar jugadores, equipos y roles</MotionText>
+                <MotionText as={ListItem} initial="hidden" whileInView="visible" variants={fadeIn} transition={{ duration: 0.4, delay: 0.2 }}><ListIcon as={FaCheckCircle} color={primaryColor} />Consultar estadísticas detalladas</MotionText>
+                <MotionText as={ListItem} initial="hidden" whileInView="visible" variants={fadeIn} transition={{ duration: 0.4, delay: 0.3 }}><ListIcon as={FaCheckCircle} color={primaryColor} />Integración con tu club</MotionText>
               </List>
             </Box>
-          </Flex>
+          </MotionFlex>
         </Container>
-      </Box>
+      </MotionBox>
 
       {/* Contacto */}
       <Box id="contact" bg="white" py={20}>
@@ -199,12 +270,5 @@ const LandingPage = () => {
     </Box>
   );
 };
-
-const Feature = ({ icon, title }) => (
-  <Flex direction="column" align="center" textAlign="center">
-    <Icon as={icon} boxSize={10} color={primaryColor} mb={2} />
-    <Text fontWeight="bold" fontSize="lg">{title}</Text>
-  </Flex>
-);
 
 export default LandingPage;
