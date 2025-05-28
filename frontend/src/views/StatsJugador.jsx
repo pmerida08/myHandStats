@@ -136,9 +136,9 @@ function StatsJugador() {
           </Flex>
 
           <Card
-            // maxW="4xl"   // Elimina esta línea para que ocupe el 100%
-            w="100%"       // Añade esta línea para que ocupe todo el ancho disponible
-            mx={0}         // Elimina el centrado horizontal
+           
+            w="100%"       
+            mx={0}         
             p={{ base: 4, md: 8 }}
             borderRadius="xl"
             shadow="md"
