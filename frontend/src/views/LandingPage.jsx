@@ -15,11 +15,12 @@ import {
   HStack,
   Spacer,
 } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { FaChartBar, FaClock, FaUsers, FaCheckCircle, FaEnvelope, FaCircle } from 'react-icons/fa';
 import { motion, useAnimation } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
+
 import wireframe from '../assets/pruebaWireframe2.png';
 import wireframe2 from '../assets/pruebaWireframe3.png';
 import fase1 from '../assets/fase1wireframe.png';
@@ -39,6 +40,7 @@ const fadeInVariant = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0 },
 };
+
 const fadeIn = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0 },
@@ -70,23 +72,59 @@ const Feature = ({ icon, title }) => {
   );
 };
 
+const sections = [
+  { id: 'hero', label: 'Inicio' },
+  { id: 'features', label: 'Funcionalidades' },
+  { id: 'contact', label: 'Contacto' },
+];
+
 const LandingPage = () => {
+  const [activeSection, setActiveSection] = useState('hero');
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY + 100;
+      let current = 'hero';
+      for (let section of sections) {
+        const element = document.getElementById(section.id);
+        if (element && element.offsetTop <= scrollY) {
+          current = section.id;
+        }
+      }
+      setActiveSection(current);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <Box bg="white" minH="100vh" color="gray.800" scrollBehavior="smooth">
-      {/* Header */}
       <Box as="header" bg="white" boxShadow="sm" py={4} position="sticky" top="0" zIndex="100">
         <Container maxW="6xl">
           <Flex align="center">
             <Heading size="md" color={primaryColor}>MyHandStats</Heading>
             <HStack as="nav" spacing={8} ml={10} display={{ base: 'none', md: 'flex' }}>
-              <a href="#hero">Inicio</a>
-              <a href="#features">Funcionalidades</a>
-              <a href="#contact">Contacto</a>
+              {sections.map((section) => (
+                <a
+                  key={section.id}
+                  href={`#${section.id}`}
+                  style={{
+                    borderBottom: activeSection === section.id ? `2px solid ${primaryColor}` : '2px solid transparent',
+                    paddingBottom: '4px',
+                    color: activeSection === section.id ? primaryColor : 'inherit',
+                    fontWeight: activeSection === section.id ? 'normal' : 'normal',
+                    transition: 'all 0.5s ease-in-out',
+                  }}
+                >
+                  {section.label}
+                </a>
+              ))}
             </HStack>
             <Spacer />
             <HStack spacing={4}>
               <Button
-                as={Link}
+                as={RouterLink}
                 to="/login"
                 variant="outline"
                 color={primaryColor}
@@ -97,7 +135,7 @@ const LandingPage = () => {
                 Iniciar sesión
               </Button>
               <Button
-                as={Link}
+                as={RouterLink}
                 to="/registrar"
                 bg={primaryColor}
                 color="white"
@@ -141,7 +179,7 @@ const LandingPage = () => {
               <Stack direction="row" spacing={4}>
                 <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }}>
                   <Button
-                    as={Link}
+                    as={RouterLink}
                     to="/registrar"
                     bg={primaryColor}
                     color="white"
@@ -152,7 +190,7 @@ const LandingPage = () => {
                   </Button>
                 </motion.div>
                 <Button
-                  as={Link}
+                  as={RouterLink}
                   to="/login"
                   variant="outline"
                   color={primaryColor}
@@ -359,49 +397,102 @@ const LandingPage = () => {
         </Container>
       </MotionBox>
 
-      {/* Contacto */}
       <MotionBox
-        id="contact"
+        id="registro"
         bg="white"
         py={20}
-        initial={{ opacity: 0, y: 40 }}
+        px={{ base: 3, md: 12 }}
+        textAlign="center"
+        initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
         transition={{ duration: 0.8 }}
       >
         <Container maxW="6xl">
-          <Flex
-            direction="column"
-            align="center"
-            bg="gray.100"
-            p={10}
-            borderRadius="xl"
-            boxShadow="lg"
-            maxW="lg"
-            mx="auto"
+          <Heading fontSize={{ base: '3xl', md: '5xl' }} fontWeight="bold" color="#014C4C" mb={2}>
+            Registro de Club
+          </Heading>
+          <Text fontSize="md" color="gray.600" mb={12} maxW="2xl" mx="auto">
+            Ponte en contacto con nosotros para registrar tu club en MyHandStats y accede a todas las funcionalidades diseñadas para equipos reales.
+          </Text>
+
+          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8} mb={10}>
+          <Box
+            bg="gray.50"
+            color="#014C4C"
+            p={8}
+            borderRadius="lg"
+            boxShadow="md"
+            textAlign="center"
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+            height="100%"
           >
-            <Heading size="lg" mb={4} color={primaryColor}>
-              ¿Hablamos?
-            </Heading>
-            <Text mb={4} textAlign="center" fontSize="lg">
-              ¿Tienes dudas o sugerencias? Escríbenos a <strong>soporte@myhandstats.com</strong>
+            <Text fontWeight="bold" fontSize="xl" mb={2}>
+              ¿Ya tienes cuenta?
             </Text>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ type: 'spring', stiffness: 300 }}
+            <Text mb={6}>
+              Accede con tu cuenta y comienza a registrar tus estadísticas.
+            </Text>
+            <Button colorScheme="teal" variant="outline">
+              Iniciar sesión
+            </Button>
+          </Box>
+
+
+           <Box
+              bg="#014C4C"
+              color="white"
+              p={8}
+              borderRadius="lg"
+              boxShadow="lg"
+              textAlign="center"
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
+              height="100%"
             >
-              <Button
-                leftIcon={<FaEnvelope />}
-                as="a"
-                href="mailto:soporte@myhandstats.com"
-                colorScheme="teal"
-                variant="solid"
-              >
-                Enviar correo
-              </Button>
-            </motion.div>
-          </Flex>
+              <Text fontWeight="bold" fontSize="xl" mb={2}>
+                Registrar un Club
+              </Text>
+              <Text mb={6}>
+                Para federaciones, clubes o entrenadores que gestionan varios equipos y necesitan estadísticas completas.
+              </Text>
+
+              <Stack direction="column" spacing={4} width="100%" maxW="sm">
+                <Button
+                  bg="white"
+                  color="#014C4C"
+                  _hover={{ bg: '#f0f0f0' }}
+                  width="100%"
+                >
+                  Registrar Club
+                </Button>
+                <Button
+                  variant="outline"
+                  borderColor="white"
+                  color="white"
+                  _hover={{ bg: 'whiteAlpha.200' }}
+                  width="100%"
+                >
+                  Hablar con Soporte
+                </Button>
+              </Stack>
+
+              <Text fontSize="sm" color="white" opacity={0.8} mt={6}>
+                También puedes escribirnos directamente a{' '}
+                <strong>soporte@myhandstats.com</strong>
+              </Text>
+            </Box>
+
+          </SimpleGrid>
+
+
+          <Text fontSize="sm" color="gray.500" mt={10}>
+            Confía en nosotros. ¿Te unes?
+          </Text>
         </Container>
       </MotionBox>
     </Box>
