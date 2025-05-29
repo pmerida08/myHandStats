@@ -193,6 +193,9 @@ def actualizar_usuario(usuario_id: int, usuario_data: UsuarioUpdate, datos_token
 
     # Actualizar el usuario con el id_club del token
     data = usuario_data.dict(exclude_unset=True)
+    if "password" in data and data["password"]:
+        from app.utils.hashing import hash_password
+        data["password"] = hash_password(data["password"])
     response = supabase.table("usuarios").update(data).eq("id", usuario_id).execute()
 
     if not response.data:
