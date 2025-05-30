@@ -32,7 +32,7 @@ import { createClient } from "@supabase/supabase-js";
 
 // Configuración de Supabase
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://rdpazmfdbcundrogccsb.supabase.co";
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || "35a010d5de8e122d92b14c66bd230fc8";
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkcGF6bWZkYmN1bmRyb2djY3NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1MTA4MjksImV4cCI6MjA2MjA4NjgyOX0.sSfVgFsJvoFYnl-jc-wJabyYUisgwgDv1jwU9rpzsw4";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const ClubInfo = () => {
@@ -92,29 +92,31 @@ const ClubInfo = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const subirLogo = async (file) => {
-    const fileExt = file.name.split(".").pop();
-    const fileName = `club_${Date.now()}.${fileExt}`;
-    const filePath = fileName;
+const subirLogo = async (file) => {
+  const fileExt = file.name.split(".").pop();
+  const fileName = `club_${Date.now()}.${fileExt}`;
+  const filePath = fileName;
 
-    const { error } = await supabase.storage
-      .from("imagenes")
-      .upload(filePath, file, {
-        contentType: file.type,
-        upsert: true, // sobreescribe si ya existe
-      });
+  const { error } = await supabase.storage
+    .from("imagenes")
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: true,
+    });
 
-    if (error) {
-      console.error("Error al subir el logo:", error.message);
-      throw new Error("Error al subir el logo");
-    }
+  if (error) {
+    console.error("Error al subir el logo:", error.message);
+    throw new Error("Error al subir el logo");
+  }
 
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("imagenes").getPublicUrl(filePath);
+  const { data: urlData } = supabase.storage
+    .from("imagenes")
+    .getPublicUrl(filePath);
 
-    return publicUrl;
-  };
+  return urlData.publicUrl;
+};
+
+
 
   const guardarCambios = async () => {
     try {
@@ -125,6 +127,8 @@ const ClubInfo = () => {
         updatedData.logo = logoUrl;
       }
 
+      console.log("Datos a actualizar:", updatedData);
+      
       const response = await fetch("https://myhandstats.onrender.com/club/", {
         method: "PUT",
         headers: {
@@ -132,6 +136,7 @@ const ClubInfo = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(updatedData),
+        
       });
 
       if (!response.ok) throw new Error("Error al actualizar club");
@@ -164,6 +169,17 @@ const ClubInfo = () => {
       </Center>
     );
   }
+
+//   async function testList() {
+//   const { data, error } = await supabase.storage.from('imagenes').list();
+//   if (error) {
+//     console.error("Error listando archivos:", error);
+//   } else {
+//     console.log("Archivos en bucket:", data);
+//   }
+// }
+// testList();
+
 
   return (
     <AuthWrapper requiredRole={null}>
