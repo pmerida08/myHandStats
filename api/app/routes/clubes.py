@@ -158,7 +158,7 @@ def actualizar_club(club_data: ClubUpdate, datos_token: dict = Depends(obtener_i
 
     # Actualizar el club con el id_club del token
     data = club_data.dict(exclude_unset=True)
-    response = supabase.table("clubes").update(data).eq("id", datos_token["id_club"]).execute()
+    response = supabase.table("clubes").update(data).eq("id", datos_token["clubs_id"]).execute()
 
     if not response.data:
         raise HTTPException(status_code=404, detail="Club no encontrado")
