@@ -21,12 +21,23 @@ import {
   Input,
   VStack,
   Select,
+  useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FaPlus, FaUser, FaBars, FaUserEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
+import { createClient } from "@supabase/supabase-js";
+
+// Configuración de Supabase
+const SUPABASE_URL =
+  import.meta.env.VITE_SUPABASE_URL ||
+  "https://rdpazmfdbcundrogccsb.supabase.co";
+const SUPABASE_KEY =
+  import.meta.env.VITE_SUPABASE_KEY ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkcGF6bWZkYmN1bmRyb2djY3NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1MTA4MjksImV4cCI6MjA2MjA4NjgyOX0.sSfVgFsJvoFYnl-jc-wJabyYUisgwgDv1jwU9rpzsw4";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const Jugadores = () => {
   const gridCols = useBreakpointValue({ base: 1, sm: 2, md: 3, lg: 4 });
@@ -37,6 +48,8 @@ const Jugadores = () => {
   const [jugadores, setJugadores] = useState([]);
   const [loading, setLoading] = useState(false);
   const [posiciones, setPosiciones] = useState([]);
+  const [selectedFoto, setSelectedFoto] = useState(null);
+  const toast = useToast();
   const navigate = useNavigate();
 
   const [jugadorForm, setJugadorForm] = useState({
@@ -56,6 +69,10 @@ const Jugadores = () => {
     setJugadorForm((prev) => ({ ...prev, foto: e.target.files[0] }));
   };
 
+  const handleFotoEditChange = (e) => {
+    setSelectedFoto(e.target.files[0]);
+  };
+
   const abrirModalEditar = (jugador) => {
     setJugadorForm({
       nombre: jugador.nombre || "",
@@ -65,15 +82,56 @@ const Jugadores = () => {
       foto: null,
     });
     setEditandoJugadorId(jugador.id);
+    setSelectedFoto(null);
     setIsModalOpen(true);
+  };
+
+  const subirFotoJugador = async (file, jugadorId) => {
+    const fileExt = file.name.split(".").pop();
+    const fileName = `jugador_${jugadorId}_${Date.now()}.${fileExt}`;
+    const filePath = fileName;
+
+    const { error } = await supabase.storage
+      .from("imagenes")
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (error) {
+      toast({
+        title: "Error al subir la foto",
+        description: error.message,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+      return null;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from("imagenes")
+      .getPublicUrl(filePath);
+
+    return urlData.publicUrl;
   };
 
   const crearJugador = async () => {
     const token = localStorage.getItem("token");
+    let fotoUrl = "foto.jpg";
+
+    // Si el usuario ha seleccionado una foto, súbela primero
+    if (jugadorForm.foto) {
+      const nuevaFotoUrl = await subirFotoJugador(jugadorForm.foto, Date.now());
+      if (nuevaFotoUrl) {
+        fotoUrl = nuevaFotoUrl;
+      }
+    }
+
     const body = {
       nombre: jugadorForm.nombre,
       fecha_nac: jugadorForm.fecha_nacimiento,
-      foto: "foto.jpg",
+      foto: fotoUrl,
       dorsal: parseInt(jugadorForm.dorsal),
       equipos_id: parseInt(equipoSeleccionado),
       posiciones: jugadorForm.posicion ? [parseInt(jugadorForm.posicion)] : [],
@@ -151,13 +209,23 @@ const Jugadores = () => {
 
   const editarJugador = async () => {
     const token = localStorage.getItem("token");
+    let fotoUrl = null;
+
+    // Si hay una nueva foto seleccionada, súbela primero
+    if (selectedFoto && editandoJugadorId) {
+      fotoUrl = await subirFotoJugador(selectedFoto, editandoJugadorId);
+    }
+
     const body = {
       nombre: jugadorForm.nombre,
       fecha_nac: jugadorForm.fecha_nacimiento,
-      foto: "foto.jpg",
       dorsal: parseInt(jugadorForm.dorsal),
       posiciones: jugadorForm.posicion ? [parseInt(jugadorForm.posicion)] : [],
     };
+
+    if (fotoUrl) {
+      body.foto = fotoUrl;
+    }
 
     try {
       const res = await fetch(
@@ -183,6 +251,7 @@ const Jugadores = () => {
         posicion: "",
         foto: null,
       });
+      setSelectedFoto(null);
       cargarJugadores();
     } catch (err) {
       console.error("Error al editar jugador:", err);
@@ -305,7 +374,18 @@ const Jugadores = () => {
                   aria-label="Editar jugador"
                   onClick={() => abrirModalEditar(jugador)}
                 />
-                <Avatar icon={<FaUser />} size="2xl" bg="#a8dadc" mb={4} />
+                <Avatar
+                  icon={<FaUser />}
+                  size="2xl"
+                  bg="#a8dadc"
+                  mb={4}
+                  src={
+                    jugador.foto && jugador.foto !== "foto.jpg"
+                      ? jugador.foto
+                      : undefined
+                  }
+                  name={jugador.nombre}
+                />
                 <Text fontWeight="bold" fontSize="lg" color="#014C4C" mb={1}>
                   {jugador.nombre}
                 </Text>
@@ -366,7 +446,12 @@ const Jugadores = () => {
           }}
         />
 
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} isCentered size="lg">
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          isCentered
+          size="lg"
+        >
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>
@@ -419,6 +504,32 @@ const Jugadores = () => {
                     ))}
                   </Select>
                 </FormControl>
+                {/* Permitir subir foto al crear o editar */}
+                {!editandoJugadorId && (
+                  <FormControl>
+                    <Text fontSize="sm" color="gray.600" mb={1}>
+                      Foto del jugador (opcional):
+                    </Text>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                  </FormControl>
+                )}
+                {/* Solo permitir subir foto en edición */}
+                {editandoJugadorId && (
+                  <FormControl>
+                    <Text fontSize="sm" color="gray.600" mb={1}>
+                      Cambiar foto del jugador:
+                    </Text>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFotoEditChange}
+                    />
+                  </FormControl>
+                )}
               </VStack>
             </ModalBody>
 
