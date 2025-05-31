@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from "react";
 import {
-    Box,
-    Input,
-    Button,
-    Avatar,
-    VStack,
-    FormControl,
-    FormLabel,
-    Heading,
-    useToast,
-    Flex,
-    Icon,
-    useDisclosure,
+  Box,
+  Input,
+  Button,
+  Avatar,
+  VStack,
+  FormControl,
+  FormLabel,
+  Heading,
+  useToast,
+  Flex,
+  Icon,
+  useDisclosure,
+  Center, // ✅ Aquí está la corrección
 } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react"; // <-- Esta línea es necesaria
 import Sidebar from "../components/Sidebar";
 import { FaBars } from "react-icons/fa";
 import AuthWrapper from "../components/AuthWrapper"; // Asegúrate de tener este componente
@@ -109,49 +110,85 @@ const EditarPerfil = () => {
     };
 
     return (
-        <AuthWrapper requiredRole={null}>
-            <Box p={4} position="relative">
-                <Sidebar isOpen={isOpen} onClose={onClose} />
-                <Flex direction="column" gap={6}>
-                    <Flex align="center" mb={6} gap={3}>
-                        <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-                        <Heading>Editar Perfil</Heading>
-                    </Flex>
-                    <VStack spacing={4} align="stretch">
-                        <Avatar size="xl" src={fotoUrl} />
-                        <FormControl>
-                            <FormLabel>Foto de perfil</FormLabel>
-                            <Input type="file" accept="image/*" onChange={(e) => setFoto(e.target.files[0])} />
-                        </FormControl>
+  <AuthWrapper requiredRole={null}>
+    <Box p={6} bg="#f0f4f5" minH="100vh">
+      <Sidebar isOpen={isOpen} onClose={onClose} />
 
-                        <FormControl isRequired>
-                            <FormLabel>Nombre</FormLabel>
-                            <Input value={nombre} onChange={(e) => setNombre(e.target.value)} />
-                        </FormControl>
+      <Flex align="center" justify="space-between" mb={8}>
+        <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
+        <Heading size="lg" color="teal.700">
+          Editar Perfil
+        </Heading>
+        <Box w="6" />
+      </Flex>
 
-                        <FormControl isRequired>
-                            <FormLabel>Email</FormLabel>
-                            <Input value={email} isDisabled />
-                        </FormControl>
+      <Flex
+        direction="column"
+        bg="white"
+        p={6}
+        borderRadius="xl"
+        boxShadow="lg"
+        maxW="600px"
+        mx="auto"
+      >
+        <Center mb={6}>
+          <Avatar
+            size="2xl"
+            src={fotoUrl}
+            border="3px solid #319795"
+            boxShadow="md"
+          />
+        </Center>
 
-                        <FormControl>
-                            <FormLabel>Nueva Contraseña</FormLabel>
-                            <Input
-                                type="password"
-                                placeholder="Deja en blanco si no quieres cambiarla"
-                                value={contraseña}
-                                onChange={(e) => setContraseña(e.target.value)}
-                            />
-                        </FormControl>
+        <VStack spacing={4} align="stretch">
+          <FormControl>
+            <FormLabel color="gray.700">Foto de perfil</FormLabel>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setFoto(e.target.files[0])}
+            />
+          </FormControl>
 
-                        <Button colorScheme="teal" onClick={handleGuardar}>
-                            Guardar Cambios
-                        </Button>
-                    </VStack>
-                </Flex>
-            </Box>
-        </AuthWrapper>
-    );
+          <FormControl isRequired>
+            <FormLabel color="gray.700">Nombre</FormLabel>
+            <Input
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              placeholder="Tu nombre"
+            />
+          </FormControl>
+
+          <FormControl isRequired>
+            <FormLabel color="gray.700">Email</FormLabel>
+            <Input value={email} isDisabled />
+          </FormControl>
+
+          <FormControl>
+            <FormLabel color="gray.700">Nueva Contraseña</FormLabel>
+            <Input
+              type="password"
+              placeholder="Deja en blanco si no quieres cambiarla"
+              value={contraseña}
+              onChange={(e) => setContraseña(e.target.value)}
+            />
+          </FormControl>
+
+          <Button
+            mt={4}
+            colorScheme="teal"
+            size="md"
+            onClick={handleGuardar}
+            alignSelf="flex-end"
+          >
+            Guardar Cambios
+          </Button>
+        </VStack>
+      </Flex>
+    </Box>
+  </AuthWrapper>
+);
+
 };
 
 export default EditarPerfil;
