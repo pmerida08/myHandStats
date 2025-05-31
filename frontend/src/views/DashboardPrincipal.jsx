@@ -209,76 +209,50 @@ const DashboardPrincipal = () => {
   }
 
   return (
-    <Box
-      p={{ base: 1, sm: 2, md: 4 }}
-      minH="100vh"
-      bg="white"
-      w="100%"
-      overflowX="hidden"
-    >
+    <Box p={4} minH="100vh" bg="white">
       {/* Sidebar desplegable */}
       <Sidebar isOpen={isOpen} onClose={onClose} />
 
       {/* Header con título y hamburguesa */}
-      <Flex
-        align="center"
-        justify="space-between"
-        mb={{ base: 4, md: 8 }}
-        flexDirection="row" // Siempre en fila
-        flexWrap="wrap"
-        gap={{ base: 1, md: 3 }}
-        w="100%"
-      >
-        <Flex align="center" gap={2} minW={0}>
-          <Icon as={FaBars} boxSize={{ base: 5, md: 6 }} onClick={onOpen} cursor="pointer" />
+      <Flex align="center" justify="space-between" mb={8}>
+        <Flex align="center" gap={3}>
+          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
+          {/* Logo de la aplicación al lado del icono de hamburguesa */}
           <Image
             src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/sign/imagenes/logo.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzUwNmYzZWZkLTg5ZDktNGI0YS1hZjMwLTdjYzQyY2Q0MjcyMCJ9.eyJ1cmwiOiJpbWFnZW5lcy9sb2dvLnBuZyIsImlhdCI6MTc0ODQxODA1OCwiZXhwIjoyMzc5MTM4MDU4fQ.P1k167Q5lOLNPH_COkQdv8FCca2cSVSmwnrE1PXUPPk"
             alt="Logo aplicación"
-            boxSize={{ base: "32px", md: "60px" }}
+            boxSize="60px"
             borderRadius="full"
             objectFit="cover"
-            mr={{ base: 1, md: 3 }}
           />
         </Flex>
-        <Flex align="center" gap={2} minW={0} maxW={{ base: "40vw", md: "none" }}>
-          <Text
-            fontSize={{ base: "md", md: "2xl" }}
-            fontWeight="bold"
-            color="#014C4C"
-            mb={0}
-            isTruncated
-            maxW={{ base: "100px", sm: "150px", md: "none" }}
-          >
+        <Flex align="center" gap={3}>
+          <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
             {equipo.nombre}
           </Text>
-          <Avatar name={club.nombre} src={club.logo} size={{ base: "xs", md: "md" }} />
+          <Avatar name={club.nombre} src={club.logo} />
+          <Text fontSize="sm" color="gray.500">
+            Dashboard
+          </Text>
         </Flex>
-        <Flex align="center" gap={1} minW={0} maxW={{ base: "30vw", md: "none" }}>
-          <Text
-            fontSize={{ base: "xs", md: "m" }}
-            fontWeight="medium"
-            color="#014C4C"
-            isTruncated
-            maxW={{ base: "80px", sm: "120px", md: "none" }}
-          >
+
+        {/* Avatar de usuario */}
+        <Flex align="center" gap={2}>
+          <Text fontSize="m" fontWeight={"medium"} color="#014C4C">
             {userName}
           </Text>
         </Flex>
       </Flex>
 
       {/* Grid principal */}
-      <Grid
-        templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
-        gap={{ base: 2, md: 4 }}
-      >
+      <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4}>
         {/* Primera fila: Goles últimos partidos y Fases del Juego */}
         <GridItem>
           <Box
             borderWidth="1px"
             borderRadius="md"
-            p={{ base: 2, md: 4 }}
-            minH={{ base: "auto", md: "320px" }}
-            mb={{ base: 2, md: 0 }}
+            p={4}
+            minH="320px"
             display="flex"
             flexDirection="column"
             justifyContent="center"
@@ -330,9 +304,8 @@ const DashboardPrincipal = () => {
           <Box
             borderWidth="1px"
             borderRadius="md"
-            p={{ base: 2, md: 4 }}
-            minH={{ base: "auto", md: "320px" }}
-            mb={{ base: 2, md: 0 }}
+            p={4}
+            minH="320px"
             display="flex"
             flexDirection="column"
             justifyContent="center"
@@ -1014,32 +987,229 @@ const DashboardPrincipal = () => {
             </Box>
           </Flex>
         </GridItem>
+        {/* Cuarta fila: Tipos de lanzamiento por jugador */}
+        <GridItem colSpan={2}>
+          <Flex
+            gap={4}
+            mb={2}
+            flexDirection={{ base: "column", md: "row" }}
+            justifyContent="space-between"
+          >
+            <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
+              <Text fontWeight="bold" mb={2}>
+                Tipos de lanzamiento por jugador
+              </Text>
+              <Text fontSize="xs" color="gray.500" mb={2}>
+                Detalle de lanzamientos por posición de tiro y jugador
+              </Text>
+              {Array.isArray(jugadores) && jugadores.length > 0 ? (
+                <Box overflowX="auto">
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "collapse",
+                      tableLayout: "fixed",
+                    }}
+                  >
+                    <thead>
+                      <tr>
+                        <th
+                          style={{
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            textAlign: "left",
+                          }}
+                        >
+                          Jugador
+                        </th>
+                        <th
+                          style={{
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            textAlign: "center",
+                          }}
+                        >
+                          ED
+                        </th>
+                        <th
+                          style={{
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            textAlign: "center",
+                          }}
+                        >
+                          EI
+                        </th>
+                        <th
+                          style={{
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            textAlign: "center",
+                          }}
+                        >
+                          LD
+                        </th>
+                        <th
+                          style={{
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            textAlign: "center",
+                          }}
+                        >
+                          LI
+                        </th>
+                        <th
+                          style={{
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            textAlign: "center",
+                          }}
+                        >
+                          C
+                        </th>
+                        <th
+                          style={{
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            textAlign: "center",
+                          }}
+                        >
+                          PI
+                        </th>
+                        <th
+                          style={{
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            textAlign: "center",
+                          }}
+                        >
+                          EXT LI
+                        </th>
+                        <th
+                          style={{
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            textAlign: "center",
+                          }}
+                        >
+                          EXT LD
+                        </th>
+                        <th
+                          style={{
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            textAlign: "center",
+                          }}
+                        >
+                          EXT C
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {jugadores.map((jugador) => (
+                        <tr key={jugador.id}>
+                          <td
+                            style={{
+                              padding: "8px",
+                              border: "1px solid #e2e8f0",
+                              textAlign: "left",
+                            }}
+                          >
+                            {jugador.nombre}
+                          </td>
+                          <td
+                            style={{
+                              padding: "8px",
+                              border: "1px solid #e2e8f0",
+                              textAlign: "center",
+                            }}
+                          >
+                            {jugador.lanzamiento_ed || 0}
+                          </td>
+                          <td
+                            style={{
+                              padding: "8px",
+                              border: "1px solid #e2e8f0",
+                              textAlign: "center",
+                            }}
+                          >
+                            {jugador.lanzamiento_ei || 0}
+                          </td>
+                          <td
+                            style={{
+                              padding: "8px",
+                              border: "1px solid #e2e8f0",
+                              textAlign: "center",
+                            }}
+                          >
+                            {jugador.lanzamiento_ld || 0}
+                          </td>
+                          <td
+                            style={{
+                              padding: "8px",
+                              border: "1px solid #e2e8f0",
+                              textAlign: "center",
+                            }}
+                          >
+                            {jugador.lanzamiento_li || 0}
+                          </td>
+                          <td
+                            style={{
+                              padding: "8px",
+                              border: "1px solid #e2e8f0",
+                              textAlign: "center",
+                            }}
+                          >
+                            {jugador.lanzamiento_c || 0}
+                          </td>
+                          <td
+                            style={{
+                              padding: "8px",
+                              border: "1px solid #e2e8f0",
+                              textAlign: "center",
+                            }}
+                          >
+                            {jugador.lanzamiento_pi || 0}
+                          </td>
+                          <td
+                            style={{
+                              padding: "8px",
+                              border: "1px solid #e2e8f0",
+                              textAlign: "center",
+                            }}
+                          >
+                            {jugador.lanzamiento_ext_li || 0}
+                          </td>
+                          <td
+                            style={{
+                              padding: "8px",
+                              border: "1px solid #e2e8f0",
+                              textAlign: "center",
+                            }}
+                          >
+                            {jugador.lanzamiento_ext_ld || 0}
+                          </td>
+                          <td
+                            style={{
+                              padding: "8px",
+                              border: "1px solid #e2e8f0",
+                              textAlign: "center",
+                            }}
+                          >
+                            {jugador.lanzamiento_ext_c || 0}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </Box>
+              ) : (
+                <Text fontSize="sm">Aún no hay registros</Text>
+              )}
+            </Box>
+          </Flex>
+        </GridItem>
       </Grid>
-      {/* Añade media queries para tablas si quieres mejorar aún más la visualización */}
-      <style>
-        {`
-        @media (max-width: 600px) {
-          table, thead, tbody, th, td, tr {
-            display: block;
-          }
-          
-          td {
-            border: none;
-            position: relative;
-            padding-left: 50%;
-            min-height: 32px;
-          }
-          td:before {
-            position: absolute;
-            left: 8px;
-            top: 8px;
-            white-space: nowrap;
-            font-weight: bold;
-            color: #888;
-          }
-        }
-      `}
-      </style>
     </Box>
   );
 };
