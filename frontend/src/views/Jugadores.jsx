@@ -118,10 +118,20 @@ const Jugadores = () => {
 
   const crearJugador = async () => {
     const token = localStorage.getItem("token");
+    let fotoUrl = "foto.jpg";
+
+    // Si el usuario ha seleccionado una foto, súbela primero
+    if (jugadorForm.foto) {
+      const nuevaFotoUrl = await subirFotoJugador(jugadorForm.foto, Date.now());
+      if (nuevaFotoUrl) {
+        fotoUrl = nuevaFotoUrl;
+      }
+    }
+
     const body = {
       nombre: jugadorForm.nombre,
       fecha_nac: jugadorForm.fecha_nacimiento,
-      foto: "foto.jpg",
+      foto: fotoUrl,
       dorsal: parseInt(jugadorForm.dorsal),
       equipos_id: parseInt(equipoSeleccionado),
       posiciones: jugadorForm.posicion ? [parseInt(jugadorForm.posicion)] : [],
@@ -494,6 +504,19 @@ const Jugadores = () => {
                     ))}
                   </Select>
                 </FormControl>
+                {/* Permitir subir foto al crear o editar */}
+                {!editandoJugadorId && (
+                  <FormControl>
+                    <Text fontSize="sm" color="gray.600" mb={1}>
+                      Foto del jugador (opcional):
+                    </Text>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                  </FormControl>
+                )}
                 {/* Solo permitir subir foto en edición */}
                 {editandoJugadorId && (
                   <FormControl>
