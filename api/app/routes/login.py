@@ -23,7 +23,7 @@ def login(data: LoginRequest):
     
     print(usuario)  # <-- Añade esto temporalmente para depurar
 
-    token = generar_token(usuario["nombre"], usuario["email"], usuario["id"], usuario["clubs_id"], usuario["rol"])
+    token = generar_token(usuario["nombre"], usuario["email"], usuario["id"], usuario["clubs_id"], usuario["rol"], usuario["foto"])
     return {"access_token": token, "token_type": "bearer"}
 
 class GoogleLoginRequest(BaseModel):
@@ -49,13 +49,15 @@ def login_con_google(payload: GoogleLoginRequest):
 
         usuario = usuario_existente.data[0]
 
+
         # Generar token JWT
         token = generar_token(
             usuario["nombre"],
             usuario["email"],
             usuario["id"],
             usuario.get("clubs_id"),
-            usuario["rol"]
+            usuario["rol"],
+            usuario["foto"]
         )
 
         return {"access_token": token, "token_type": "bearer"}
