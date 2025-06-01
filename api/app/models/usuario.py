@@ -8,6 +8,7 @@ class UsuarioCreate(BaseModel):
     email: str
     password: str
     rol: str
+    foto: Optional[str] = None  # Nuevo campo
 
     class Config:
         orm_mode = True
@@ -19,6 +20,7 @@ class Usuario(BaseModel):
     email: str
     password: str
     rol: str
+    foto: Optional[str] = None  # Nuevo campo
     created_at: datetime
     updated_at: datetime
 
@@ -31,6 +33,7 @@ class UsuarioUpdate(BaseModel):
     email: Optional[str] = None
     password: Optional[str] = None
     rol: Optional[str] = None
+    foto: Optional[str] = None  # Nuevo campo
 
     class Config:
         orm_mode = True
@@ -48,6 +51,7 @@ class UsuarioOut(BaseModel):
     nombre: str
     email: str
     rol: str
+    foto: Optional[str] = None  # Nuevo campo
     clubs_id: int
     created_at: datetime
     updated_at: datetime
@@ -67,6 +71,7 @@ class RegisterRequest(BaseModel):
     email: str
     password: str
     rol: str = "admin"
+    foto: Optional[str] = None  # Nuevo campo
 
     class Config:
         orm_mode = True
