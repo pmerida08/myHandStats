@@ -378,7 +378,7 @@ const Jugadores = () => {
                   icon={<FaUser />}
                   size="2xl"
                   bg="#a8dadc"
-                  mb={4}
+                  mb={4} 
                   src={
                     jugador.foto && jugador.foto !== "foto.jpg"
                       ? jugador.foto
