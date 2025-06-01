@@ -55,7 +55,8 @@ def login_con_google(payload: GoogleLoginRequest):
             usuario["email"],
             usuario["id"],
             usuario.get("clubs_id"),
-            usuario["rol"]
+            usuario["rol"],
+            usuario["foto"]
         )
 
         return {"access_token": token, "token_type": "bearer"}
