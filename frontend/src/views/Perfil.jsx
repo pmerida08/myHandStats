@@ -11,184 +11,222 @@ import {
   Flex,
   Icon,
   useDisclosure,
-  Center, // ✅ Aquí está la corrección
+  Center,
 } from "@chakra-ui/react";
-import React, { useState, useEffect } from "react"; // <-- Esta línea es necesaria
+import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import { FaBars } from "react-icons/fa";
-import AuthWrapper from "../components/AuthWrapper"; // Asegúrate de tener este componente
+import AuthWrapper from "../components/AuthWrapper";
+import { createClient } from "@supabase/supabase-js";
+
+// Configuración de Supabase
+const SUPABASE_URL =
+  import.meta.env.VITE_SUPABASE_URL ||
+  "https://rdpazmfdbcundrogccsb.supabase.co";
+const SUPABASE_KEY =
+  import.meta.env.VITE_SUPABASE_KEY ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkcGF6bWZkYmN1bmRyb2djY3NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1MTA4MjksImV4cCI6MjA2MjA4NjgyOX0.sSfVgFsJvoFYnl-jc-wJabyYUisgwgDv1jwU9rpzsw4";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const EditarPerfil = () => {
-    const [usuario, setUsuario] = useState(null);
-    const [nombre, setNombre] = useState("");
-    const [email, setEmail] = useState("");
-    const [contraseña, setContraseña] = useState("");
-    const [foto, setFoto] = useState(null);
-    const [fotoUrl, setFotoUrl] = useState("");
-    const toast = useToast();
-    const { isOpen, onOpen, onClose } = useDisclosure();
+  const [usuario, setUsuario] = useState(null);
+  const [nombre, setNombre] = useState("");
+  const [email, setEmail] = useState("");
+  const [contraseña, setContraseña] = useState("");
+  const [foto, setFoto] = useState(null);
+  const [fotoUrl, setFotoUrl] = useState("");
+  const [userId, setUserId] = useState(null);
+  const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-    useEffect(() => {
-        const cargarPerfil = async () => {
-            const {
-                data: { user },
-            } = await supabase.auth.getUser();
-
-            if (user) {
-                setUsuario(user);
-                setEmail(user.email);
-
-                const { data, error } = await supabase
-                    .from("usuarios")
-                    .select("*")
-                    .eq("id", user.id)
-                    .single();
-
-                if (!error && data) {
-                    setNombre(data.nombre || "");
-                    setFotoUrl(data.foto_url || "");
-                }
-            }
-        };
-
-        cargarPerfil();
-    }, []);
-
-    const handleGuardar = async () => {
-        try {
-            let nuevaFotoUrl = fotoUrl;
-
-            if (foto) {
-                const extension = foto.name.split(".").pop();
-                const nombreArchivo = `perfil_${usuario.id}.${extension}`;
-                const { error: uploadError } = await supabase.storage
-                    .from("imagenes")
-                    .upload(nombreArchivo, foto, { upsert: true });
-
-                if (uploadError) throw uploadError;
-
-                const {
-                    data: { publicUrl },
-                } = supabase.storage.from("imagenes").getPublicUrl(nombreArchivo);
-
-                nuevaFotoUrl = publicUrl;
-            }
-
-            const { error } = await supabase
-                .from("usuarios")
-                .update({
-                    nombre,
-                    foto_url: nuevaFotoUrl,
-                    fecha_actualizacion: new Date(),
-                })
-                .eq("id", usuario.id);
-
-            if (error) throw error;
-
-            if (contraseña) {
-                const { error: passError } = await supabase.auth.updateUser({
-                    password: contraseña,
-                });
-                if (passError) throw passError;
-            }
-
-            toast({
-                title: "Perfil actualizado",
-                status: "success",
-                duration: 3000,
-                isClosable: true,
-            });
-        } catch (error) {
-            toast({
-                title: "Error al actualizar perfil",
-                description: error.message,
-                status: "error",
-                duration: 4000,
-                isClosable: true,
-            });
+  useEffect(() => {
+    const cargarPerfil = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        const res = await fetch("https://myhandstats.onrender.com/usuario/perfil", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        if (data.info) {
+          setUsuario(data.info);
+          setNombre(data.info.nombre || "");
+          setEmail(data.info.email || "");
+          setFotoUrl(data.info.foto || "");
+          setUserId(data.info.user_id); // Guardamos el id para el PUT
         }
+      } catch (error) {
+        toast({
+          title: "Error al cargar perfil",
+          description: error.message,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+      }
     };
 
-    return (
-  <AuthWrapper requiredRole={null}>
-    <Box p={6} bg="#f0f4f5" minH="100vh">
-      <Sidebar isOpen={isOpen} onClose={onClose} />
+    cargarPerfil();
+  }, [toast]);
 
-      <Flex align="center" justify="space-between" mb={8}>
-        <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-        <Heading size="lg" color="teal.700">
-          Editar Perfil
-        </Heading>
-        <Box w="6" />
-      </Flex>
+  const subirFotoPerfil = async (file, userId) => {
+    const extension = file.name.split(".").pop();
+    const nombreArchivo = `perfil_${userId}.${extension}`;
+    const { error: uploadError } = await supabase.storage
+      .from("imagenes")
+      .upload(nombreArchivo, file, { upsert: true });
 
-      <Flex
-        direction="column"
-        bg="white"
-        p={6}
-        borderRadius="xl"
-        boxShadow="lg"
-        maxW="600px"
-        mx="auto"
-      >
-        <Center mb={6}>
-          <Avatar
-            size="2xl"
-            src={fotoUrl}
-            border="3px solid #319795"
-            boxShadow="md"
-          />
-        </Center>
+    if (uploadError) throw uploadError;
 
-        <VStack spacing={4} align="stretch">
-          <FormControl>
-            <FormLabel color="gray.700">Foto de perfil</FormLabel>
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setFoto(e.target.files[0])}
-            />
-          </FormControl>
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("imagenes").getPublicUrl(nombreArchivo);
 
-          <FormControl isRequired>
-            <FormLabel color="gray.700">Nombre</FormLabel>
-            <Input
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              placeholder="Tu nombre"
-            />
-          </FormControl>
+    return publicUrl;
+  };
 
-          <FormControl isRequired>
-            <FormLabel color="gray.700">Email</FormLabel>
-            <Input value={email} isDisabled />
-          </FormControl>
+  const handleGuardar = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      let nuevaFotoUrl = fotoUrl;
 
-          <FormControl>
-            <FormLabel color="gray.700">Nueva Contraseña</FormLabel>
-            <Input
-              type="password"
-              placeholder="Deja en blanco si no quieres cambiarla"
-              value={contraseña}
-              onChange={(e) => setContraseña(e.target.value)}
-            />
-          </FormControl>
+      // Subir nueva foto si se seleccionó
+      if (foto && userId) {
+        nuevaFotoUrl = await subirFotoPerfil(foto, userId);
+      }
 
-          <Button
-            mt={4}
-            colorScheme="teal"
-            size="md"
-            onClick={handleGuardar}
-            alignSelf="flex-end"
-          >
-            Guardar Cambios
-          </Button>
-        </VStack>
-      </Flex>
-    </Box>
-  </AuthWrapper>
-);
+      // PUT al endpoint correcto con el id del usuario
+      const res = await fetch(`https://myhandstats.onrender.com/usuario/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          nombre,
+          foto: nuevaFotoUrl,
+          password: contraseña ? contraseña : undefined,
+        }),
+      });
 
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.detail || "Error al actualizar perfil");
+      }
+
+      toast({
+        title: "Perfil actualizado",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+      setFotoUrl(nuevaFotoUrl);
+      setContraseña("");
+    } catch (error) {
+      toast({
+        title: "Error al actualizar perfil",
+        description: error.message,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+    }
+  };
+
+  return (
+    <AuthWrapper requiredRole={null}>
+      <Box p={6} bg="#f0f4f5" minH="100vh">
+        <Sidebar isOpen={isOpen} onClose={onClose} />
+
+        <Flex align="center" justify="space-between" mb={8}>
+          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
+          <Heading size="lg" color="teal.700">
+            Editar Perfil
+          </Heading>
+          <Box w="6" />
+        </Flex>
+
+        <Flex
+          direction="column"
+          bg="white"
+          p={6}
+          borderRadius="xl"
+          boxShadow="lg"
+          maxW="600px"
+          mx="auto"
+        >
+          <Center mb={6}>
+            <Avatar
+              size="2xl"
+              src={fotoUrl && fotoUrl !== "foto.jpg" ? fotoUrl : undefined}
+              name={nombre}
+              border="3px solid #319795"
+              boxShadow="md"
+              bg="#a8dadc"
+              fontSize="3xl"
+            >
+              {/* Iniciales si no hay foto */}
+              {(!fotoUrl || fotoUrl === "foto.jpg") && nombre && (() => {
+                const partes = nombre.trim().split(" ").filter(Boolean);
+                if (partes.length === 1) {
+                  return partes[0][0].toUpperCase();
+                } else if (partes.length > 1) {
+                  return (partes[0][0] + partes[1][0]).toUpperCase();
+                }
+                return "";
+              })()}
+            </Avatar>
+          </Center>
+
+          <VStack spacing={4} align="stretch">
+            <FormControl>
+              <FormLabel color="gray.700">Foto de perfil</FormLabel>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFoto(e.target.files[0])}
+              />
+            </FormControl>
+
+            <FormControl isRequired>
+              <FormLabel color="gray.700">Nombre</FormLabel>
+              <Input
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                placeholder="Tu nombre"
+              />
+            </FormControl>
+
+            <FormControl isRequired>
+              <FormLabel color="gray.700">Email</FormLabel>
+              <Input value={email} isDisabled />
+            </FormControl>
+
+            <FormControl>
+              <FormLabel color="gray.700">Nueva Contraseña</FormLabel>
+              <Input
+                type="password"
+                placeholder="Deja en blanco si no quieres cambiarla"
+                value={contraseña}
+                onChange={(e) => setContraseña(e.target.value)}
+              />
+            </FormControl>
+
+            <Button
+              mt={4}
+              colorScheme="teal"
+              size="md"
+              onClick={handleGuardar}
+              alignSelf="flex-end"
+            >
+              Guardar Cambios
+            </Button>
+          </VStack>
+        </Flex>
+      </Box>
+    </AuthWrapper>
+  );
 };
 
 export default EditarPerfil;
