@@ -7,6 +7,7 @@ from app.models.entrenador import EntrenadorOut, EntrenadorCreate, EntrenadorUpd
 from app.models.jugador_partido import JugadorPartidoOut, JugadorPartidoCreate, JugadorPartidoUpdate
 from app.models.acciones_partido import AccionesPartidoOut, AccionesPartidoCreate, AccionesPartidoUpdate
 from app.models.jugador_posicion import JugadorPosicionOut, JugadorPosicionCreate, JugadorPosicionUpdate
+from app.models.equipo_entrenador import EquipoEntrenador, EquipoEntrenadorCreate, EquipoEntrenadorUpdate
 from app.supabase_client import supabase
 from app.services.auth import obtener_info_desde_token
 from datetime import datetime
@@ -350,6 +351,25 @@ def obtener_jugadores_partidos_equipo(equipo_id: int, datos_token: dict = Depend
 
     return jugadores_partido.data
 
+
+@router.get("/{equipo_id}/entrenadores_equipo/", response_model=List[EquipoEntrenador])
+def obtener_entrenadores_equipo(equipo_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
+    equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
+
+    if not equipo_data.data:
+        raise HTTPException(status_code=404, detail="Equipo no encontrado")
+    
+    if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
+        raise HTTPException(status_code=403, detail="No tienes permiso para ver los entrenadores de este equipo")
+
+    # Obtener los entrenadores asociados al equipo
+    response = supabase.table("equipo_entrenador").select("*").eq("equipo_id", equipo_id).execute()
+    
+    if not response.data or len(response.data) == 0:
+        raise HTTPException(status_code=404, detail="No se encontraron entrenadores para este equipo")
+
+    return response.data
+
 # @router.post("/", response_model=EquipoOut)
 # def crear_equipo(equipo: EquipoCreate):
 #     response = supabase.table("equipos").insert(equipo.dict()).execute()
@@ -486,6 +506,28 @@ def crear_jugador_partido_equipo(equipo_id: int, partido_id: int, jugador_partid
     return response.data[0]
 
 
+@router.post("/equipo_entrenador/{equipo_id}", response_model=EquipoEntrenador)
+def crear_equipo_entrenador(equipo_id: int, equipo_entrenador: EquipoEntrenadorCreate, datos_token: dict = Depends(obtener_info_desde_token)):
+    equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
+    if not equipo_data.data:
+        raise HTTPException(status_code=404, detail="Equipo no encontrado")
+    
+    if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
+        raise HTTPException(status_code=403, detail="No tienes permiso para crear entrenadores para este equipo")
+
+    # Crear la relación entre el equipo y el entrenador
+    response = supabase.table("equipo_entrenador").insert({
+        "equipo_id": equipo_id,
+        "entrenador_id": equipo_entrenador.entrenador_id,
+        "rol": "entrenador"
+    }).execute()
+
+    if getattr(response, "error", None):
+        raise HTTPException(status_code=400, detail=f"Error al crear la relación: {response.error.message}")
+
+    return response.data[0]
+
+
 # @router.delete("/{equipo_id}")
 # def eliminar_equipo(equipo_id: int):
 #     response = supabase.table("equipos").delete().eq("id", equipo_id).execute()
@@ -498,6 +540,28 @@ def crear_jugador_partido_equipo(equipo_id: int, partido_id: int, jugador_partid
 
 #     return {"message": "Equipo eliminado correctamente"}
     
+@router.delete("/{equipo_id}/entrenador_equipo/{entrenador_id}")
+def eliminar_entrenador_equipo(equipo_id: int, entrenador_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
+    equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
+    if not equipo_data.data:
+        raise HTTPException(status_code=404, detail="Equipo no encontrado")
+    
+    if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
+        raise HTTPException(status_code=403, detail="No tienes permiso para eliminar entrenadores de este equipo")
+
+    # Verificar que el entrenador está asociado al equipo
+    relacion = supabase.table("equipo_entrenador").select("*").eq("equipo_id", equipo_id).eq("entrenador_id", entrenador_id).execute()
+    if not relacion.data or len(relacion.data) == 0:
+        raise HTTPException(status_code=404, detail="El entrenador no está asociado a este equipo")
+
+    try:
+        respuesta = supabase.table("equipo_entrenador").delete().eq("equipo_id", equipo_id).eq("entrenador_id", entrenador_id).execute()
+        if not respuesta.data:
+            raise HTTPException(status_code=404, detail="Entrenador no encontrado")
+        return {"mensaje": "Entrenador eliminado correctamente"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al eliminar el entrenador: {str(e)}")   
+
 
 @router.put("/{equipo_id}/jugador/{id}")
 def actualizar_jugador(id: int, jugador: JugadorUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
