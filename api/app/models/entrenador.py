@@ -5,9 +5,7 @@ from datetime import datetime
 class Entrenador(BaseModel):
     id: int
     nombre: str
-    apellidos: str
     email: str
-    telefono: str
     usuario_id: int
 
     class Config:
@@ -15,9 +13,7 @@ class Entrenador(BaseModel):
 
 class EntrenadorCreate(BaseModel):
     nombre: str
-    apellidos: str
     email: str
-    telefono: str
     usuario_id: int
 
     class Config:
@@ -25,9 +21,7 @@ class EntrenadorCreate(BaseModel):
     
 class EntrenadorUpdate(BaseModel):
     nombre: Optional[str] = None
-    apellidos: Optional[str] = None
     email: Optional[str] = None
-    telefono: Optional[str] = None
     usuario_id: Optional[int] = None
 
     class Config:
@@ -42,9 +36,7 @@ class EntrenadorDelete(BaseModel):
 class EntrenadorOut(BaseModel):
     id: int
     nombre: str
-    apellidos: str
     email: str
-    telefono: str
     usuario_id: int
 
     class Config:
