@@ -6,15 +6,15 @@ from app.supabase_client import supabase
 
 router = APIRouter()
 
-# @router.get("/", response_model=List[AccionesPartido])
-# def get_acciones_partidos():
+@router.get("/", response_model=List[AccionesPartido])
+def get_acciones_partidos():
     
-#     response = supabase.table("acciones_partido").select("*").execute()
+    response = supabase.table("acciones_partido").select("*").execute()
 
-#     if getattr(response, "error", None):
-#         raise HTTPException(status_code=500, detail="Error fetching data from Supabase")
+    if getattr(response, "error", None):
+        raise HTTPException(status_code=500, detail="Error fetching data from Supabase")
     
-#     return response.data
+    return response.data
 
 
 @router.post("/", response_model=AccionesPartidoOut)

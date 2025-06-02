@@ -15,8 +15,10 @@ import GestionEquiposClub from "./views/GestionEquiposClub.jsx";
 import GestionInfoClub from "./views/GestionInfoClub.jsx";
 import EditarPerfil  from "./views/Perfil.jsx";
 import StatsJugador from "./views/StatsJugador.jsx";
+import GestionClubEntrenadores from "./views/GestionClubEntrenadores.jsx";
 
 import './index.css';
+import StatsAvanzadas from "./views/StatsAvanzadas.jsx";
 function App() {
   return (
     <BrowserRouter>
@@ -29,6 +31,7 @@ function App() {
         <Route path="/nuevo-partido" element={<DashboardPartido />} />
         <Route path="/jugadores" element={<Jugadores />} />
         <Route path="/partidos" element={<Partidos />} />
+        <Route path="/estadisticas" element={<StatsAvanzadas />} />
         <Route path="/seleccionar-equipo" element={<SeleccionarEquipo />} />
         <Route path="/resumen-partido/:partido_id" element={<ResumenPartido />} />
         <Route path="/jugador/:jugador_id/stats" element={<StatsJugador />} />
@@ -37,6 +40,7 @@ function App() {
         <Route path="/club/equipos" element={<GestionEquiposClub />} /> 
         <Route path="/club/info" element={<GestionInfoClub />} />
         <Route path="/perfil" element={<EditarPerfil />} />
+        <Route path="/club/entrenadores" element={<GestionClubEntrenadores />} />
       </Routes>
     </BrowserRouter>
   );
