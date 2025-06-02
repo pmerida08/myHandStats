@@ -440,7 +440,7 @@ def crear_jugador_equipo(id_equipo: int, jugador: JugadorCreate, datos_token: di
     jugador_raw["posiciones"] = [
         pos["posiciones"]
         for pos in jugador_raw.get("jugador_posicion", [])
-        if pos.get("posiciones")
+        if isinstance(pos, dict) and "posiciones" in pos
     ]
     jugador_raw.pop("jugador_posicion", None)
 
