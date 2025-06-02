@@ -16,11 +16,6 @@ import {
   useDisclosure,
   Icon,
   Avatar,
-  Button,
-  Grid,
-  Divider,
-  GridItem,
-  Collapse,
   Spinner,
   Image,
 } from "@chakra-ui/react";
@@ -43,21 +38,110 @@ const StatsAvanzadas = () => {
   const [userName, setUserName] = useState("");
   const [club, setClub] = useState({ nombre: "", logo: "" });
   const [equipo, setEquipo] = useState({ id: "", nombre: "", logo: "" });
-  const [ultimosPartidos, setUltimosPartidos] = useState([]);
-
-  const [golesFavor, setGolesFavor] = useState(0);
-  const [golesContra, setGolesContra] = useState(0);
-  const [lanzamientos, setLanzamientos] = useState(0);
-  const [paradas, setParadas] = useState(0);
-  const [goles7m, setGoles7m] = useState(0);
-  const [perdidas, setPerdidas] = useState(0);
-  const [faltas, setFaltas] = useState(0);
-  const [paradas7m, setParadas7m] = useState(0);
-  const [recuperacion, setRecuperacion] = useState(0);
-  const [golesEnContra, setGolesEnContra] = useState(0);
 
   const [jugadores, setJugadores] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Estado para saber qué tab está activo
+  const [tabIndex, setTabIndex] = useState(0);
+
+  const partidosEjemplo = [
+    {
+      id: 1,
+      nombre: "Jornada1 - 15/09/2025",
+      partes: [
+        {
+          nombre: "1º Parte",
+          datos: [
+            {
+              tipo: "Ataque Posicional",
+              lanzamientos: 20,
+              goles: 15,
+              perdidas: 20,
+              faltas: 2,
+              aPuerta: 18,
+              goles7m: 1,
+            },
+            {
+              tipo: "Contraataque",
+              lanzamientos: 10,
+              goles: 7,
+              perdidas: 3,
+              faltas: 0,
+              aPuerta: 9,
+              goles7m: "n/a",
+            },
+            {
+              tipo: "Defensa Posicional",
+              lanzamientos: 3,
+              goles: "n/a",
+              perdidas: "n/a",
+              faltas: 5,
+              aPuerta: 4,
+              goles7m: 1,
+            },
+            {
+              tipo: "Repliegue",
+              lanzamientos: 3,
+              goles: "n/a",
+              perdidas: "n/a",
+              faltas: 2,
+              aPuerta: 2,
+              goles7m: 0,
+            },
+          ],
+          sanciones: { min2: 3, amarillas: 4, rojas: 0, azul: 0 },
+        },
+        {
+          nombre: "2º Parte",
+          datos: [
+            {
+              tipo: "Ataque Posicional",
+              lanzamientos: 20,
+              goles: 15,
+              perdidas: 20,
+              faltas: 2,
+              aPuerta: 18,
+              goles7m: 1,
+            },
+            {
+              tipo: "Contraataque",
+              lanzamientos: 10,
+              goles: 7,
+              perdidas: 3,
+              faltas: 0,
+              aPuerta: 9,
+              goles7m: "n/a",
+            },
+            {
+              tipo: "Defensa Posicional",
+              lanzamientos: 3,
+              goles: "n/a",
+              perdidas: "n/a",
+              faltas: 5,
+              aPuerta: 4,
+              goles7m: 1,
+            },
+            {
+              tipo: "Repliegue",
+              lanzamientos: 3,
+              goles: "n/a",
+              perdidas: "n/a",
+              faltas: 2,
+              aPuerta: 2,
+              goles7m: 0,
+            },
+          ],
+          sanciones: { min2: 3, amarillas: 4, rojas: 0, azul: 0 },
+        },
+      ],
+    },
+    // Puedes añadir más partidos aquí
+  ];
+
+  const [partidoSeleccionado, setPartidoSeleccionado] = useState(
+    partidosEjemplo[0]
+  );
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -87,7 +171,7 @@ const StatsAvanzadas = () => {
       }).then((res) => res.json()),
     ])
       .then(
-        ([usuarioData, clubData, equipoData, jugadoresData, partidosData]) => {
+        ([usuarioData, clubData, equipoData, jugadoresData]) => {
           setUserName(usuarioData.info?.nombre || "Usuario");
           // Club
           let clubObj = null;
@@ -109,23 +193,9 @@ const StatsAvanzadas = () => {
           // Jugadores y goles
           if (Array.isArray(jugadoresData)) {
             setJugadores(jugadoresData);
-            const totalGolesFavor = jugadoresData.reduce(
-              (acc, jugador) => acc + (jugador.golest || 0),
-              0
-            );
-            setGolesFavor(totalGolesFavor);
-            const totalGolesContra = jugadoresData.reduce(
-              (acc, jugador) => acc + (jugador.gol_en_contra_t || 0),
-              0
-            );
-            setGolesContra(totalGolesContra);
           } else {
             setJugadores([]);
-            setGolesFavor(0);
-            setGolesContra(0);
           }
-          // Partidos
-          setUltimosPartidos(Array.isArray(partidosData) ? partidosData : []);
           setLoading(false);
         }
       )
@@ -240,7 +310,14 @@ const StatsAvanzadas = () => {
       </Flex>
 
       {/* Tabs */}
-      <Tabs variant="unstyled" mt={2} mb={6} w="100%">
+      <Tabs
+        variant="unstyled"
+        mt={2}
+        mb={6}
+        w="100%"
+        index={tabIndex}
+        onChange={setTabIndex}
+      >
         <TabList
           borderBottom="1px solid #e2e8f0"
           display="flex"
@@ -274,110 +351,227 @@ const StatsAvanzadas = () => {
         </TabList>
       </Tabs>
 
-      {/* Tablas principales */}
-      <Flex
-        direction={{ base: "column", md: "row" }}
-        gap={4}
-        align="flex-start"
-        flexWrap="wrap"
-      >
-        {/* Tablas de ataque y defensa */}
-        <Box flex="2" minW={{ base: "100%", md: "60%" }}>
-          {/* Ataque */}
-          <Box
-            border="2px solid #31979530"
-            borderRadius="md"
-            mb={4}
-            p={boxPadding}
-            bg="white"
-            overflowX="auto"
-          >
-            <Table size="sm" variant="simple">
-              <Thead>
-                <Tr>
-                  <Th></Th>
-                  <Th>Goles</Th>
-                  <Th>Lanzamientos</Th>
-                  <Th>Perdidas</Th>
-                  <Th>Goles 7M</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr bg="gray.50">
-                  <Td fontWeight="semibold">Ofensiva</Td>
-                  <Td>{infoEquipo.ofensiva.golest}</Td>
-                  <Td>{infoEquipo.ofensiva.lanzamientos}</Td>
-                  <Td>{infoEquipo.ofensiva.perdidas}</Td>
-                  <Td>{infoEquipo.ofensiva.goles7m}</Td>
-                </Tr>
-              </Tbody>
-            </Table>
-          </Box>
-          {/* Defensa */}
-          <Box
-            border="2px solid #31979530"
-            borderRadius="md"
-            mb={4}
-            p={boxPadding}
-            bg="white"
-            overflowX="auto"
-          >
-            <Table size="sm" variant="simple">
-              <Thead>
-                <Tr>
-                  <Th></Th>
-                  <Th>Paradas</Th>
-                  <Th>Faltas</Th>
-                  <Th>Recuperación</Th>
-                  <Th>Goles en Contra</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr bg="gray.50">
-                  <Td fontWeight="semibold">Defensiva</Td>
-                  <Td>{infoEquipo.defensiva.paradas}</Td>
-                  <Td>{infoEquipo.defensiva.faltas}</Td>
-                  <Td>{infoEquipo.defensiva.recuperacion}</Td>
-                  <Td>{infoEquipo.defensiva.goles_en_contra_t}</Td>
-                </Tr>
-              </Tbody>
-            </Table>
-          </Box>
-        </Box>
-        {/* Tabla de jugadores */}
-        <Box
-          flex="1"
-          minW={{ base: "100%", md: "35%" }}
-          border="2px solid #31979530"
-          borderRadius="md"
-          p={boxPadding}
-          bg="white"
-          overflowX="auto"
+      {/* Renderizado condicional según el tab activo */}
+      {tabIndex === 0 && (
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          gap={4}
+          align="flex-start"
+          flexWrap="wrap"
         >
-          <Table size="sm" variant="simple">
-            <Thead>
-              <Tr>
-                <Th></Th>
-                <Th>Goles/7M</Th>
-                <Th>Paradas/7M</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {jugadores.map((row, idx) => (
-                <Tr key={idx} bg={idx % 2 === 0 ? "gray.50" : "white"}>
-                  <Td fontWeight="semibold">{row.nombre}</Td>
-                  <Td>
-                    {row.goles7m} / {row.lanzamiento_7m}
-                  </Td>
-                  <Td>
-                    {row.paradas7m} / {row.paradas}{" "}
-                  </Td>
+          {/* Tablas de ataque y defensa */}
+          <Box flex="2" minW={{ base: "100%", md: "60%" }}>
+            {/* Ataque */}
+            <Box
+              border="2px solid #31979530"
+              borderRadius="md"
+              mb={4}
+              p={boxPadding}
+              bg="white"
+              overflowX="auto"
+            >
+              <Table size="sm" variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th></Th>
+                    <Th>Goles</Th>
+                    <Th>Lanzamientos</Th>
+                    <Th>Perdidas</Th>
+                    <Th>Goles 7M</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr bg="gray.50">
+                    <Td fontWeight="semibold">Ofensiva</Td>
+                    <Td>{infoEquipo.ofensiva.golest}</Td>
+                    <Td>{infoEquipo.ofensiva.lanzamientos}</Td>
+                    <Td>{infoEquipo.ofensiva.perdidas}</Td>
+                    <Td>{infoEquipo.ofensiva.goles7m}</Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            </Box>
+            {/* Defensa */}
+            <Box
+              border="2px solid #31979530"
+              borderRadius="md"
+              mb={4}
+              p={boxPadding}
+              bg="white"
+              overflowX="auto"
+            >
+              <Table size="sm" variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th></Th>
+                    <Th>Paradas</Th>
+                    <Th>Faltas</Th>
+                    <Th>Recuperación</Th>
+                    <Th>Goles en Contra</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr bg="gray.50">
+                    <Td fontWeight="semibold">Defensiva</Td>
+                    <Td>{infoEquipo.defensiva.paradas}</Td>
+                    <Td>{infoEquipo.defensiva.faltas}</Td>
+                    <Td>{infoEquipo.defensiva.recuperacion}</Td>
+                    <Td>{infoEquipo.defensiva.goles_en_contra_t}</Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            </Box>
+          </Box>
+          {/* Tabla de jugadores */}
+          <Box
+            flex="1"
+            minW={{ base: "100%", md: "35%" }}
+            border="2px solid #31979530"
+            borderRadius="md"
+            p={boxPadding}
+            bg="white"
+            overflowX="auto"
+          >
+            <Table size="sm" variant="simple">
+              <Thead>
+                <Tr>
+                  <Th></Th>
+                  <Th>Goles/7M</Th>
+                  <Th>Paradas/7M</Th>
                 </Tr>
+              </Thead>
+              <Tbody>
+                {jugadores.map((row, idx) => (
+                  <Tr key={idx} bg={idx % 2 === 0 ? "gray.50" : "white"}>
+                    <Td fontWeight="semibold">{row.nombre}</Td>
+                    <Td>
+                      {row.goles7m} / {row.lanzamiento_7m}
+                    </Td>
+                    <Td>
+                      {row.paradas7m} / {row.paradas}{" "}
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Box>
+        </Flex>
+      )}
+      {tabIndex === 1 && (
+        <Box>
+          {/* Selector de partido */}
+          <Box mb={4}>
+            <select
+              style={{
+                width: "100%",
+                fontSize: "18px",
+                padding: "6px",
+              }}
+              value={partidoSeleccionado.id}
+              onChange={(e) => {
+                const partido = partidosEjemplo.find(
+                  (p) => p.id === Number(e.target.value)
+                );
+                setPartidoSeleccionado(partido);
+              }}
+            >
+              {partidosEjemplo.map((partido) => (
+                <option key={partido.id} value={partido.id}>
+                  {partido.nombre}
+                </option>
               ))}
-            </Tbody>
-          </Table>
+            </select>
+          </Box>
+          {/* Tablas de partes */}
+          <Flex gap={6} flexWrap="wrap">
+            {partidoSeleccionado.partes.map((parte, idx) => (
+              <Box
+                key={idx}
+                border="2px solid #319795"
+                borderRadius="md"
+                p={3}
+                minW="350px"
+                mb={4}
+                flex="1"
+              >
+                <Text fontWeight="bold" mb={2}>
+                  {parte.nombre}
+                </Text>
+                <Table size="sm" variant="simple">
+                  <Thead>
+                    <Tr>
+                      <Th></Th>
+                      <Th>Lanzamientos</Th>
+                      <Th>Goles</Th>
+                      <Th>Pérdidas</Th>
+                      <Th>Faltas</Th>
+                      <Th>A Puerta</Th>
+                      <Th>Goles 7M</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {parte.datos.map((fila, i) => (
+                      <Tr key={i}>
+                        <Td fontWeight="semibold">{fila.tipo}</Td>
+                        <Td>{fila.lanzamientos}</Td>
+                        <Td>{fila.goles}</Td>
+                        <Td>{fila.perdidas}</Td>
+                        <Td>{fila.faltas}</Td>
+                        <Td>{fila.aPuerta}</Td>
+                        <Td>{fila.goles7m}</Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+                {/* Sanciones */}
+                <Box
+                  border="1px solid #319795"
+                  borderRadius="md"
+                  mt={4}
+                  p={2}
+                >
+                  <Table size="sm" variant="simple">
+                    <Thead>
+                      <Tr>
+                        <Th>2 Minutos</Th>
+                        <Th>Amarillas</Th>
+                        <Th>Rojas</Th>
+                        <Th>Azul</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      <Tr>
+                        <Td>{parte.sanciones.min2}</Td>
+                        <Td>{parte.sanciones.amarillas}</Td>
+                        <Td>{parte.sanciones.rojas}</Td>
+                        <Td>{parte.sanciones.azul}</Td>
+                      </Tr>
+                    </Tbody>
+                  </Table>
+                </Box>
+              </Box>
+            ))}
+          </Flex>
         </Box>
-      </Flex>
+      )}
+      {tabIndex === 2 && (
+        <Box>
+          {/* Aquí el contenido de Por Jugador */}
+          <Text>Estadísticas por jugador</Text>
+        </Box>
+      )}
+      {tabIndex === 3 && (
+        <Box>
+          {/* Aquí el contenido de Jugadores */}
+          <Text>Listado de jugadores</Text>
+        </Box>
+      )}
+      {tabIndex === 4 && (
+        <Box>
+          {/* Aquí el contenido de Tiros */}
+          <Text>Estadísticas de tiros</Text>
+        </Box>
+      )}
     </Box>
   );
 };
