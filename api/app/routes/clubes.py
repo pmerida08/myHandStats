@@ -74,6 +74,26 @@ def obtener_entrenadores_club(datos_token: dict = Depends(obtener_info_desde_tok
     return entrenadores_response.data
 
 
+@router.get("/entrenador/{entrenador_id}", response_model=EntrenadorOut)
+def obtener_entrenador_por_id(entrenador_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
+    if datos_token["rol"] != "admin":
+        raise HTTPException(status_code=403, detail="Solo los administradores pueden ver los entrenadores del club")
+
+    # Comprobar si el entrenador pertenece al club
+    response = supabase.table("club_entrenador").select("entrenador_id").eq("club_id", datos_token["clubs_id"]).eq("entrenador_id", entrenador_id).execute()
+    
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Entrenador no encontrado o no pertenece al club")
+
+    # Obtener los datos del entrenador
+    entrenador_response = supabase.table("entrenadores").select("*").eq("id", entrenador_id).execute()
+
+    if getattr(entrenador_response, "error", None):
+        raise HTTPException(status_code=400, detail=f"Error al obtener el entrenador: {entrenador_response.error.message}")
+
+    return entrenador_response.data[0]
+
+
 @router.post("/nuevo_equipo/", response_model=EquipoOut)
 def crear_nuevo_equipo_club(equipo: EquipoCreate, datos_token: dict = Depends(obtener_info_desde_token)):
 
