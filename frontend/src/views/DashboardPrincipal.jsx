@@ -236,11 +236,26 @@ const DashboardPrincipal = () => {
           </Text>
         </Flex>
 
-        {/* Avatar de usuario */}
         <Flex align="center" gap={2}>
           <Text fontSize="m" fontWeight={"medium"} color="#014C4C">
             {userName}
           </Text>
+          {/* Mostrar avatar de usuario si existe foto en el token */}
+          {(() => {
+            const token = localStorage.getItem("token");
+            let foto = "";
+            if (token) {
+              try {
+                const payload = JSON.parse(atob(token.split(".")[1]));
+                foto = payload.foto || "";
+              } catch {}
+            }
+            return foto ? (
+              <Avatar size="sm" src={foto} name={userName} />
+            ) : (
+              <Avatar size="sm" name={userName} />
+            );
+          })()}
         </Flex>
       </Flex>
 
@@ -995,218 +1010,6 @@ const DashboardPrincipal = () => {
             flexDirection={{ base: "column", md: "row" }}
             justifyContent="space-between"
           >
-            <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
-              <Text fontWeight="bold" mb={2}>
-                Tipos de lanzamiento por jugador
-              </Text>
-              <Text fontSize="xs" color="gray.500" mb={2}>
-                Detalle de lanzamientos por posición de tiro y jugador
-              </Text>
-              {Array.isArray(jugadores) && jugadores.length > 0 ? (
-                <Box overflowX="auto">
-                  <table
-                    style={{
-                      width: "100%",
-                      borderCollapse: "collapse",
-                      tableLayout: "fixed",
-                    }}
-                  >
-                    <thead>
-                      <tr>
-                        <th
-                          style={{
-                            padding: "8px",
-                            border: "1px solid #e2e8f0",
-                            textAlign: "left",
-                          }}
-                        >
-                          Jugador
-                        </th>
-                        <th
-                          style={{
-                            padding: "8px",
-                            border: "1px solid #e2e8f0",
-                            textAlign: "center",
-                          }}
-                        >
-                          ED
-                        </th>
-                        <th
-                          style={{
-                            padding: "8px",
-                            border: "1px solid #e2e8f0",
-                            textAlign: "center",
-                          }}
-                        >
-                          EI
-                        </th>
-                        <th
-                          style={{
-                            padding: "8px",
-                            border: "1px solid #e2e8f0",
-                            textAlign: "center",
-                          }}
-                        >
-                          LD
-                        </th>
-                        <th
-                          style={{
-                            padding: "8px",
-                            border: "1px solid #e2e8f0",
-                            textAlign: "center",
-                          }}
-                        >
-                          LI
-                        </th>
-                        <th
-                          style={{
-                            padding: "8px",
-                            border: "1px solid #e2e8f0",
-                            textAlign: "center",
-                          }}
-                        >
-                          C
-                        </th>
-                        <th
-                          style={{
-                            padding: "8px",
-                            border: "1px solid #e2e8f0",
-                            textAlign: "center",
-                          }}
-                        >
-                          PI
-                        </th>
-                        <th
-                          style={{
-                            padding: "8px",
-                            border: "1px solid #e2e8f0",
-                            textAlign: "center",
-                          }}
-                        >
-                          EXT LI
-                        </th>
-                        <th
-                          style={{
-                            padding: "8px",
-                            border: "1px solid #e2e8f0",
-                            textAlign: "center",
-                          }}
-                        >
-                          EXT LD
-                        </th>
-                        <th
-                          style={{
-                            padding: "8px",
-                            border: "1px solid #e2e8f0",
-                            textAlign: "center",
-                          }}
-                        >
-                          EXT C
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {jugadores.map((jugador) => (
-                        <tr key={jugador.id}>
-                          <td
-                            style={{
-                              padding: "8px",
-                              border: "1px solid #e2e8f0",
-                              textAlign: "left",
-                            }}
-                          >
-                            {jugador.nombre}
-                          </td>
-                          <td
-                            style={{
-                              padding: "8px",
-                              border: "1px solid #e2e8f0",
-                              textAlign: "center",
-                            }}
-                          >
-                            {jugador.lanzamiento_ed || 0}
-                          </td>
-                          <td
-                            style={{
-                              padding: "8px",
-                              border: "1px solid #e2e8f0",
-                              textAlign: "center",
-                            }}
-                          >
-                            {jugador.lanzamiento_ei || 0}
-                          </td>
-                          <td
-                            style={{
-                              padding: "8px",
-                              border: "1px solid #e2e8f0",
-                              textAlign: "center",
-                            }}
-                          >
-                            {jugador.lanzamiento_ld || 0}
-                          </td>
-                          <td
-                            style={{
-                              padding: "8px",
-                              border: "1px solid #e2e8f0",
-                              textAlign: "center",
-                            }}
-                          >
-                            {jugador.lanzamiento_li || 0}
-                          </td>
-                          <td
-                            style={{
-                              padding: "8px",
-                              border: "1px solid #e2e8f0",
-                              textAlign: "center",
-                            }}
-                          >
-                            {jugador.lanzamiento_c || 0}
-                          </td>
-                          <td
-                            style={{
-                              padding: "8px",
-                              border: "1px solid #e2e8f0",
-                              textAlign: "center",
-                            }}
-                          >
-                            {jugador.lanzamiento_pi || 0}
-                          </td>
-                          <td
-                            style={{
-                              padding: "8px",
-                              border: "1px solid #e2e8f0",
-                              textAlign: "center",
-                            }}
-                          >
-                            {jugador.lanzamiento_ext_li || 0}
-                          </td>
-                          <td
-                            style={{
-                              padding: "8px",
-                              border: "1px solid #e2e8f0",
-                              textAlign: "center",
-                            }}
-                          >
-                            {jugador.lanzamiento_ext_ld || 0}
-                          </td>
-                          <td
-                            style={{
-                              padding: "8px",
-                              border: "1px solid #e2e8f0",
-                              textAlign: "center",
-                            }}
-                          >
-                            {jugador.lanzamiento_ext_c || 0}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </Box>
-              ) : (
-                <Text fontSize="sm">Aún no hay registros</Text>
-              )}
-            </Box>
           </Flex>
         </GridItem>
       </Grid>
