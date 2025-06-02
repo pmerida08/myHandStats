@@ -24,9 +24,11 @@ const ResumenPartido = () => {
 
   const [partido, setPartido] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [tabSeleccionado, setTabSeleccionado] = useState("Resumen");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const bg = useColorModeValue("white", "gray.800");
 
+  // FETCH DATOS DEL PARTIDO
   useEffect(() => {
     const token = localStorage.getItem("token");
     fetch(`https://myhandstats.onrender.com/equipo/${equipo_id}/partido/${partido_id}`, {
@@ -134,13 +136,11 @@ const ResumenPartido = () => {
           <Box w="6" />
         </Flex>
 
-        {/* Cabecera */}
+        {/* Encabezado */}
         <Box textAlign="center" mb={6}>
           <Text fontSize="xl" fontWeight="bold" color="#014C4C">Estadísticas del Partido</Text>
           <Text color="gray.600">Liga</Text>
-          <Text fontSize="sm" color="gray.500">
-            Jornada 1 - {fechaFormateada}
-          </Text>
+          <Text fontSize="sm" color="gray.500">Jornada 1 - {fechaFormateada}</Text>
         </Box>
 
         {/* Marcador */}
