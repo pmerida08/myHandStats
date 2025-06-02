@@ -17,6 +17,7 @@ import EditarPerfil  from "./views/Perfil.jsx";
 import StatsJugador from "./views/StatsJugador.jsx";
 
 import './index.css';
+import StatsAvanzadas from "./views/StatsAvanzadas.jsx";
 function App() {
   return (
     <BrowserRouter>
@@ -29,6 +30,7 @@ function App() {
         <Route path="/nuevo-partido" element={<DashboardPartido />} />
         <Route path="/jugadores" element={<Jugadores />} />
         <Route path="/partidos" element={<Partidos />} />
+        <Route path="/estadisticas" element={<StatsAvanzadas />} />
         <Route path="/seleccionar-equipo" element={<SeleccionarEquipo />} />
         <Route path="/resumen-partido/:partido_id" element={<ResumenPartido />} />
         <Route path="/jugador/:jugador_id/stats" element={<StatsJugador />} />
