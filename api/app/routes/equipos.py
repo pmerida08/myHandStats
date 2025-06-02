@@ -540,6 +540,28 @@ def crear_equipo_entrenador(equipo_id: int, equipo_entrenador: EquipoEntrenadorC
 
 #     return {"message": "Equipo eliminado correctamente"}
     
+@router.delete("/{equipo_id}/entrenador_equipo/{entrenador_id}")
+def eliminar_entrenador_equipo(equipo_id: int, entrenador_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
+    equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
+    if not equipo_data.data:
+        raise HTTPException(status_code=404, detail="Equipo no encontrado")
+    
+    if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
+        raise HTTPException(status_code=403, detail="No tienes permiso para eliminar entrenadores de este equipo")
+
+    # Verificar que el entrenador está asociado al equipo
+    relacion = supabase.table("equipo_entrenador").select("*").eq("equipo_id", equipo_id).eq("entrenador_id", entrenador_id).execute()
+    if not relacion.data or len(relacion.data) == 0:
+        raise HTTPException(status_code=404, detail="El entrenador no está asociado a este equipo")
+
+    try:
+        respuesta = supabase.table("equipo_entrenador").delete().eq("equipo_id", equipo_id).eq("entrenador_id", entrenador_id).execute()
+        if not respuesta.data:
+            raise HTTPException(status_code=404, detail="Entrenador no encontrado")
+        return {"mensaje": "Entrenador eliminado correctamente"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al eliminar el entrenador: {str(e)}")   
+
 
 @router.put("/{equipo_id}/jugador/{id}")
 def actualizar_jugador(id: int, jugador: JugadorUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
