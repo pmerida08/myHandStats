@@ -121,6 +121,16 @@ def registrar_nuevo_usuario_club(usuario: UsuarioCreate, datos_token: dict = Dep
         if getattr(entrenador_response, "error", None):
             raise HTTPException(status_code=400, detail=f"Error al crear el entrenador: {entrenador_response.error.message}")
        
+        # Guardar relación en club_entrenador
+        relacion = {
+            "club_id": datos_token["clubs_id"],
+            "entrenador_id": entrenador_response.data[0]["id"]
+        }
+        rel_response = supabase.table("club_entrenador").insert(relacion).execute()
+        if getattr(rel_response, "error", None):
+            raise HTTPException(status_code=400, detail=f"Error al guardar la relación club-entrenador: {rel_response.error.message}")
+        
+
     return nuevo_usuario
 
 

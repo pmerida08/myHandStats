@@ -7,6 +7,7 @@ from app.models.entrenador import EntrenadorOut, EntrenadorCreate, EntrenadorUpd
 from app.models.jugador_partido import JugadorPartidoOut, JugadorPartidoCreate, JugadorPartidoUpdate
 from app.models.acciones_partido import AccionesPartidoOut, AccionesPartidoCreate, AccionesPartidoUpdate
 from app.models.jugador_posicion import JugadorPosicionOut, JugadorPosicionCreate, JugadorPosicionUpdate
+from app.models.equipo_entrenador import EquipoEntrenador, EquipoEntrenadorCreate, EquipoEntrenadorUpdate
 from app.supabase_client import supabase
 from app.services.auth import obtener_info_desde_token
 from datetime import datetime
@@ -350,6 +351,25 @@ def obtener_jugadores_partidos_equipo(equipo_id: int, datos_token: dict = Depend
 
     return jugadores_partido.data
 
+
+@router.get("/entrenadores_equipo/", response_model=List[EquipoEntrenador])
+def obtener_equipos_entrenadores(datos_token: dict = Depends(obtener_info_desde_token)):
+    # Obtener los equipos del club del usuario
+    equipos_resp = supabase.table("equipos").select("id").eq("clubs_id", datos_token["clubs_id"]).execute()
+    if not equipos_resp.data:
+        return []
+    equipos_ids = [e["id"] for e in equipos_resp.data]
+
+    # Obtener solo las relaciones equipo_entrenador de esos equipos
+    response = supabase.table("equipo_entrenador").select(
+        "*, equipo_id:equipos(nombre), entrenador_id:entrenadores(nombre)"
+    ).in_("equipo_id", equipos_ids).execute()
+
+    if getattr(response, "error", None):
+        raise HTTPException(status_code=400, detail=f"Error al obtener los equipos_entrenadores: {response.error.message}")
+    return response.data
+
+
 # @router.post("/", response_model=EquipoOut)
 # def crear_equipo(equipo: EquipoCreate):
 #     response = supabase.table("equipos").insert(equipo.dict()).execute()
@@ -482,6 +502,27 @@ def crear_jugador_partido_equipo(equipo_id: int, partido_id: int, jugador_partid
 
     if getattr(response, "error", None):
         raise HTTPException(status_code=400, detail=f"Error al crear el jugador_partido: {response.error.message}")
+
+    return response.data[0]
+
+
+@router.post("/equipo_entrenador/{equipo_id}", response_model=EquipoEntrenador)
+def crear_equipo_entrenador(equipo_id: int, equipo_entrenador: EquipoEntrenadorCreate, datos_token: dict = Depends(obtener_info_desde_token)):
+    equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
+    if not equipo_data.data:
+        raise HTTPException(status_code=404, detail="Equipo no encontrado")
+    
+    if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
+        raise HTTPException(status_code=403, detail="No tienes permiso para crear entrenadores para este equipo")
+
+    # Crear la relación entre el equipo y el entrenador
+    response = supabase.table("equipo_entrenador").insert({
+        "equipo_id": equipo_id,
+        "entrenador_id": equipo_entrenador.entrenador_id
+    }).execute()
+
+    if getattr(response, "error", None):
+        raise HTTPException(status_code=400, detail=f"Error al crear la relación: {response.error.message}")
 
     return response.data[0]
 
