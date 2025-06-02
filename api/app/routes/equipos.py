@@ -518,7 +518,8 @@ def crear_equipo_entrenador(equipo_id: int, equipo_entrenador: EquipoEntrenadorC
     # Crear la relación entre el equipo y el entrenador
     response = supabase.table("equipo_entrenador").insert({
         "equipo_id": equipo_id,
-        "entrenador_id": equipo_entrenador.entrenador_id
+        "entrenador_id": equipo_entrenador.entrenador_id,
+        "rol": "entrenador"
     }).execute()
 
     if getattr(response, "error", None):
