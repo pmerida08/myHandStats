@@ -96,7 +96,6 @@ def registrar_nuevo_usuario_club(usuario: UsuarioCreate, datos_token: dict = Dep
     if datos_token["rol"] != "admin":
         raise HTTPException(status_code=403, detail="Solo administradores pueden registrar nuevos usuarios")
 
-    # Forzamos el rol y el id_club del nuevo usuario
     data = usuario.dict()
     data["clubs_id"] = datos_token["clubs_id"]
     data["password"] = hash_password(data["password"])
@@ -105,34 +104,51 @@ def registrar_nuevo_usuario_club(usuario: UsuarioCreate, datos_token: dict = Dep
 
     nuevo_usuario = response.data[0]
     nuevo_usuario.pop("password", None)
+
+    if getattr(response, "error", None):
+        raise HTTPException(status_code=400, detail=f"Error al crear el usuario: {response.error.message}")
+    
+    
+    if usuario.rol == "entrenador":
+        # Guardar relación en club_entrenador si el rol es entrenador
+        entrenador_data = {
+            "nombre": nuevo_usuario["nombre"],
+            "email": nuevo_usuario["email"],
+            "usuario_id": nuevo_usuario["id"],
+
+        }
+        entrenador_response = supabase.table("entrenadores").insert(entrenador_data).execute()
+        if getattr(entrenador_response, "error", None):
+            raise HTTPException(status_code=400, detail=f"Error al crear el entrenador: {entrenador_response.error.message}")
+       
     return nuevo_usuario
 
 
-@router.post("/entrenador/register", response_model=EntrenadorOut)
-def registrar_nuevo_entrenador_club(entrenador: EntrenadorCreate, datos_token: dict = Depends(obtener_info_desde_token)):
-    if datos_token["rol"] != "admin":
-        raise HTTPException(status_code=403, detail="Solo administradores pueden registrar nuevos entrenadores")
+# @router.post("/entrenador/register", response_model=EntrenadorOut)
+# def registrar_nuevo_entrenador_club(entrenador: EntrenadorCreate, datos_token: dict = Depends(obtener_info_desde_token)):
+#     if datos_token["rol"] != "admin":
+#         raise HTTPException(status_code=403, detail="Solo administradores pueden registrar nuevos entrenadores")
 
-    data = entrenador.dict()
-    # No poner clubs_id en esta tabla, quitar esta línea
-    # data["clubs_id"] = datos_token["clubs_id"]
+#     data = entrenador.dict()
+#     # No poner clubs_id en esta tabla, quitar esta línea
+#     # data["clubs_id"] = datos_token["clubs_id"]
 
-    response = supabase.table("entrenadores").insert(data).execute()
-    if getattr(response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al crear el entrenador: {response.error.message}")
+#     response = supabase.table("entrenadores").insert(data).execute()
+#     if getattr(response, "error", None):
+#         raise HTTPException(status_code=400, detail=f"Error al crear el entrenador: {response.error.message}")
 
-    nuevo_entrenador = response.data[0]
+#     nuevo_entrenador = response.data[0]
 
-    # Guardar relación en club_entrenador
-    relacion = {
-        "club_id": datos_token["clubs_id"],
-        "entrenador_id": nuevo_entrenador["id"]
-    }
-    rel_response = supabase.table("club_entrenador").insert(relacion).execute()
-    if getattr(rel_response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al guardar la relación club-entrenador: {rel_response.error.message}")
+#     # Guardar relación en club_entrenador
+#     relacion = {
+#         "club_id": datos_token["clubs_id"],
+#         "entrenador_id": nuevo_entrenador["id"]
+#     }
+#     rel_response = supabase.table("club_entrenador").insert(relacion).execute()
+#     if getattr(rel_response, "error", None):
+#         raise HTTPException(status_code=400, detail=f"Error al guardar la relación club-entrenador: {rel_response.error.message}")
 
-    return nuevo_entrenador
+#     return nuevo_entrenador
 
 
 
