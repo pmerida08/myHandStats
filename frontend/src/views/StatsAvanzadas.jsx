@@ -115,6 +115,7 @@ const StatsAvanzadas = () => {
           const partidoStats = statsPartidoSeleccionadoData.find(
             (p) => p.partido_id === partidoId
           );
+        }
         // Selecciona el primer partido automáticamente si hay datos
         if (Array.isArray(partidosData) && partidosData.length > 0) {
           setPartidoSeleccionado(partidosData[0]);
@@ -122,7 +123,8 @@ const StatsAvanzadas = () => {
           setPartidoSeleccionado(null);
         }
         setLoading(false);
-      }).catch(() => {
+      })
+      .catch(() => {
         setLoading(false);
       });
   }, []);
