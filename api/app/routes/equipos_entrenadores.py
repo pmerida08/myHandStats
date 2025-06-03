@@ -17,7 +17,7 @@ def crear_equipo_entrenador(equipo_entrenador: EquipoEntrenadorCreate):
 
 # @router.get("/", response_model=List[EquipoEntrenador])
 # def obtener_equipos_entrenadores():
-#     response = supabase.table("equipos_entrenadores").select("*, equipo_id:equipos(nombre), entrenador_id:entrenadores(nombre)").execute()
+#     response = supabase.table("equipo_entrenador").select("*, equipo_id:equipos(nombre), entrenador_id:entrenadores(nombre)").execute()
 
 #     if getattr(response, "error", None):
 #         raise HTTPException(status_code=400, detail=f"Error al obtener los equipos_entrenadores: {response.error.message}")
