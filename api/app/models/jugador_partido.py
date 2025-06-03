@@ -38,6 +38,20 @@ class JugadorPartido(BaseModel):
     invasion_area: int
     blocaje: int
     robo: int
+    lanzamiento_en_contra_ei: int
+    lanzamiento_en_contra_ed: int
+    lanzamiento_en_contra_li: int
+    lanzamiento_en_contra_c: int
+    lanzamiento_en_contra_ld: int
+    lanzamiento_en_contra_pi: int
+    lanzamiento_en_contra_7m: int
+    gol_en_contra_ei: int
+    gol_en_contra_ed: int
+    gol_en_contra_li: int
+    gol_en_contra_c: int
+    gol_en_contra_ld: int
+    gol_en_contra_pi: int
+    gol_en_contra_7m: int
 
     class Config:
         orm_mode = True
@@ -78,6 +92,20 @@ class JugadorPartidoCreate(BaseModel):
     invasion_area: int
     blocaje: int
     robo: int
+    lanzamiento_en_contra_ei: int
+    lanzamiento_en_contra_ed: int
+    lanzamiento_en_contra_li: int
+    lanzamiento_en_contra_c: int
+    lanzamiento_en_contra_ld: int
+    lanzamiento_en_contra_pi: int
+    lanzamiento_en_contra_7m: int
+    gol_en_contra_ei: int
+    gol_en_contra_ed: int
+    gol_en_contra_li: int
+    gol_en_contra_c: int
+    gol_en_contra_ld: int
+    gol_en_contra_pi: int
+    gol_en_contra_7m: int
 
     class Config:
         orm_mode = True
@@ -118,6 +146,20 @@ class JugadorPartidoUpdate(BaseModel):
     invasion_area: Optional[int] = None
     blocaje: Optional[int] = None
     robo: Optional[int] = None
+    lanzamiento_en_contra_ei: Optional[int] = None
+    lanzamiento_en_contra_ed: Optional[int] = None
+    lanzamiento_en_contra_li: Optional[int] = None
+    lanzamiento_en_contra_c: Optional[int] = None
+    lanzamiento_en_contra_ld: Optional[int] = None
+    lanzamiento_en_contra_pi: Optional[int] = None
+    lanzamiento_en_contra_7m: Optional[int] = None
+    gol_en_contra_ei: Optional[int] = None
+    gol_en_contra_ed: Optional[int] = None
+    gol_en_contra_li: Optional[int] = None
+    gol_en_contra_c: Optional[int] = None
+    gol_en_contra_ld: Optional[int] = None
+    gol_en_contra_pi: Optional[int] = None
+    gol_en_contra_7m: Optional[int] = None
 
     class Config:
         orm_mode = True
@@ -165,6 +207,20 @@ class JugadorPartidoOut(BaseModel):
     invasion_area: int
     blocaje: int
     robo: int
+    lanzamiento_en_contra_ei: int
+    lanzamiento_en_contra_ed: int
+    lanzamiento_en_contra_li: int
+    lanzamiento_en_contra_c: int
+    lanzamiento_en_contra_ld: int
+    lanzamiento_en_contra_pi: int
+    lanzamiento_en_contra_7m: int
+    gol_en_contra_ei: int
+    gol_en_contra_ed: int
+    gol_en_contra_li: int
+    gol_en_contra_c: int
+    gol_en_contra_ld: int
+    gol_en_contra_pi: int
+    gol_en_contra_7m: int
 
     class Config:
         orm_mode = True
