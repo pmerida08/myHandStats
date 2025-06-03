@@ -22,6 +22,7 @@ import {
   VStack,
   Select,
   useToast,
+  Image,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FaPlus, FaUser, FaBars, FaUserEdit } from "react-icons/fa";
@@ -49,6 +50,7 @@ const Jugadores = () => {
   const [loading, setLoading] = useState(false);
   const [posiciones, setPosiciones] = useState([]);
   const [selectedFoto, setSelectedFoto] = useState(null);
+  const [busqueda, setBusqueda] = useState("");
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -176,6 +178,13 @@ const Jugadores = () => {
       gol_en_contra_ld: 0,
       gol_en_contra_pi: 0,
       gol_en_contra_7m: 0,
+      lanzamiento_en_contra_ei: 0,
+      lanzamiento_en_contra_ed: 0,
+      lanzamiento_en_contra_li: 0,
+      lanzamiento_en_contra_c: 0,
+      lanzamiento_en_contra_ld: 0,
+      lanzamiento_en_contra_pi: 0,
+      lanzamiento_en_contra_7m: 0,
     };
 
     try {
@@ -190,6 +199,8 @@ const Jugadores = () => {
           body: JSON.stringify(body),
         }
       );
+
+      console.log("Respuesta del servidor:", res);
 
       if (!res.ok) throw new Error("No se pudo crear el jugador");
 
@@ -330,7 +341,22 @@ const Jugadores = () => {
   return (
     <AuthWrapper requiredRole={null}>
       <Box p={4} position="relative">
+        <Image
+          src="/myHandstatsLogo.png"
+          alt="Logo MyHandStats"
+          position="fixed"
+          left="50%"
+          top="50%"
+          transform="translate(-50%, -50%)"
+          opacity={0.12}
+          zIndex={0}
+          boxSize={["250px", "350px", "450px"]}
+          pointerEvents="none"
+          userSelect="none"
+        />
+
         <Sidebar isOpen={isOpen} onClose={onClose} />
+
         <Flex align="center" justify="space-between" mb={8}>
           <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
           <Text fontSize="2xl" fontWeight="bold" color="#014C4C">
@@ -339,86 +365,142 @@ const Jugadores = () => {
           <Box w="6" />
         </Flex>
 
+        {/* Buscador por nombre */}
+        <Box maxW="350px" mx="auto" mb={6}>
+          <Input
+            placeholder="Buscar jugador por nombre..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            bg="white"
+            borderColor="#b2f5ea"
+            _focus={{ borderColor: "#319795", boxShadow: "0 0 0 1px #319795" }}
+          />
+        </Box>
+
         {loading ? (
           <Box textAlign="center" mt={10}>
             <Spinner size="xl" color="teal.600" />
           </Box>
         ) : (
-          <SimpleGrid columns={gridCols} spacing={6}>
-            {jugadores.map((jugador) => (
-              <Box
-                key={jugador.id}
-                bg="#e0f7f7"
-                borderRadius="2xl"
-                boxShadow="lg"
-                p={6}
-                textAlign="center"
-                maxW="320px"
-                w="100%"
-                mx="auto"
-                transition="all 0.3s ease"
-                _hover={{
-                  transform: "translateY(-5px)",
-                  boxShadow: "xl",
-                  bg: "#d3f0f0",
-                }}
-                position="relative"
-              >
-                <IconButton
-                  icon={<FaUserEdit />}
-                  size="sm"
-                  position="absolute"
-                  top={2}
-                  right={2}
-                  colorScheme="teal"
-                  aria-label="Editar jugador"
-                  onClick={() => abrirModalEditar(jugador)}
-                />
-                <Avatar
-                  icon={<FaUser />}
-                  size="2xl"
-                  bg="#a8dadc"
-                  mb={4}
-                  src={
-                    jugador.foto && jugador.foto !== "foto.jpg"
-                      ? jugador.foto
-                      : undefined
-                  }
-                  name={jugador.nombre}
-                />
-                <Text fontWeight="bold" fontSize="lg" color="#014C4C" mb={1}>
-                  {jugador.nombre}
-                </Text>
-                <Text fontSize="sm" color="gray.600">
-                  Edad:{" "}
-                  {jugador.fecha_nac
-                    ? calcularEdad(jugador.fecha_nac) + " años"
-                    : "—"}
-                </Text>
-                <Text fontSize="sm" color="gray.600">
-                  Dorsal: {jugador.dorsal}
-                </Text>
-                <Text fontSize="sm" color="gray.600" mb={4}>
-                  {jugador.posiciones && jugador.posiciones.length > 0
-                    ? jugador.posiciones
-                        .map((p) => p.nombre.replace(/_/g, " "))
-                        .join(", ")
-                    : "Sin posición"}
-                </Text>
-                <Button
-                  bg="#014C4C"
-                  color="white"
-                  size="md"
-                  borderRadius="lg"
-                  _hover={{ bg: "#013C3C" }}
-                  px={6}
-                  onClick={() => navigate(`/jugador/${jugador.id}/stats`)}
+          <Flex wrap="wrap" gap={8} justify="center" align="flex-start">
+            {jugadores
+              .filter((jugador) =>
+                jugador.nombre.toLowerCase().includes(busqueda.toLowerCase())
+              )
+              .map((jugador) => (
+                <Box
+                  key={jugador.id}
+                  bg="white"
+                  borderRadius="xl"
+                  boxShadow="md"
+                  p={5}
+                  maxW="290px"
+                  w="100%"
+                  mx="auto"
+                  transition="all 0.2s"
+                  _hover={{
+                    transform: "translateY(-4px) scale(1.02)",
+                    boxShadow: "lg",
+                    bg: "gray.50",
+                  }}
+                  position="relative"
+                  mb={8}
+                  border="1px solid #e2e8f0"
                 >
-                  Ver Stats
-                </Button>
-              </Box>
-            ))}
-          </SimpleGrid>
+                  {/* Círculo decorativo sutil */}
+                  
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    position="relative"
+                    zIndex={1}
+                    p={0}
+                    pt={2}
+                  >
+                    <IconButton
+                      icon={<FaUserEdit />}
+                      size="sm"
+                      position="absolute"
+                      top={2}
+                      right={2}
+                      aria-label="Editar jugador"
+                      onClick={() => abrirModalEditar(jugador)}
+                      bg="#014C4C"
+                      color="white"
+                      boxShadow="sm"
+                      _hover={{ bg: "#013C3C" }}
+                    />
+                    <Avatar
+                      icon={<FaUser />}
+                      size="xl"
+                      bg="#b2f5ea"
+                      mb={2}
+                      mx="auto"
+                      border="2px solid #319795"
+                      boxShadow="md"
+                      src={
+                        jugador.foto && jugador.foto !== "foto.jpg"
+                          ? jugador.foto
+                          : undefined
+                      }
+                      name={jugador.nombre}
+                    />
+                    <Text
+                      fontWeight="bold"
+                      fontSize="lg"
+                      color="#014C4C"
+                      mb={1}
+                      letterSpacing="wide"
+                    >
+                      {jugador.nombre}
+                    </Text>
+                    <Text fontSize="sm" color="gray.500" mb={1}>
+                      Edad:{" "}
+                      {jugador.fecha_nac
+                        ? calcularEdad(jugador.fecha_nac) + " años"
+                        : "—"}
+                    </Text>
+                    <Text
+                      fontSize="sm"
+                      color="#319795"
+                      fontWeight="semibold"
+                      mb={1}
+                    >
+                      Dorsal: {jugador.dorsal}
+                    </Text>
+                    <Text
+                      fontSize="sm"
+                      color="gray.600"
+                      mb={3}
+                      fontStyle="italic"
+                    >
+                      {jugador.posiciones && jugador.posiciones.length > 0
+                        ? jugador.posiciones
+                            .map((p) => p.nombre.replace(/_/g, " "))
+                            .join(", ")
+                        : "Sin posición"}
+                    </Text>
+                    <Button
+                      bg="#319795"
+                      color="white"
+                      size="sm"
+                      borderRadius="full"
+                      fontWeight="bold"
+                      px={6}
+                      _hover={{
+                        bg: "#285e61",
+                        transform: "scale(1.04)",
+                      }}
+                      boxShadow="sm"
+                      onClick={() => navigate(`/jugador/${jugador.id}/stats`)}
+                    >
+                      Ver Stats
+                    </Button>
+                  </Box>
+                </Box>
+              ))}
+          </Flex>
         )}
 
         <IconButton

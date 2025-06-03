@@ -34,6 +34,8 @@ Chart.register(
   LinearScale,
   BarElement
 );
+import AuthWrapper from "../components/AuthWrapper";
+import Header from "../components/Header";
 
 // Función para decodificar el token JWT y extraer el id del club
 function getClubIdFromToken(token) {
@@ -47,7 +49,7 @@ function getClubIdFromToken(token) {
 }
 
 const DashboardPrincipal = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { onOpen } = useDisclosure();
   const [userName, setUserName] = useState("");
   const [club, setClub] = useState({ nombre: "", logo: "" });
   const [equipo, setEquipo] = useState({ id: "", nombre: "", logo: "" });
@@ -209,183 +211,175 @@ const DashboardPrincipal = () => {
   }
 
   return (
-    <Box p={4} minH="100vh" bg="white">
-      {/* Sidebar desplegable */}
-      <Sidebar isOpen={isOpen} onClose={onClose} />
+    <AuthWrapper requiredRole={null}>
+      <Box p={4} minH="100vh" bg="white">
+        <Image
+          src="/myHandstatsLogo.png"
+          alt="Logo MyHandStats"
+          position="fixed"
+          left="50%"
+          top="50%"
+          transform="translate(-50%, -50%)"
+          opacity={0.12}
+          zIndex={0}
+          boxSize={["250px", "350px", "450px"]}
+          pointerEvents="none"
+          userSelect="none"
+        />
 
-      {/* Header con título y hamburguesa */}
-      <Flex align="center" justify="space-between" mb={8}>
-        <Flex align="center" gap={3}>
-          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-          {/* Logo de la aplicación al lado del icono de hamburguesa */}
-          <Image
-            src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/sign/imagenes/logo.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzUwNmYzZWZkLTg5ZDktNGI0YS1hZjMwLTdjYzQyY2Q0MjcyMCJ9.eyJ1cmwiOiJpbWFnZW5lcy9sb2dvLnBuZyIsImlhdCI6MTc0ODQxODA1OCwiZXhwIjoyMzc5MTM4MDU4fQ.P1k167Q5lOLNPH_COkQdv8FCca2cSVSmwnrE1PXUPPk"
-            alt="Logo aplicación"
-            boxSize="60px"
-            borderRadius="full"
-            objectFit="cover"
-          />
-        </Flex>
-        <Flex align="center" gap={3}>
-          <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
-            {equipo.nombre}
-          </Text>
-          <Avatar name={club.nombre} src={club.logo} />
-          <Text fontSize="sm" color="gray.500">
-            Dashboard
-          </Text>
-        </Flex>
+        {/* Header con título y hamburguesa */}
+        <Header
+          onOpen={onOpen}
+          userName={userName}
+          club={club}
+          equipo={equipo}
+        />
 
-        <Flex align="center" gap={2}>
-          <Text fontSize="m" fontWeight={"medium"} color="#014C4C">
-            {userName}
-          </Text>
-          {/* Mostrar avatar de usuario si existe foto en el token */}
-          {(() => {
-            const token = localStorage.getItem("token");
-            let foto = "";
-            if (token) {
-              try {
-                const payload = JSON.parse(atob(token.split(".")[1]));
-                foto = payload.foto || "";
-              } catch {}
-            }
-            return foto ? (
-              <Avatar size="sm" src={foto} name={userName} />
-            ) : (
-              <Avatar size="sm" name={userName} />
-            );
-          })()}
-        </Flex>
-      </Flex>
-
-      {/* Grid principal */}
-      <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4}>
-        {/* Primera fila: Goles últimos partidos y Fases del Juego */}
-        <GridItem>
-          <Box
-            borderWidth="1px"
-            borderRadius="md"
-            p={4}
-            minH="320px"
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-          >
-            <Flex justify="space-between" mb={2} align="center">
-              <Flex align="center" gap={2}>
-                <Text fontWeight="bold">Goles totales</Text>
+        {/* Sustituye el Grid por Flex */}
+        <Flex
+          direction="column"
+          gap={4}
+          width="100%"
+          mx="auto"
+          zIndex={1}
+          position="relative"
+        >
+          {/* Primera fila: Goles últimos partidos y Fases del Juego */}
+          <Flex gap={4} flexDirection={{ base: "column", md: "row" }}>
+            <Box
+              borderWidth="1px"
+              borderRadius="md"
+              p={4}
+              minH="320px"
+              flex="1"
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              bg="whiteAlpha.900"
+            >
+              {/* ...contenido de la primera tarjeta... */}
+              {/* Goles totales */}
+              <Flex justify="space-between" mb={2} align="center">
+                <Flex align="center" gap={2}>
+                  <Text fontWeight="bold">Goles totales</Text>
+                </Flex>
               </Flex>
-            </Flex>
-            <Box h="200px" maxW="320px" mx="auto" position="relative">
-              <Doughnut data={golesData} />
-              {/* Mostrar los valores numéricos sobre el gráfico */}
-              <Flex
-                position="absolute"
-                top="50%"
-                left="50%"
-                transform="translate(-50%, -50%)"
-                flexDirection="column"
-                align="center"
-                pointerEvents="none"
-                zIndex={1}
-              ></Flex>
+              <Box h="200px" maxW="320px" mx="auto" position="relative">
+                <Doughnut data={golesData} />
+                <Flex
+                  position="absolute"
+                  top="50%"
+                  left="50%"
+                  transform="translate(-50%, -50%)"
+                  flexDirection="column"
+                  align="center"
+                  pointerEvents="none"
+                  zIndex={1}
+                ></Flex>
+              </Box>
+              <Flex justify="center" align="center" gap={6} mt={2}>
+                <Flex align="center" gap={1}>
+                  <Box h={2} w={2} borderRadius="full" bg="#014C4C" />
+                  <Text fontSize="sm" fontWeight="bold" color="#014C4C">
+                    {golesFavor}
+                  </Text>
+                  <Text fontSize="xs" color="gray.600" ml={1}>
+                    a favor
+                  </Text>
+                </Flex>
+                <Flex align="center" gap={1}>
+                  <Box h={2} w={2} borderRadius="full" bg="gray.300" />
+                  <Text fontSize="sm" fontWeight="bold" color="gray.600">
+                    {golesContra}
+                  </Text>
+                  <Text fontSize="xs" color="gray.600" ml={1}>
+                    en contra
+                  </Text>
+                </Flex>
+              </Flex>
+              <Divider my={4} />
             </Box>
-            {/* Mostrar los valores numéricos debajo del gráfico */}
-            <Flex justify="center" align="center" gap={6} mt={2}>
-              <Flex align="center" gap={1}>
-                <Box h={2} w={2} borderRadius="full" bg="#014C4C" />
-                <Text fontSize="sm" fontWeight="bold" color="#014C4C">
-                  {golesFavor}
-                </Text>
-                <Text fontSize="xs" color="gray.600" ml={1}>
-                  a favor
-                </Text>
+            <Box
+              borderWidth="1px"
+              borderRadius="md"
+              p={4}
+              minH="320px"
+              flex="1"
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              bg="whiteAlpha.900"
+            >
+              {/* ...contenido de la segunda tarjeta... */}
+              {/* Comparativa últimos partidos */}
+              <Flex justify="space-between" mb={2} align="center">
+                <Flex align="center" gap={2}>
+                  <Text fontWeight="bold">Comparativa últimos partidos</Text>
+                  <Text fontSize="md" color="gray.600" fontWeight="semibold">
+                    {partidoActual.goles_id_equipo ?? 0} -{" "}
+                    {partidoActual.goles_id_equiporival ?? 0}
+                  </Text>
+                </Flex>
+                <Flex gap={2}>
+                  <Button
+                    size="xs"
+                    onClick={() => setPartidoIndex((i) => Math.max(i - 1, 0))}
+                    isDisabled={partidoIndex === 0}
+                  >
+                    {"<"}
+                  </Button>
+                  <Button
+                    size="xs"
+                    onClick={() =>
+                      setPartidoIndex((i) =>
+                        Math.min(i + 1, partidosOrdenados.length - 1)
+                      )
+                    }
+                    isDisabled={partidoIndex === partidosOrdenados.length - 1}
+                  >
+                    {">"}
+                  </Button>
+                </Flex>
               </Flex>
-              <Flex align="center" gap={1}>
-                <Box h={2} w={2} borderRadius="full" bg="gray.300" />
-                <Text fontSize="sm" fontWeight="bold" color="gray.600">
-                  {golesContra}
-                </Text>
-                <Text fontSize="xs" color="gray.600" ml={1}>
-                  en contra
-                </Text>
-              </Flex>
-            </Flex>
-            <Divider my={4} />
-          </Box>
-        </GridItem>
-        <GridItem>
-          <Box
-            borderWidth="1px"
-            borderRadius="md"
-            p={4}
-            minH="320px"
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-          >
-            <Flex justify="space-between" mb={2} align="center">
-              <Flex align="center" gap={2}>
-                <Text fontWeight="bold">Comparativa últimos partidos</Text>
-                {/* Mostrar resultado del partido actual */}
-                <Text fontSize="md" color="gray.600" fontWeight="semibold">
-                  {partidoActual.goles_id_equipo ?? 0} -{" "}
-                  {partidoActual.goles_id_equiporival ?? 0}
-                </Text>
-              </Flex>
-              <Flex gap={2}>
-                <Button
-                  size="xs"
-                  onClick={() => setPartidoIndex((i) => Math.max(i - 1, 0))}
-                  isDisabled={partidoIndex === 0}
-                >
-                  {"<"}
-                </Button>
-                <Button
-                  size="xs"
-                  onClick={() =>
-                    setPartidoIndex((i) =>
-                      Math.min(i + 1, partidosOrdenados.length - 1)
-                    )
-                  }
-                  isDisabled={partidoIndex === partidosOrdenados.length - 1}
-                >
-                  {">"}
-                </Button>
-              </Flex>
-            </Flex>
-            {partidosOrdenados.length > 0 ? (
-              <>
-                <Text fontSize="sm" mb={2}>
-                  Rival: <b>{partidoActual.equiporival_id || "Rival"}</b> <br />
-                  Fecha:{" "}
-                  <b>
-                    {partidoActual.fecha
-                      ? new Date(partidoActual.fecha).toLocaleDateString()
-                      : "Sin fecha"}
-                  </b>
-                </Text>
-                <Box h="200px" w="100%" maxW="320px" mx="auto">
-                  <Bar data={barData} options={barOptions} />
-                </Box>
-              </>
-            ) : (
-              <Text fontSize="sm">Aún no hay registros</Text>
-            )}
-          </Box>
-        </GridItem>
+              {partidosOrdenados.length > 0 ? (
+                <>
+                  <Text fontSize="sm" mb={2}>
+                    Rival: <b>{partidoActual.equiporival_id || "Rival"}</b>{" "}
+                    <br />
+                    Fecha:{" "}
+                    <b>
+                      {partidoActual.fecha
+                        ? new Date(partidoActual.fecha).toLocaleDateString()
+                        : "Sin fecha"}
+                    </b>
+                  </Text>
+                  <Box h="200px" w="100%" maxW="320px" mx="auto">
+                    <Bar data={barData} options={barOptions} />
+                  </Box>
+                </>
+              ) : (
+                <Text fontSize="sm">Aún no hay registros</Text>
+              )}
+            </Box>
+          </Flex>
 
-        {/* Segunda fila: Lanzamientos 7m, Goleadores, Historial de partidos */}
-        <GridItem colSpan={2}>
+          {/* Segunda fila: Lanzamientos 7m, Goleadores, Amonestaciones, Historial de partidos */}
           <Flex
             gap={4}
             mb={2}
             flexDirection={{ base: "column", md: "row" }}
-            justify="space-between"
+            justifyContent="space-between"
+            flexWrap="wrap"
           >
             {/* Lanzamientos 7m */}
-            <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
+            <Box
+              borderWidth="1px"
+              borderRadius="md"
+              p={4}
+              flex="1"
+              bg="whiteAlpha.900"
+              minW="250px"
+            >
               <Flex justify="space-between" align="center" mb={2}>
                 <Text fontWeight="bold">Lanzamientos 7m</Text>
                 {jugadores.length > 5 && (
@@ -412,7 +406,9 @@ const DashboardPrincipal = () => {
               </Text>
               {Array.isArray(jugadores) && jugadores.length > 0 ? (
                 <Box overflowX="auto">
-                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <table
+                    style={{ width: "100%", borderCollapse: "collapse" }}
+                  >
                     <thead>
                       <tr>
                         <th style={{ textAlign: "left", padding: "4px" }}>
@@ -429,11 +425,18 @@ const DashboardPrincipal = () => {
                           (a, b) =>
                             (b.lanzamiento_7m || 0) - (a.lanzamiento_7m || 0)
                         )
-                        .slice(0, mostrarTodosLanzadores ? jugadores.length : 5)
+                        .slice(
+                          0,
+                          mostrarTodosLanzadores ? jugadores.length : 5
+                        )
                         .map((jugador) => (
                           <tr key={jugador.id}>
-                            <td style={{ padding: "4px" }}>{jugador.nombre}</td>
-                            <td style={{ textAlign: "right", padding: "4px" }}>
+                            <td style={{ padding: "4px" }}>
+                              {jugador.nombre}
+                            </td>
+                            <td
+                              style={{ textAlign: "right", padding: "4px" }}
+                            >
                               {jugador.lanzamiento_7m || 0}
                             </td>
                           </tr>
@@ -445,9 +448,15 @@ const DashboardPrincipal = () => {
                 <Text fontSize="sm">Aún no hay registros</Text>
               )}
             </Box>
-
             {/* Goleadores */}
-            <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
+            <Box
+              borderWidth="1px"
+              borderRadius="md"
+              p={4}
+              flex="1"
+              bg="whiteAlpha.900"
+              minW="250px"
+            >
               <Flex justify="space-between" align="center" mb={2}>
                 <Text fontWeight="bold">Goleadores</Text>
                 {jugadores.length > 5 && (
@@ -494,11 +503,18 @@ const DashboardPrincipal = () => {
                     <tbody>
                       {jugadores
                         .sort((a, b) => (b.golest || 0) - (a.golest || 0))
-                        .slice(0, mostrarTodosGoleadores ? jugadores.length : 5)
+                        .slice(
+                          0,
+                          mostrarTodosGoleadores ? jugadores.length : 5
+                        )
                         .map((jugador) => (
                           <tr key={jugador.id}>
-                            <td style={{ padding: "4px" }}>{jugador.nombre}</td>
-                            <td style={{ textAlign: "right", padding: "4px" }}>
+                            <td style={{ padding: "4px" }}>
+                              {jugador.nombre}
+                            </td>
+                            <td
+                              style={{ textAlign: "right", padding: "4px" }}
+                            >
                               {jugador.golest || 0}
                             </td>
                           </tr>
@@ -510,9 +526,15 @@ const DashboardPrincipal = () => {
                 <Text fontSize="sm">Aún no hay registros</Text>
               )}
             </Box>
-
-            {/* Nueva tarjeta de amonestaciones */}
-            <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
+            {/* Amonestaciones */}
+            <Box
+              borderWidth="1px"
+              borderRadius="md"
+              p={4}
+              flex="1"
+              bg="whiteAlpha.900"
+              minW="250px"
+            >
               <Flex justify="space-between" align="center" mb={2}>
                 <Text fontWeight="bold">Amonestaciones</Text>
                 {jugadores.length > 5 && (
@@ -539,7 +561,9 @@ const DashboardPrincipal = () => {
               </Text>
               {Array.isArray(jugadores) && jugadores.length > 0 ? (
                 <Box overflowX="auto">
-                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <table
+                    style={{ width: "100%", borderCollapse: "collapse" }}
+                  >
                     <thead>
                       <tr>
                         <th style={{ textAlign: "left", padding: "4px" }}>
@@ -602,7 +626,9 @@ const DashboardPrincipal = () => {
                         )
                         .map((jugador) => (
                           <tr key={jugador.id}>
-                            <td style={{ padding: "4px" }}>{jugador.nombre}</td>
+                            <td style={{ padding: "4px" }}>
+                              {jugador.nombre}
+                            </td>
                             <td
                               style={{
                                 textAlign: "center",
@@ -648,9 +674,15 @@ const DashboardPrincipal = () => {
                 <Text fontSize="sm">Aún no hay registros</Text>
               )}
             </Box>
-
             {/* Historial de partidos */}
-            <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
+            <Box
+              borderWidth="1px"
+              borderRadius="md"
+              p={4}
+              flex="1"
+              bg="whiteAlpha.900"
+              minW="250px"
+            >
               <Flex justify="space-between" mb={2} align="center">
                 <Text fontWeight="bold">Historial de partidos</Text>
                 {ultimosPartidos.length > 5 && (
@@ -686,9 +718,12 @@ const DashboardPrincipal = () => {
                   boxSize={4}
                 />
               </Flex>
-              {Array.isArray(ultimosPartidos) && ultimosPartidos.length > 0 ? (
+              {Array.isArray(ultimosPartidos) &&
+              ultimosPartidos.length > 0 ? (
                 <Box overflowX="auto">
-                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <table
+                    style={{ width: "100%", borderCollapse: "collapse" }}
+                  >
                     <thead>
                       <tr>
                         <th style={{ textAlign: "left", padding: "4px" }}>
@@ -712,7 +747,8 @@ const DashboardPrincipal = () => {
                         )
                         .map((partido) => {
                           const golesFavor = partido.goles_id_equipo ?? 0;
-                          const golesContra = partido.goles_id_equiporival ?? 0;
+                          const golesContra =
+                            partido.goles_id_equiporival ?? 0;
                           let bgColor = "";
                           if (golesFavor > golesContra) bgColor = "#d1fae5";
                           else if (golesFavor < golesContra)
@@ -728,7 +764,9 @@ const DashboardPrincipal = () => {
                               </td>
                               <td style={{ padding: "4px" }}>
                                 {partido.fecha
-                                  ? new Date(partido.fecha).toLocaleDateString()
+                                  ? new Date(
+                                      partido.fecha
+                                    ).toLocaleDateString()
                                   : "Sin fecha"}
                               </td>
                               <td
@@ -753,17 +791,24 @@ const DashboardPrincipal = () => {
               )}
             </Box>
           </Flex>
-        </GridItem>
-        {/* Tercera fila: Aspecto defensivo y pérdidas */}
-        <GridItem colSpan={2}>
+
+          {/* Tercera fila: Aspecto defensivo y pérdidas */}
           <Flex
             gap={4}
             mb={2}
             flexDirection={{ base: "column", md: "row" }}
-            justify="space-between"
+            justifyContent="space-between"
+            flexWrap="wrap"
           >
             {/* Aspecto defensivo */}
-            <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
+            <Box
+              borderWidth="1px"
+              borderRadius="md"
+              p={4}
+              flex="1"
+              bg="whiteAlpha.900"
+              minW="250px"
+            >
               <Flex justify="space-between" align="center" mb={2}>
                 <Text fontWeight="bold">Aspecto defensivo</Text>
                 {jugadores.length > 5 && (
@@ -790,7 +835,9 @@ const DashboardPrincipal = () => {
               </Text>
               {Array.isArray(jugadores) && jugadores.length > 0 ? (
                 <Box overflowX="auto">
-                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <table
+                    style={{ width: "100%", borderCollapse: "collapse" }}
+                  >
                     <thead>
                       <tr>
                         <th style={{ textAlign: "left", padding: "4px" }}>
@@ -824,10 +871,15 @@ const DashboardPrincipal = () => {
                             (b.robo || 0) -
                             ((a.blocaje || 0) + (a.robo || 0))
                         )
-                        .slice(0, mostrarTodosDefensivos ? jugadores.length : 5)
+                        .slice(
+                          0,
+                          mostrarTodosDefensivos ? jugadores.length : 5
+                        )
                         .map((jugador) => (
                           <tr key={jugador.id}>
-                            <td style={{ padding: "4px" }}>{jugador.nombre}</td>
+                            <td style={{ padding: "4px" }}>
+                              {jugador.nombre}
+                            </td>
                             <td
                               style={{
                                 textAlign: "center",
@@ -855,9 +907,15 @@ const DashboardPrincipal = () => {
                 <Text fontSize="sm">Aún no hay registros</Text>
               )}
             </Box>
-
             {/* Pérdidas */}
-            <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
+            <Box
+              borderWidth="1px"
+              borderRadius="md"
+              p={4}
+              flex="1"
+              bg="whiteAlpha.900"
+              minW="250px"
+            >
               <Flex justify="space-between" align="center" mb={2}>
                 <Text fontWeight="bold">Pérdidas</Text>
                 {jugadores.length > 5 && (
@@ -884,7 +942,9 @@ const DashboardPrincipal = () => {
               </Text>
               {Array.isArray(jugadores) && jugadores.length > 0 ? (
                 <Box overflowX="auto">
-                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <table
+                    style={{ width: "100%", borderCollapse: "collapse" }}
+                  >
                     <thead>
                       <tr>
                         <th style={{ textAlign: "left", padding: "4px" }}>
@@ -951,32 +1011,50 @@ const DashboardPrincipal = () => {
                                 {jugador.nombre}
                               </td>
                               <td
-                                style={{ textAlign: "center", padding: "4px" }}
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                }}
                               >
                                 {jugador.fallo_pase || 0}
                               </td>
                               <td
-                                style={{ textAlign: "center", padding: "4px" }}
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                }}
                               >
                                 {jugador.fallo_recepcion || 0}
                               </td>
                               <td
-                                style={{ textAlign: "center", padding: "4px" }}
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                }}
                               >
                                 {jugador.pasos || 0}
                               </td>
                               <td
-                                style={{ textAlign: "center", padding: "4px" }}
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                }}
                               >
                                 {jugador.falta_en_ataque || 0}
                               </td>
                               <td
-                                style={{ textAlign: "center", padding: "4px" }}
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                }}
                               >
                                 {jugador.dobles || 0}
                               </td>
                               <td
-                                style={{ textAlign: "center", padding: "4px" }}
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                }}
                               >
                                 {jugador.invasion_area || 0}
                               </td>
@@ -1001,19 +1079,9 @@ const DashboardPrincipal = () => {
               )}
             </Box>
           </Flex>
-        </GridItem>
-        {/* Cuarta fila: Tipos de lanzamiento por jugador */}
-        <GridItem colSpan={2}>
-          <Flex
-            gap={4}
-            mb={2}
-            flexDirection={{ base: "column", md: "row" }}
-            justifyContent="space-between"
-          >
-          </Flex>
-        </GridItem>
-      </Grid>
-    </Box>
+        </Flex>
+      </Box>
+    </AuthWrapper>
   );
 };
 
