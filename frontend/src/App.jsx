@@ -16,6 +16,7 @@ import GestionInfoClub from "./views/GestionInfoClub.jsx";
 import EditarPerfil  from "./views/Perfil.jsx";
 import StatsJugador from "./views/StatsJugador.jsx";
 import GestionClubEntrenadores from "./views/GestionClubEntrenadores.jsx";
+import NotFound from "./views/NotFound.jsx";
 
 import './index.css';
 import StatsAvanzadas from "./views/StatsAvanzadas.jsx";
@@ -41,6 +42,8 @@ function App() {
         <Route path="/club/info" element={<GestionInfoClub />} />
         <Route path="/perfil" element={<EditarPerfil />} />
         <Route path="/club/entrenadores" element={<GestionClubEntrenadores />} />
+        <Route path="*" element={<NotFound />} />
+
       </Routes>
     </BrowserRouter>
   );
