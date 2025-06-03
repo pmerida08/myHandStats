@@ -72,7 +72,7 @@ const SeleccionEquipo = () => {
         navigate("/dashboard");
       });
 
-    fetch("https://myhandstats.onrender.com/club/equipos", {
+    fetch("https://myhandstats.onrender.com/equipo/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

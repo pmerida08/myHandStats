@@ -191,6 +191,8 @@ const Jugadores = () => {
         }
       );
 
+      console.log("Respuesta del servidor:", res);
+
       if (!res.ok) throw new Error("No se pudo crear el jugador");
 
       setIsModalOpen(false);

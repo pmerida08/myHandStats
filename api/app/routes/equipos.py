@@ -18,9 +18,19 @@ router = APIRouter()
 
 @router.get("/", response_model=List[EquipoOut])
 def obtener_equipos_club(datos_token: dict = Depends(obtener_info_desde_token)):
-    
-    response = supabase.table("equipos").select("*").eq("clubs_id", datos_token["clubs_id"]).execute()
-
+    if datos_token["rol"] != "entrenador":
+        response = supabase.table("equipos").select("*").eq("clubs_id", datos_token["clubs_id"]).execute()
+    else:
+        # Buscar el entrenador por email de usuario
+        entrenadores = supabase.table("entrenadores").select("id").eq("email", datos_token["email"]).execute()
+        if not entrenadores.data:
+            return []
+        entrenador_ids = [e["id"] for e in entrenadores.data]
+        equipo_entrenador = supabase.table("equipo_entrenador").select("equipo_id").in_("entrenador_id", entrenador_ids).execute()
+        if not equipo_entrenador.data:
+            return []
+        equipo_ids = [ee["equipo_id"] for ee in equipo_entrenador.data]
+        response = supabase.table("equipos").select("*").eq("clubs_id", datos_token["clubs_id"]).in_("id", equipo_ids).execute()
     return response.data
 
 @router.get("/{equipo_id}", response_model=EquipoOut)
@@ -440,7 +450,7 @@ def crear_jugador_equipo(id_equipo: int, jugador: JugadorCreate, datos_token: di
     jugador_raw["posiciones"] = [
         pos["posiciones"]
         for pos in jugador_raw.get("jugador_posicion", [])
-        if pos.get("posiciones")
+        if isinstance(pos, dict) and "posiciones" in pos
     ]
     jugador_raw.pop("jugador_posicion", None)
 
