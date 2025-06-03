@@ -200,7 +200,7 @@ const EquiposClubAdmin = () => {
   if (!token) return null;
 
   return (
-    <AuthWrapper requiredRole={null}>
+    <AuthWrapper requiredRole={"admin"}>
       <Box p={4} position="relative">
         <Sidebar isOpen={isOpen} onClose={onClose} />
         <Flex align="center" justify="space-between" mb={8}>
