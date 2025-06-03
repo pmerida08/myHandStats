@@ -35,7 +35,7 @@ Chart.register(
   BarElement
 );
 import AuthWrapper from "../components/AuthWrapper";
-
+import Header from "../components/Header";
 
 // Función para decodificar el token JWT y extraer el id del club
 function getClubIdFromToken(token) {
@@ -49,7 +49,7 @@ function getClubIdFromToken(token) {
 }
 
 const DashboardPrincipal = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { onOpen } = useDisclosure();
   const [userName, setUserName] = useState("");
   const [club, setClub] = useState({ nombre: "", logo: "" });
   const [equipo, setEquipo] = useState({ id: "", nombre: "", logo: "" });
@@ -213,70 +213,52 @@ const DashboardPrincipal = () => {
   return (
     <AuthWrapper requiredRole={null}>
       <Box p={4} minH="100vh" bg="white">
-        {/* Sidebar desplegable */}
-        <Sidebar isOpen={isOpen} onClose={onClose} />
+        <Image
+          src="/myHandstatsLogo.png"
+          alt="Logo MyHandStats"
+          position="fixed"
+          left="50%"
+          top="50%"
+          transform="translate(-50%, -50%)"
+          opacity={0.12}
+          zIndex={0}
+          boxSize={["250px", "350px", "450px"]}
+          pointerEvents="none"
+          userSelect="none"
+        />
 
         {/* Header con título y hamburguesa */}
-        <Flex align="center" justify="space-between" mb={8}>
-          <Flex align="center" gap={3}>
-            <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-            {/* Logo de la aplicación al lado del icono de hamburguesa */}
-            <Image
-              src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/sign/imagenes/logo.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzUwNmYzZWZkLTg5ZDktNGI0YS1hZjMwLTdjYzQyY2Q0MjcyMCJ9.eyJ1cmwiOiJpbWFnZW5lcy9sb2dvLnBuZyIsImlhdCI6MTc0ODQxODA1OCwiZXhwIjoyMzc5MTM4MDU4fQ.P1k167Q5lOLNPH_COkQdv8FCca2cSVSmwnrE1PXUPPk"
-              alt="Logo aplicación"
-              boxSize="60px"
-              borderRadius="full"
-              objectFit="cover"
-            />
-          </Flex>
-          <Flex align="center" gap={3}>
-            <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
-              {equipo.nombre}
-            </Text>
-            <Avatar name={club.nombre} src={club.logo} />
-            <Text fontSize="sm" color="gray.500">
-              Dashboard
-            </Text>
-          </Flex>
+        <Header
+          onOpen={onOpen}
+          userName={userName}
+          club={club}
+          equipo={equipo}
+        />
 
-          <Flex align="center" gap={2}>
-            <Text fontSize="m" fontWeight={"medium"} color="#014C4C">
-              {userName}
-            </Text>
-            {/* Mostrar avatar de usuario si existe foto en el token */}
-            {(() => {
-              const token = localStorage.getItem("token");
-              let foto = "";
-              if (token) {
-                try {
-                  const payload = JSON.parse(atob(token.split(".")[1]));
-                  foto = payload.foto || "";
-                } catch {
-                      return null;
-                }
-              }
-              return foto ? (
-                <Avatar size="sm" src={foto} name={userName} />
-              ) : (
-                <Avatar size="sm" name={userName} />
-              );
-            })()}
-          </Flex>
-        </Flex>
-
-        {/* Grid principal */}
-        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4}>
+        {/* Sustituye el Grid por Flex */}
+        <Flex
+          direction="column"
+          gap={4}
+          width="100%"
+          mx="auto"
+          zIndex={1}
+          position="relative"
+        >
           {/* Primera fila: Goles últimos partidos y Fases del Juego */}
-          <GridItem>
+          <Flex gap={4} flexDirection={{ base: "column", md: "row" }}>
             <Box
               borderWidth="1px"
               borderRadius="md"
               p={4}
               minH="320px"
+              flex="1"
               display="flex"
               flexDirection="column"
               justifyContent="center"
+              bg="whiteAlpha.900"
             >
+              {/* ...contenido de la primera tarjeta... */}
+              {/* Goles totales */}
               <Flex justify="space-between" mb={2} align="center">
                 <Flex align="center" gap={2}>
                   <Text fontWeight="bold">Goles totales</Text>
@@ -284,7 +266,6 @@ const DashboardPrincipal = () => {
               </Flex>
               <Box h="200px" maxW="320px" mx="auto" position="relative">
                 <Doughnut data={golesData} />
-                {/* Mostrar los valores numéricos sobre el gráfico */}
                 <Flex
                   position="absolute"
                   top="50%"
@@ -296,7 +277,6 @@ const DashboardPrincipal = () => {
                   zIndex={1}
                 ></Flex>
               </Box>
-              {/* Mostrar los valores numéricos debajo del gráfico */}
               <Flex justify="center" align="center" gap={6} mt={2}>
                 <Flex align="center" gap={1}>
                   <Box h={2} w={2} borderRadius="full" bg="#014C4C" />
@@ -319,21 +299,22 @@ const DashboardPrincipal = () => {
               </Flex>
               <Divider my={4} />
             </Box>
-          </GridItem>
-          <GridItem>
             <Box
               borderWidth="1px"
               borderRadius="md"
               p={4}
               minH="320px"
+              flex="1"
               display="flex"
               flexDirection="column"
               justifyContent="center"
+              bg="whiteAlpha.900"
             >
+              {/* ...contenido de la segunda tarjeta... */}
+              {/* Comparativa últimos partidos */}
               <Flex justify="space-between" mb={2} align="center">
                 <Flex align="center" gap={2}>
                   <Text fontWeight="bold">Comparativa últimos partidos</Text>
-                  {/* Mostrar resultado del partido actual */}
                   <Text fontSize="md" color="gray.600" fontWeight="semibold">
                     {partidoActual.goles_id_equipo ?? 0} -{" "}
                     {partidoActual.goles_id_equiporival ?? 0}
@@ -363,7 +344,8 @@ const DashboardPrincipal = () => {
               {partidosOrdenados.length > 0 ? (
                 <>
                   <Text fontSize="sm" mb={2}>
-                    Rival: <b>{partidoActual.equiporival_id || "Rival"}</b> <br />
+                    Rival: <b>{partidoActual.equiporival_id || "Rival"}</b>{" "}
+                    <br />
                     Fecha:{" "}
                     <b>
                       {partidoActual.fecha
@@ -379,645 +361,725 @@ const DashboardPrincipal = () => {
                 <Text fontSize="sm">Aún no hay registros</Text>
               )}
             </Box>
-          </GridItem>
+          </Flex>
 
-          {/* Segunda fila: Lanzamientos 7m, Goleadores, Historial de partidos */}
-          <GridItem colSpan={2}>
-            <Flex
-              gap={4}
-              mb={2}
-              flexDirection={{ base: "column", md: "row" }}
-              justify="space-between"
+          {/* Segunda fila: Lanzamientos 7m, Goleadores, Amonestaciones, Historial de partidos */}
+          <Flex
+            gap={4}
+            mb={2}
+            flexDirection={{ base: "column", md: "row" }}
+            justifyContent="space-between"
+            flexWrap="wrap"
+          >
+            {/* Lanzamientos 7m */}
+            <Box
+              borderWidth="1px"
+              borderRadius="md"
+              p={4}
+              flex="1"
+              bg="whiteAlpha.900"
+              minW="250px"
             >
-              {/* Lanzamientos 7m */}
-              <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
-                <Flex justify="space-between" align="center" mb={2}>
-                  <Text fontWeight="bold">Lanzamientos 7m</Text>
-                  {jugadores.length > 5 && (
-                    <Button
-                      size="xs"
-                      variant="outline"
-                      onClick={() => setMostrarTodosLanzadores((v) => !v)}
-                      transition="all 0.2s"
-                      _active={{
-                        transform: "scale(0.95)",
-                        bg: "#e6fffa",
-                      }}
-                      _hover={{
-                        bg: "#f0fdfa",
-                        transform: "scale(1.05)",
-                      }}
-                    >
-                      {mostrarTodosLanzadores ? "Ver top 5" : "Ver todos"}
-                    </Button>
-                  )}
-                </Flex>
-                <Text fontSize="xs" color="gray.500" mb={2}>
-                  Los máximos lanzadores de 7 metros del equipo
+              <Flex justify="space-between" align="center" mb={2}>
+                <Text fontWeight="bold">Lanzamientos 7m</Text>
+                {jugadores.length > 5 && (
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    onClick={() => setMostrarTodosLanzadores((v) => !v)}
+                    transition="all 0.2s"
+                    _active={{
+                      transform: "scale(0.95)",
+                      bg: "#e6fffa",
+                    }}
+                    _hover={{
+                      bg: "#f0fdfa",
+                      transform: "scale(1.05)",
+                    }}
+                  >
+                    {mostrarTodosLanzadores ? "Ver top 5" : "Ver todos"}
+                  </Button>
+                )}
+              </Flex>
+              <Text fontSize="xs" color="gray.500" mb={2}>
+                Los máximos lanzadores de 7 metros del equipo
+              </Text>
+              {Array.isArray(jugadores) && jugadores.length > 0 ? (
+                <Box overflowX="auto">
+                  <table
+                    style={{ width: "100%", borderCollapse: "collapse" }}
+                  >
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Jugador
+                        </th>
+                        <th style={{ textAlign: "right", padding: "4px" }}>
+                          Lanzamientos 7m
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {jugadores
+                        .sort(
+                          (a, b) =>
+                            (b.lanzamiento_7m || 0) - (a.lanzamiento_7m || 0)
+                        )
+                        .slice(
+                          0,
+                          mostrarTodosLanzadores ? jugadores.length : 5
+                        )
+                        .map((jugador) => (
+                          <tr key={jugador.id}>
+                            <td style={{ padding: "4px" }}>
+                              {jugador.nombre}
+                            </td>
+                            <td
+                              style={{ textAlign: "right", padding: "4px" }}
+                            >
+                              {jugador.lanzamiento_7m || 0}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </Box>
+              ) : (
+                <Text fontSize="sm">Aún no hay registros</Text>
+              )}
+            </Box>
+            {/* Goleadores */}
+            <Box
+              borderWidth="1px"
+              borderRadius="md"
+              p={4}
+              flex="1"
+              bg="whiteAlpha.900"
+              minW="250px"
+            >
+              <Flex justify="space-between" align="center" mb={2}>
+                <Text fontWeight="bold">Goleadores</Text>
+                {jugadores.length > 5 && (
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    onClick={() => setMostrarTodosGoleadores((v) => !v)}
+                    transition="all 0.2s"
+                    _active={{
+                      transform: "scale(0.95)",
+                      bg: "#e6fffa",
+                    }}
+                    _hover={{
+                      bg: "#f0fdfa",
+                      transform: "scale(1.05)",
+                    }}
+                  >
+                    {mostrarTodosGoleadores ? "Ver top 5" : "Ver todos"}
+                  </Button>
+                )}
+              </Flex>
+              <Text fontSize="xs" color="gray.500" mb={2}>
+                Los máximos goleadores del equipo
+              </Text>
+              {Array.isArray(jugadores) && jugadores.length > 0 ? (
+                <Box overflowX="auto">
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "collapse",
+                      transition: "all 0.3s",
+                    }}
+                  >
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Jugador
+                        </th>
+                        <th style={{ textAlign: "right", padding: "4px" }}>
+                          Goles
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {jugadores
+                        .sort((a, b) => (b.golest || 0) - (a.golest || 0))
+                        .slice(
+                          0,
+                          mostrarTodosGoleadores ? jugadores.length : 5
+                        )
+                        .map((jugador) => (
+                          <tr key={jugador.id}>
+                            <td style={{ padding: "4px" }}>
+                              {jugador.nombre}
+                            </td>
+                            <td
+                              style={{ textAlign: "right", padding: "4px" }}
+                            >
+                              {jugador.golest || 0}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </Box>
+              ) : (
+                <Text fontSize="sm">Aún no hay registros</Text>
+              )}
+            </Box>
+            {/* Amonestaciones */}
+            <Box
+              borderWidth="1px"
+              borderRadius="md"
+              p={4}
+              flex="1"
+              bg="whiteAlpha.900"
+              minW="250px"
+            >
+              <Flex justify="space-between" align="center" mb={2}>
+                <Text fontWeight="bold">Amonestaciones</Text>
+                {jugadores.length > 5 && (
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    onClick={() => setMostrarTodosAmonestados?.((v) => !v)}
+                    transition="all 0.2s"
+                    _active={{
+                      transform: "scale(0.95)",
+                      bg: "#e6fffa",
+                    }}
+                    _hover={{
+                      bg: "#f0fdfa",
+                      transform: "scale(1.05)",
+                    }}
+                  >
+                    {mostrarTodosAmonestados ? "Ver top 5" : "Ver todos"}
+                  </Button>
+                )}
+              </Flex>
+              <Text fontSize="xs" color="gray.500" mb={2}>
+                Jugadores con más tarjetas (rojas, amarillas, azules, 2 min)
+              </Text>
+              {Array.isArray(jugadores) && jugadores.length > 0 ? (
+                <Box overflowX="auto">
+                  <table
+                    style={{ width: "100%", borderCollapse: "collapse" }}
+                  >
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Jugador
+                        </th>
+                        <th
+                          style={{
+                            textAlign: "center",
+                            padding: "4px",
+                            color: "#e53e3e",
+                          }}
+                        >
+                          Rojas
+                        </th>
+                        <th
+                          style={{
+                            textAlign: "center",
+                            padding: "4px",
+                            color: "#ecc94b",
+                          }}
+                        >
+                          Amarillas
+                        </th>
+                        <th
+                          style={{
+                            textAlign: "center",
+                            padding: "4px",
+                            color: "#3182ce",
+                          }}
+                        >
+                          Azules
+                        </th>
+                        <th
+                          style={{
+                            textAlign: "center",
+                            padding: "4px",
+                            color: "#805ad5",
+                          }}
+                        >
+                          2 min
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {jugadores
+                        .sort(
+                          (a, b) =>
+                            (b.tarjetas_rojas || 0) +
+                            (b.tarjetas_amarillas || 0) +
+                            (b.tarjetas_azules || 0) +
+                            (b.exclusion_2_min || 0) -
+                            ((a.tarjetas_rojas || 0) +
+                              (a.tarjetas_amarillas || 0) +
+                              (a.tarjetas_azules || 0) +
+                              (a.exclusion_2_min || 0))
+                        )
+                        .slice(
+                          0,
+                          mostrarTodosAmonestados ? jugadores.length : 5
+                        )
+                        .map((jugador) => (
+                          <tr key={jugador.id}>
+                            <td style={{ padding: "4px" }}>
+                              {jugador.nombre}
+                            </td>
+                            <td
+                              style={{
+                                textAlign: "center",
+                                padding: "4px",
+                                color: "#e53e3e",
+                              }}
+                            >
+                              {jugador.tarjetas_rojas || 0}
+                            </td>
+                            <td
+                              style={{
+                                textAlign: "center",
+                                padding: "4px",
+                                color: "#ecc94b",
+                              }}
+                            >
+                              {jugador.tarjetas_amarillas || 0}
+                            </td>
+                            <td
+                              style={{
+                                textAlign: "center",
+                                padding: "4px",
+                                color: "#3182ce",
+                              }}
+                            >
+                              {jugador.tarjetas_azules || 0}
+                            </td>
+                            <td
+                              style={{
+                                textAlign: "center",
+                                padding: "4px",
+                                color: "#805ad5",
+                              }}
+                            >
+                              {jugador.exclusion_2_min || 0}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </Box>
+              ) : (
+                <Text fontSize="sm">Aún no hay registros</Text>
+              )}
+            </Box>
+            {/* Historial de partidos */}
+            <Box
+              borderWidth="1px"
+              borderRadius="md"
+              p={4}
+              flex="1"
+              bg="whiteAlpha.900"
+              minW="250px"
+            >
+              <Flex justify="space-between" mb={2} align="center">
+                <Text fontWeight="bold">Historial de partidos</Text>
+                {ultimosPartidos.length > 5 && (
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    onClick={() => setMostrarTodosPartidos((v) => !v)}
+                    transition="all 0.2s"
+                    _active={{
+                      transform: "scale(0.95)",
+                      bg: "#e6fffa",
+                    }}
+                    _hover={{
+                      bg: "#f0fdfa",
+                      transform: "scale(1.05)",
+                    }}
+                  >
+                    {mostrarTodosPartidos ? "Ver últimos 5" : "Ver todos"}
+                  </Button>
+                )}
+              </Flex>
+              <Flex align="center" gap={2} mb={2}>
+                <Text fontSize={"sm"}>Porcentaje de victorias:</Text>
+                <Text
+                  color={esPorcentajeAlto ? "green.600" : "red.600"}
+                  fontWeight="bold"
+                >
+                  {porcentajeGanados}%
                 </Text>
-                {Array.isArray(jugadores) && jugadores.length > 0 ? (
-                  <Box overflowX="auto">
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                      <thead>
-                        <tr>
-                          <th style={{ textAlign: "left", padding: "4px" }}>
-                            Jugador
-                          </th>
-                          <th style={{ textAlign: "right", padding: "4px" }}>
-                            Lanzamientos 7m
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {jugadores
-                          .sort(
-                            (a, b) =>
-                              (b.lanzamiento_7m || 0) - (a.lanzamiento_7m || 0)
-                          )
-                          .slice(0, mostrarTodosLanzadores ? jugadores.length : 5)
-                          .map((jugador) => (
-                            <tr key={jugador.id}>
-                              <td style={{ padding: "4px" }}>{jugador.nombre}</td>
-                              <td style={{ textAlign: "right", padding: "4px" }}>
-                                {jugador.lanzamiento_7m || 0}
+                <Icon
+                  as={esPorcentajeAlto ? FaArrowUp : FaArrowDown}
+                  color={esPorcentajeAlto ? "green.600" : "red.600"}
+                  boxSize={4}
+                />
+              </Flex>
+              {Array.isArray(ultimosPartidos) &&
+              ultimosPartidos.length > 0 ? (
+                <Box overflowX="auto">
+                  <table
+                    style={{ width: "100%", borderCollapse: "collapse" }}
+                  >
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Rival
+                        </th>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Fecha
+                        </th>
+                        <th style={{ textAlign: "right", padding: "4px" }}>
+                          Resultado
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ultimosPartidos
+                        .slice()
+                        .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+                        .slice(
+                          0,
+                          mostrarTodosPartidos ? ultimosPartidos.length : 5
+                        )
+                        .map((partido) => {
+                          const golesFavor = partido.goles_id_equipo ?? 0;
+                          const golesContra =
+                            partido.goles_id_equiporival ?? 0;
+                          let bgColor = "";
+                          if (golesFavor > golesContra) bgColor = "#d1fae5";
+                          else if (golesFavor < golesContra)
+                            bgColor = "#fee2e2";
+
+                          return (
+                            <tr
+                              key={partido.id}
+                              style={{ borderBottom: "1px solid #e2e8f0" }}
+                            >
+                              <td style={{ padding: "4px" }}>
+                                {partido.equiporival_id || "Desconocido"}
+                              </td>
+                              <td style={{ padding: "4px" }}>
+                                {partido.fecha
+                                  ? new Date(
+                                      partido.fecha
+                                    ).toLocaleDateString()
+                                  : "Sin fecha"}
+                              </td>
+                              <td
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                  backgroundColor: bgColor,
+                                  borderRadius: "6px",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                {golesFavor} - {golesContra}
                               </td>
                             </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </Box>
-                ) : (
-                  <Text fontSize="sm">Aún no hay registros</Text>
-                )}
-              </Box>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </Box>
+              ) : (
+                <Text fontSize="sm">Aún no hay registros</Text>
+              )}
+            </Box>
+          </Flex>
 
-              {/* Goleadores */}
-              <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
-                <Flex justify="space-between" align="center" mb={2}>
-                  <Text fontWeight="bold">Goleadores</Text>
-                  {jugadores.length > 5 && (
-                    <Button
-                      size="xs"
-                      variant="outline"
-                      onClick={() => setMostrarTodosGoleadores((v) => !v)}
-                      transition="all 0.2s"
-                      _active={{
-                        transform: "scale(0.95)",
-                        bg: "#e6fffa",
-                      }}
-                      _hover={{
-                        bg: "#f0fdfa",
-                        transform: "scale(1.05)",
-                      }}
-                    >
-                      {mostrarTodosGoleadores ? "Ver top 5" : "Ver todos"}
-                    </Button>
-                  )}
-                </Flex>
-                <Text fontSize="xs" color="gray.500" mb={2}>
-                  Los máximos goleadores del equipo
-                </Text>
-                {Array.isArray(jugadores) && jugadores.length > 0 ? (
-                  <Box overflowX="auto">
-                    <table
-                      style={{
-                        width: "100%",
-                        borderCollapse: "collapse",
-                        transition: "all 0.3s",
-                      }}
-                    >
-                      <thead>
-                        <tr>
-                          <th style={{ textAlign: "left", padding: "4px" }}>
-                            Jugador
-                          </th>
-                          <th style={{ textAlign: "right", padding: "4px" }}>
-                            Goles
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {jugadores
-                          .sort((a, b) => (b.golest || 0) - (a.golest || 0))
-                          .slice(0, mostrarTodosGoleadores ? jugadores.length : 5)
-                          .map((jugador) => (
+          {/* Tercera fila: Aspecto defensivo y pérdidas */}
+          <Flex
+            gap={4}
+            mb={2}
+            flexDirection={{ base: "column", md: "row" }}
+            justifyContent="space-between"
+            flexWrap="wrap"
+          >
+            {/* Aspecto defensivo */}
+            <Box
+              borderWidth="1px"
+              borderRadius="md"
+              p={4}
+              flex="1"
+              bg="whiteAlpha.900"
+              minW="250px"
+            >
+              <Flex justify="space-between" align="center" mb={2}>
+                <Text fontWeight="bold">Aspecto defensivo</Text>
+                {jugadores.length > 5 && (
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    onClick={() => setMostrarTodosDefensivos?.((v) => !v)}
+                    transition="all 0.2s"
+                    _active={{
+                      transform: "scale(0.95)",
+                      bg: "#e6fffa",
+                    }}
+                    _hover={{
+                      bg: "#f0fdfa",
+                      transform: "scale(1.05)",
+                    }}
+                  >
+                    {mostrarTodosDefensivos ? "Ver top 5" : "Ver todos"}
+                  </Button>
+                )}
+              </Flex>
+              <Text fontSize="xs" color="gray.500" mb={2}>
+                Jugadores con más blocajes y robos
+              </Text>
+              {Array.isArray(jugadores) && jugadores.length > 0 ? (
+                <Box overflowX="auto">
+                  <table
+                    style={{ width: "100%", borderCollapse: "collapse" }}
+                  >
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Jugador
+                        </th>
+                        <th
+                          style={{
+                            textAlign: "center",
+                            padding: "4px",
+                            color: "#38a169",
+                          }}
+                        >
+                          Blocajes
+                        </th>
+                        <th
+                          style={{
+                            textAlign: "center",
+                            padding: "4px",
+                            color: "#3182ce",
+                          }}
+                        >
+                          Robos
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {jugadores
+                        .sort(
+                          (a, b) =>
+                            (b.blocaje || 0) +
+                            (b.robo || 0) -
+                            ((a.blocaje || 0) + (a.robo || 0))
+                        )
+                        .slice(
+                          0,
+                          mostrarTodosDefensivos ? jugadores.length : 5
+                        )
+                        .map((jugador) => (
+                          <tr key={jugador.id}>
+                            <td style={{ padding: "4px" }}>
+                              {jugador.nombre}
+                            </td>
+                            <td
+                              style={{
+                                textAlign: "center",
+                                padding: "4px",
+                                color: "#38a169",
+                              }}
+                            >
+                              {jugador.blocaje || 0}
+                            </td>
+                            <td
+                              style={{
+                                textAlign: "center",
+                                padding: "4px",
+                                color: "#3182ce",
+                              }}
+                            >
+                              {jugador.robo || 0}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </Box>
+              ) : (
+                <Text fontSize="sm">Aún no hay registros</Text>
+              )}
+            </Box>
+            {/* Pérdidas */}
+            <Box
+              borderWidth="1px"
+              borderRadius="md"
+              p={4}
+              flex="1"
+              bg="whiteAlpha.900"
+              minW="250px"
+            >
+              <Flex justify="space-between" align="center" mb={2}>
+                <Text fontWeight="bold">Pérdidas</Text>
+                {jugadores.length > 5 && (
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    onClick={() => setMostrarTodosPerdidas?.((v) => !v)}
+                    transition="all 0.2s"
+                    _active={{
+                      transform: "scale(0.95)",
+                      bg: "#e6fffa",
+                    }}
+                    _hover={{
+                      bg: "#f0fdfa",
+                      transform: "scale(1.05)",
+                    }}
+                  >
+                    {mostrarTodosPerdidas ? "Ver top 5" : "Ver todos"}
+                  </Button>
+                )}
+              </Flex>
+              <Text fontSize="xs" color="gray.500" mb={2}>
+                Jugadores con más pérdidas (fallos y faltas técnicas)
+              </Text>
+              {Array.isArray(jugadores) && jugadores.length > 0 ? (
+                <Box overflowX="auto">
+                  <table
+                    style={{ width: "100%", borderCollapse: "collapse" }}
+                  >
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: "left", padding: "4px" }}>
+                          Jugador
+                        </th>
+                        <th style={{ textAlign: "center", padding: "4px" }}>
+                          F. Pase
+                        </th>
+                        <th style={{ textAlign: "center", padding: "4px" }}>
+                          F. Recepción
+                        </th>
+                        <th style={{ textAlign: "center", padding: "4px" }}>
+                          Pasos
+                        </th>
+                        <th style={{ textAlign: "center", padding: "4px" }}>
+                          F. Ataque
+                        </th>
+                        <th style={{ textAlign: "center", padding: "4px" }}>
+                          Dobles
+                        </th>
+                        <th style={{ textAlign: "center", padding: "4px" }}>
+                          Inv. Área
+                        </th>
+                        <th
+                          style={{
+                            textAlign: "center",
+                            padding: "4px",
+                            color: "#e53e3e",
+                          }}
+                        >
+                          Total
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {jugadores
+                        .sort(
+                          (a, b) =>
+                            (b.fallo_pase || 0) +
+                            (b.fallo_recepcion || 0) +
+                            (b.pasos || 0) +
+                            (b.falta_en_ataque || 0) +
+                            (b.dobles || 0) +
+                            (b.invasion_area || 0) -
+                            ((a.fallo_pase || 0) +
+                              (a.fallo_recepcion || 0) +
+                              (a.pasos || 0) +
+                              (a.falta_en_ataque || 0) +
+                              (a.dobles || 0) +
+                              (a.invasion_area || 0))
+                        )
+                        .slice(0, mostrarTodosPerdidas ? jugadores.length : 5)
+                        .map((jugador) => {
+                          const total =
+                            (jugador.fallo_pase || 0) +
+                            (jugador.fallo_recepcion || 0) +
+                            (jugador.pasos || 0) +
+                            (jugador.falta_en_ataque || 0) +
+                            (jugador.dobles || 0) +
+                            (jugador.invasion_area || 0);
+                          return (
                             <tr key={jugador.id}>
-                              <td style={{ padding: "4px" }}>{jugador.nombre}</td>
-                              <td style={{ textAlign: "right", padding: "4px" }}>
-                                {jugador.golest || 0}
+                              <td style={{ padding: "4px" }}>
+                                {jugador.nombre}
                               </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </Box>
-                ) : (
-                  <Text fontSize="sm">Aún no hay registros</Text>
-                )}
-              </Box>
-
-              {/* Nueva tarjeta de amonestaciones */}
-              <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
-                <Flex justify="space-between" align="center" mb={2}>
-                  <Text fontWeight="bold">Amonestaciones</Text>
-                  {jugadores.length > 5 && (
-                    <Button
-                      size="xs"
-                      variant="outline"
-                      onClick={() => setMostrarTodosAmonestados?.((v) => !v)}
-                      transition="all 0.2s"
-                      _active={{
-                        transform: "scale(0.95)",
-                        bg: "#e6fffa",
-                      }}
-                      _hover={{
-                        bg: "#f0fdfa",
-                        transform: "scale(1.05)",
-                      }}
-                    >
-                      {mostrarTodosAmonestados ? "Ver top 5" : "Ver todos"}
-                    </Button>
-                  )}
-                </Flex>
-                <Text fontSize="xs" color="gray.500" mb={2}>
-                  Jugadores con más tarjetas (rojas, amarillas, azules, 2 min)
-                </Text>
-                {Array.isArray(jugadores) && jugadores.length > 0 ? (
-                  <Box overflowX="auto">
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                      <thead>
-                        <tr>
-                          <th style={{ textAlign: "left", padding: "4px" }}>
-                            Jugador
-                          </th>
-                          <th
-                            style={{
-                              textAlign: "center",
-                              padding: "4px",
-                              color: "#e53e3e",
-                            }}
-                          >
-                            Rojas
-                          </th>
-                          <th
-                            style={{
-                              textAlign: "center",
-                              padding: "4px",
-                              color: "#ecc94b",
-                            }}
-                          >
-                            Amarillas
-                          </th>
-                          <th
-                            style={{
-                              textAlign: "center",
-                              padding: "4px",
-                              color: "#3182ce",
-                            }}
-                          >
-                            Azules
-                          </th>
-                          <th
-                            style={{
-                              textAlign: "center",
-                              padding: "4px",
-                              color: "#805ad5",
-                            }}
-                          >
-                            2 min
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {jugadores
-                          .sort(
-                            (a, b) =>
-                              (b.tarjetas_rojas || 0) +
-                              (b.tarjetas_amarillas || 0) +
-                              (b.tarjetas_azules || 0) +
-                              (b.exclusion_2_min || 0) -
-                              ((a.tarjetas_rojas || 0) +
-                                (a.tarjetas_amarillas || 0) +
-                                (a.tarjetas_azules || 0) +
-                                (a.exclusion_2_min || 0))
-                          )
-                          .slice(
-                            0,
-                            mostrarTodosAmonestados ? jugadores.length : 5
-                          )
-                          .map((jugador) => (
-                            <tr key={jugador.id}>
-                              <td style={{ padding: "4px" }}>{jugador.nombre}</td>
+                              <td
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                }}
+                              >
+                                {jugador.fallo_pase || 0}
+                              </td>
+                              <td
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                }}
+                              >
+                                {jugador.fallo_recepcion || 0}
+                              </td>
+                              <td
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                }}
+                              >
+                                {jugador.pasos || 0}
+                              </td>
+                              <td
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                }}
+                              >
+                                {jugador.falta_en_ataque || 0}
+                              </td>
+                              <td
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                }}
+                              >
+                                {jugador.dobles || 0}
+                              </td>
+                              <td
+                                style={{
+                                  textAlign: "center",
+                                  padding: "4px",
+                                }}
+                              >
+                                {jugador.invasion_area || 0}
+                              </td>
                               <td
                                 style={{
                                   textAlign: "center",
                                   padding: "4px",
                                   color: "#e53e3e",
+                                  fontWeight: "bold",
                                 }}
                               >
-                                {jugador.tarjetas_rojas || 0}
-                              </td>
-                              <td
-                                style={{
-                                  textAlign: "center",
-                                  padding: "4px",
-                                  color: "#ecc94b",
-                                }}
-                              >
-                                {jugador.tarjetas_amarillas || 0}
-                              </td>
-                              <td
-                                style={{
-                                  textAlign: "center",
-                                  padding: "4px",
-                                  color: "#3182ce",
-                                }}
-                              >
-                                {jugador.tarjetas_azules || 0}
-                              </td>
-                              <td
-                                style={{
-                                  textAlign: "center",
-                                  padding: "4px",
-                                  color: "#805ad5",
-                                }}
-                              >
-                                {jugador.exclusion_2_min || 0}
+                                {total}
                               </td>
                             </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </Box>
-                ) : (
-                  <Text fontSize="sm">Aún no hay registros</Text>
-                )}
-              </Box>
-
-              {/* Historial de partidos */}
-              <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
-                <Flex justify="space-between" mb={2} align="center">
-                  <Text fontWeight="bold">Historial de partidos</Text>
-                  {ultimosPartidos.length > 5 && (
-                    <Button
-                      size="xs"
-                      variant="outline"
-                      onClick={() => setMostrarTodosPartidos((v) => !v)}
-                      transition="all 0.2s"
-                      _active={{
-                        transform: "scale(0.95)",
-                        bg: "#e6fffa",
-                      }}
-                      _hover={{
-                        bg: "#f0fdfa",
-                        transform: "scale(1.05)",
-                      }}
-                    >
-                      {mostrarTodosPartidos ? "Ver últimos 5" : "Ver todos"}
-                    </Button>
-                  )}
-                </Flex>
-                <Flex align="center" gap={2} mb={2}>
-                  <Text fontSize={"sm"}>Porcentaje de victorias:</Text>
-                  <Text
-                    color={esPorcentajeAlto ? "green.600" : "red.600"}
-                    fontWeight="bold"
-                  >
-                    {porcentajeGanados}%
-                  </Text>
-                  <Icon
-                    as={esPorcentajeAlto ? FaArrowUp : FaArrowDown}
-                    color={esPorcentajeAlto ? "green.600" : "red.600"}
-                    boxSize={4}
-                  />
-                </Flex>
-                {Array.isArray(ultimosPartidos) && ultimosPartidos.length > 0 ? (
-                  <Box overflowX="auto">
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                      <thead>
-                        <tr>
-                          <th style={{ textAlign: "left", padding: "4px" }}>
-                            Rival
-                          </th>
-                          <th style={{ textAlign: "left", padding: "4px" }}>
-                            Fecha
-                          </th>
-                          <th style={{ textAlign: "right", padding: "4px" }}>
-                            Resultado
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {ultimosPartidos
-                          .slice()
-                          .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-                          .slice(
-                            0,
-                            mostrarTodosPartidos ? ultimosPartidos.length : 5
-                          )
-                          .map((partido) => {
-                            const golesFavor = partido.goles_id_equipo ?? 0;
-                            const golesContra = partido.goles_id_equiporival ?? 0;
-                            let bgColor = "";
-                            if (golesFavor > golesContra) bgColor = "#d1fae5";
-                            else if (golesFavor < golesContra)
-                              bgColor = "#fee2e2";
-
-                            return (
-                              <tr
-                                key={partido.id}
-                                style={{ borderBottom: "1px solid #e2e8f0" }}
-                              >
-                                <td style={{ padding: "4px" }}>
-                                  {partido.equiporival_id || "Desconocido"}
-                                </td>
-                                <td style={{ padding: "4px" }}>
-                                  {partido.fecha
-                                    ? new Date(partido.fecha).toLocaleDateString()
-                                    : "Sin fecha"}
-                                </td>
-                                <td
-                                  style={{
-                                    textAlign: "center",
-                                    padding: "4px",
-                                    backgroundColor: bgColor,
-                                    borderRadius: "6px",
-                                    fontWeight: "bold",
-                                  }}
-                                >
-                                  {golesFavor} - {golesContra}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                      </tbody>
-                    </table>
-                  </Box>
-                ) : (
-                  <Text fontSize="sm">Aún no hay registros</Text>
-                )}
-              </Box>
-            </Flex>
-          </GridItem>
-          {/* Tercera fila: Aspecto defensivo y pérdidas */}
-          <GridItem colSpan={2}>
-            <Flex
-              gap={4}
-              mb={2}
-              flexDirection={{ base: "column", md: "row" }}
-              justify="space-between"
-            >
-              {/* Aspecto defensivo */}
-              <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
-                <Flex justify="space-between" align="center" mb={2}>
-                  <Text fontWeight="bold">Aspecto defensivo</Text>
-                  {jugadores.length > 5 && (
-                    <Button
-                      size="xs"
-                      variant="outline"
-                      onClick={() => setMostrarTodosDefensivos?.((v) => !v)}
-                      transition="all 0.2s"
-                      _active={{
-                        transform: "scale(0.95)",
-                        bg: "#e6fffa",
-                      }}
-                      _hover={{
-                        bg: "#f0fdfa",
-                        transform: "scale(1.05)",
-                      }}
-                    >
-                      {mostrarTodosDefensivos ? "Ver top 5" : "Ver todos"}
-                    </Button>
-                  )}
-                </Flex>
-                <Text fontSize="xs" color="gray.500" mb={2}>
-                  Jugadores con más blocajes y robos
-                </Text>
-                {Array.isArray(jugadores) && jugadores.length > 0 ? (
-                  <Box overflowX="auto">
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                      <thead>
-                        <tr>
-                          <th style={{ textAlign: "left", padding: "4px" }}>
-                            Jugador
-                          </th>
-                          <th
-                            style={{
-                              textAlign: "center",
-                              padding: "4px",
-                              color: "#38a169",
-                            }}
-                          >
-                            Blocajes
-                          </th>
-                          <th
-                            style={{
-                              textAlign: "center",
-                              padding: "4px",
-                              color: "#3182ce",
-                            }}
-                          >
-                            Robos
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {jugadores
-                          .sort(
-                            (a, b) =>
-                              (b.blocaje || 0) +
-                              (b.robo || 0) -
-                              ((a.blocaje || 0) + (a.robo || 0))
-                          )
-                          .slice(0, mostrarTodosDefensivos ? jugadores.length : 5)
-                          .map((jugador) => (
-                            <tr key={jugador.id}>
-                              <td style={{ padding: "4px" }}>{jugador.nombre}</td>
-                              <td
-                                style={{
-                                  textAlign: "center",
-                                  padding: "4px",
-                                  color: "#38a169",
-                                }}
-                              >
-                                {jugador.blocaje || 0}
-                              </td>
-                              <td
-                                style={{
-                                  textAlign: "center",
-                                  padding: "4px",
-                                  color: "#3182ce",
-                                }}
-                              >
-                                {jugador.robo || 0}
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </Box>
-                ) : (
-                  <Text fontSize="sm">Aún no hay registros</Text>
-                )}
-              </Box>
-
-              {/* Pérdidas */}
-              <Box borderWidth="1px" borderRadius="md" p={4} flex="1">
-                <Flex justify="space-between" align="center" mb={2}>
-                  <Text fontWeight="bold">Pérdidas</Text>
-                  {jugadores.length > 5 && (
-                    <Button
-                      size="xs"
-                      variant="outline"
-                      onClick={() => setMostrarTodosPerdidas?.((v) => !v)}
-                      transition="all 0.2s"
-                      _active={{
-                        transform: "scale(0.95)",
-                        bg: "#e6fffa",
-                      }}
-                      _hover={{
-                        bg: "#f0fdfa",
-                        transform: "scale(1.05)",
-                      }}
-                    >
-                      {mostrarTodosPerdidas ? "Ver top 5" : "Ver todos"}
-                    </Button>
-                  )}
-                </Flex>
-                <Text fontSize="xs" color="gray.500" mb={2}>
-                  Jugadores con más pérdidas (fallos y faltas técnicas)
-                </Text>
-                {Array.isArray(jugadores) && jugadores.length > 0 ? (
-                  <Box overflowX="auto">
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                      <thead>
-                        <tr>
-                          <th style={{ textAlign: "left", padding: "4px" }}>
-                            Jugador
-                          </th>
-                          <th style={{ textAlign: "center", padding: "4px" }}>
-                            F. Pase
-                          </th>
-                          <th style={{ textAlign: "center", padding: "4px" }}>
-                            F. Recepción
-                          </th>
-                          <th style={{ textAlign: "center", padding: "4px" }}>
-                            Pasos
-                          </th>
-                          <th style={{ textAlign: "center", padding: "4px" }}>
-                            F. Ataque
-                          </th>
-                          <th style={{ textAlign: "center", padding: "4px" }}>
-                            Dobles
-                          </th>
-                          <th style={{ textAlign: "center", padding: "4px" }}>
-                            Inv. Área
-                          </th>
-                          <th
-                            style={{
-                              textAlign: "center",
-                              padding: "4px",
-                              color: "#e53e3e",
-                            }}
-                          >
-                            Total
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {jugadores
-                          .sort(
-                            (a, b) =>
-                              (b.fallo_pase || 0) +
-                              (b.fallo_recepcion || 0) +
-                              (b.pasos || 0) +
-                              (b.falta_en_ataque || 0) +
-                              (b.dobles || 0) +
-                              (b.invasion_area || 0) -
-                              ((a.fallo_pase || 0) +
-                                (a.fallo_recepcion || 0) +
-                                (a.pasos || 0) +
-                                (a.falta_en_ataque || 0) +
-                                (a.dobles || 0) +
-                                (a.invasion_area || 0))
-                          )
-                          .slice(0, mostrarTodosPerdidas ? jugadores.length : 5)
-                          .map((jugador) => {
-                            const total =
-                              (jugador.fallo_pase || 0) +
-                              (jugador.fallo_recepcion || 0) +
-                              (jugador.pasos || 0) +
-                              (jugador.falta_en_ataque || 0) +
-                              (jugador.dobles || 0) +
-                              (jugador.invasion_area || 0);
-                            return (
-                              <tr key={jugador.id}>
-                                <td style={{ padding: "4px" }}>
-                                  {jugador.nombre}
-                                </td>
-                                <td
-                                  style={{ textAlign: "center", padding: "4px" }}
-                                >
-                                  {jugador.fallo_pase || 0}
-                                </td>
-                                <td
-                                  style={{ textAlign: "center", padding: "4px" }}
-                                >
-                                  {jugador.fallo_recepcion || 0}
-                                </td>
-                                <td
-                                  style={{ textAlign: "center", padding: "4px" }}
-                                >
-                                  {jugador.pasos || 0}
-                                </td>
-                                <td
-                                  style={{ textAlign: "center", padding: "4px" }}
-                                >
-                                  {jugador.falta_en_ataque || 0}
-                                </td>
-                                <td
-                                  style={{ textAlign: "center", padding: "4px" }}
-                                >
-                                  {jugador.dobles || 0}
-                                </td>
-                                <td
-                                  style={{ textAlign: "center", padding: "4px" }}
-                                >
-                                  {jugador.invasion_area || 0}
-                                </td>
-                                <td
-                                  style={{
-                                    textAlign: "center",
-                                    padding: "4px",
-                                    color: "#e53e3e",
-                                    fontWeight: "bold",
-                                  }}
-                                >
-                                  {total}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                      </tbody>
-                    </table>
-                  </Box>
-                ) : (
-                  <Text fontSize="sm">Aún no hay registros</Text>
-                )}
-              </Box>
-            </Flex>
-          </GridItem>
-          {/* Cuarta fila: Tipos de lanzamiento por jugador */}
-          <GridItem colSpan={2}>
-            <Flex
-              gap={4}
-              mb={2}
-              flexDirection={{ base: "column", md: "row" }}
-              justifyContent="space-between"
-            >
-            </Flex>
-          </GridItem>
-        </Grid>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </Box>
+              ) : (
+                <Text fontSize="sm">Aún no hay registros</Text>
+              )}
+            </Box>
+          </Flex>
+        </Flex>
       </Box>
     </AuthWrapper>
   );

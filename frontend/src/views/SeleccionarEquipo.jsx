@@ -25,8 +25,8 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
-import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
+import Sidebar from "../components/Sidebar";
 
 const SeleccionEquipo = () => {
   const [club, setClub] = useState({});
@@ -177,34 +177,44 @@ const SeleccionEquipo = () => {
       borderWidth="1px"
       borderRadius="xl"
       boxShadow="md"
-      _hover={{ boxShadow: "lg", transform: "translateY(-2px)" }}
+      _hover={{ boxShadow: "lg", transform: "translateY(-2px)", bg: "#f0f4f4" }}
       transition="0.2s"
       bg="white"
+      cursor="pointer"
+      onClick={() => handleSeleccion(equipo)}
+      display="flex"
+      alignItems="center"
+      justifyContent="space-between"
+      role="group"
+      maxW="400px" // Tamaño máximo reducido
+
     >
+      {/* Información a la izquierda */}
+      <Box textAlign="left" flex="1">
+        <Text fontSize="xl" fontWeight="bold" color="#014C4C" mb={2}>
+          {equipo.nombre}
+        </Text>
+        <Text fontSize="md" fontWeight="bold" color="#014C4C" mb={2}>
+          {club.nombre}
+        </Text>
+        {equipo.descripcion && equipo.categoria && (
+          <Text color="gray.600" mb={2}>
+            {equipo.categoria} - {equipo.descripcion}
+          </Text>
+        )}
+      </Box>
+      {/* Foto a la derecha */}
       <Image
         src={equipo.logo || club.logo}
         alt={equipo.nombre}
         borderRadius="full"
-        boxSize="100px"
-        mb={4}
+        boxSize="90px"
+        ml={6}
         objectFit="cover"
+        border="2px solid #319795"
+        transition="0.2s"
+        _groupHover={{ borderColor: "#014C4C" }}
       />
-      <Text fontSize="xl" fontWeight="bold" color="#014C4C" mb={4}>
-        {equipo.nombre}
-      </Text>
-      <Text fontSize="l" fontWeight="bold" color="#014C4C" mb={4}>
-        {club.nombre}
-      </Text>
-
-      {equipo.descripcion && equipo.categoria && (
-        <Text color="gray.600" mb={4}>
-          {equipo.categoria} - {equipo.descripcion}
-        </Text>
-      )}
-
-      <Button colorScheme="teal" onClick={() => handleSeleccion(equipo)}>
-        Seleccionar
-      </Button>
     </Box>
   );
 
@@ -234,10 +244,37 @@ const SeleccionEquipo = () => {
 
   return (
     <AuthWrapper requiredRole={null}>
-      <Box p={6} minH="100vh" bg="white">
+      <Box
+        p={6}
+        minH="100vh"
+        bg="white"
+        position="relative"
+        overflow="hidden"
+      >
+        {/* Marca de agua centrada */}
+        <Image
+          src="/myHandstatsLogo.png"
+          alt="Logo MyHandStats"
+          position="fixed"
+          left="50%"
+          top="50%"
+          transform="translate(-50%, -50%)"
+          opacity={0.12}
+          zIndex={0}
+          boxSize={["250px", "350px", "450px"]}
+          pointerEvents="none"
+          userSelect="none"
+        />
+
         <Sidebar isOpen={isOpen} onClose={onClose} />
 
-        <Flex justify="space-between" align="center" mb={6}>
+        <Flex
+          justify="space-between"
+          align="center"
+          mb={6}
+          zIndex={1}
+          position="relative"
+        >
           <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
           <Heading size="lg" color="#014C4C">
             Selecciona tu equipo
@@ -246,22 +283,34 @@ const SeleccionEquipo = () => {
         </Flex>
 
         {loading ? (
-          <Center mt={10}>
+          <Center mt={10} zIndex={1} position="relative">
             <Spinner size="xl" color="teal.600" />
           </Center>
         ) : equipos.length === 0 ? (
-          <Center flexDirection="column" mt={10}>
+          <Center
+            flexDirection="column"
+            mt={10}
+            zIndex={1}
+            position="relative"
+          >
             <Text fontSize="xl" mb={4} color="gray.600">
               No hay equipos disponibles.
             </Text>
             {esAdmin && <CrearEquipoCard />}
           </Center>
         ) : (
-          <SimpleGrid columns={[1, 2, 3]} spacing={6}>
+          <Flex
+            wrap="wrap"
+            gap={10}
+            zIndex={1}
+            position="relative"
+            justify="center"
+            align="flex-start"
+          >
             {equipos.map((equipo) => (
               <EquipoCard key={equipo.id} equipo={equipo} />
             ))}
-          </SimpleGrid>
+          </Flex>
         )}
 
         {/* Modal para crear nuevo equipo */}
