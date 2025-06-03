@@ -176,6 +176,13 @@ const Jugadores = () => {
       gol_en_contra_ld: 0,
       gol_en_contra_pi: 0,
       gol_en_contra_7m: 0,
+      lanzamiento_en_contra_ei: 0,
+      lanzamiento_en_contra_ed: 0,
+      lanzamiento_en_contra_li: 0,
+      lanzamiento_en_contra_c: 0,
+      lanzamiento_en_contra_ld: 0,
+      lanzamiento_en_contra_pi: 0,
+      lanzamiento_en_contra_7m: 0,
     };
 
     try {

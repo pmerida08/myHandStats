@@ -55,6 +55,13 @@ class Jugador(BaseModel):
     gol_en_contra_pi: int
     gol_en_contra_7m: int
     gol_en_contra_t: int
+    lanzamiento_en_contra_ei: int
+    lanzamiento_en_contra_ed: int
+    lanzamiento_en_contra_li: int
+    lanzamiento_en_contra_c: int
+    lanzamiento_en_contra_ld: int
+    lanzamiento_en_contra_pi: int
+    lanzamiento_en_contra_7m: int
 
     class Config:
         orm_mode = True
@@ -108,6 +115,13 @@ class JugadorCreate(BaseModel):
     gol_en_contra_pi: Optional[int] = 0
     gol_en_contra_7m: Optional[int] = 0
     gol_en_contra_t: Optional[int] = 0
+    lanzamiento_en_contra_ei: Optional[int] = 0
+    lanzamiento_en_contra_ed: Optional[int] = 0
+    lanzamiento_en_contra_li: Optional[int] = 0
+    lanzamiento_en_contra_c: Optional[int] = 0
+    lanzamiento_en_contra_ld: Optional[int] = 0
+    lanzamiento_en_contra_pi: Optional[int] = 0
+    lanzamiento_en_contra_7m: Optional[int] = 0
 
     class Config:
         orm_mode = True
@@ -160,6 +174,13 @@ class JugadorUpdate(BaseModel):
     gol_en_contra_pi: Optional[int] = None
     gol_en_contra_7m: Optional[int] = None
     gol_en_contra_t: Optional[int] = None
+    lanzamiento_en_contra_ei: Optional[int] = None
+    lanzamiento_en_contra_ed: Optional[int] = None
+    lanzamiento_en_contra_li: Optional[int] = None
+    lanzamiento_en_contra_c: Optional[int] = None
+    lanzamiento_en_contra_ld: Optional[int] = None
+    lanzamiento_en_contra_pi: Optional[int] = None
+    lanzamiento_en_contra_7m: Optional[int] = None
 
     class Config:
         orm_mode = True
@@ -216,6 +237,13 @@ class JugadorOut(BaseModel):
     gol_en_contra_pi: int
     gol_en_contra_7m: int
     gol_en_contra_t: int
+    lanzamiento_en_contra_ei: int
+    lanzamiento_en_contra_ed: int
+    lanzamiento_en_contra_li: int
+    lanzamiento_en_contra_c: int
+    lanzamiento_en_contra_ld: int
+    lanzamiento_en_contra_pi: int
+    lanzamiento_en_contra_7m: int
 
     class Config:
         orm_mode = True
