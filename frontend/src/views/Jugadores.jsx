@@ -622,6 +622,7 @@ const Jugadores = () => {
                 _hover={{ bg: "#013C3C" }}
                 onClick={editandoJugadorId ? editarJugador : crearJugador}
               >
+                
                 {editandoJugadorId ? "Guardar Cambios" : "Crear Jugador"}
               </Button>
             </ModalFooter>
