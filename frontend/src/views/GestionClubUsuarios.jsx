@@ -41,8 +41,6 @@ const UsuariosClubAdmin = () => {
   const [nuevoUsuario, setNuevoUsuario] = useState({
     nombre: "",
     email: "",
-    contraseña: "",
-    confirmarContraseña: "",
     rol: "",
   });
 
@@ -127,10 +125,10 @@ const UsuariosClubAdmin = () => {
   };
 
   const crearUsuario = () => {
-    if (nuevoUsuario.contraseña !== nuevoUsuario.confirmarContraseña) {
+    if (!nuevoUsuario.nombre || !nuevoUsuario.email || !nuevoUsuario.rol) {
       toast({
-        title: "Las contraseñas no coinciden.",
-        status: "error",
+        title: "Todos los campos son obligatorios.",
+        status: "warning",
         duration: 3000,
         isClosable: true,
       });
@@ -140,12 +138,11 @@ const UsuariosClubAdmin = () => {
     const usuarioAEnviar = {
       nombre: nuevoUsuario.nombre,
       email: nuevoUsuario.email,
-      password: nuevoUsuario.contraseña,
       rol: nuevoUsuario.rol,
       clubs_id: clubId,
     };
 
-    fetch("https://myhandstats.onrender.com/club/usuario/register", {
+    fetch("https://myhandstats.onrender.com/club/crear-por-admin", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -168,8 +165,6 @@ const UsuariosClubAdmin = () => {
         setNuevoUsuario({
           nombre: "",
           email: "",
-          contraseña: "",
-          confirmarContraseña: "",
           rol: "",
         });
         cargarUsuarios();
@@ -420,8 +415,6 @@ const UsuariosClubAdmin = () => {
             setNuevoUsuario({
               nombre: "",
               email: "",
-              contraseña: "",
-              confirmarContraseña: "",
               rol: "",
             });
             setIsModalOpen(true);
@@ -454,24 +447,6 @@ const UsuariosClubAdmin = () => {
                     type="email"
                     placeholder="Email"
                     value={nuevoUsuario.email}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <Input
-                    name="contraseña"
-                    type="password"
-                    placeholder="Contraseña"
-                    value={nuevoUsuario.contraseña}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <Input
-                    name="confirmarContraseña"
-                    type="password"
-                    placeholder="Confirmar contraseña"
-                    value={nuevoUsuario.confirmarContraseña}
                     onChange={handleInputChange}
                   />
                 </FormControl>

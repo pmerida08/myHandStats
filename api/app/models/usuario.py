@@ -27,6 +27,15 @@ class Usuario(BaseModel):
     class Config:
         orm_mode = True
 
+
+class CrearUsuarioAdminDTO(BaseModel):
+    nombre: str
+    email: str
+    rol: str
+
+    class Config:
+        orm_mode = True
+
 # Modelo para actualizar datos de usuarios (los campos son opcionales)
 class UsuarioUpdate(BaseModel):
     nombre: Optional[str] = None
