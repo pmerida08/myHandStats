@@ -27,12 +27,14 @@ import { useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import AuthWrapper from "../components/AuthWrapper";
 import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
 
 const SeleccionEquipo = () => {
   const [club, setClub] = useState({});
   const [equipos, setEquipos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [esAdmin, setEsAdmin] = useState(false);
+  const [userName, setUserName] = useState("");
 
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -93,6 +95,14 @@ const SeleccionEquipo = () => {
         setEquipos([]);
       })
       .finally(() => setLoading(false));
+
+    // Cargar nombre usuario para el header
+    fetch("https://myhandstats.onrender.com/usuario/perfil", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setUserName(data.info?.nombre || "Usuario"))
+      .catch(() => setUserName("Usuario"));
 
     // Comprobar si es admin
     try {
@@ -266,21 +276,14 @@ const SeleccionEquipo = () => {
           userSelect="none"
         />
 
-        <Sidebar isOpen={isOpen} onClose={onClose} />
+        <Header
+          onOpen={onOpen}
+          userName={userName}
+          club={club}
+          texto="Selecciona tu equipo"
+        />
 
-        <Flex
-          justify="space-between"
-          align="center"
-          mb={6}
-          zIndex={1}
-          position="relative"
-        >
-          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-          <Heading size="lg" color="#014C4C">
-            Selecciona tu equipo
-          </Heading>
-          <Box w="6" />
-        </Flex>
+        <Sidebar isOpen={isOpen} onClose={onClose} />
 
         {loading ? (
           <Center mt={10} zIndex={1} position="relative">
