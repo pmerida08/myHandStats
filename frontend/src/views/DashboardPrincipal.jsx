@@ -233,6 +233,7 @@ const DashboardPrincipal = () => {
           userName={userName}
           club={club}
           equipo={equipo}
+          texto={equipo.nombre || "Mi Equipo"}
         />
 
         {/* Sustituye el Grid por Flex */}

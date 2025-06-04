@@ -18,6 +18,7 @@ import Sidebar from "../components/Sidebar";
 import { FaBars } from "react-icons/fa";
 import AuthWrapper from "../components/AuthWrapper";
 import { createClient } from "@supabase/supabase-js";
+import Header from "../components/Header";
 
 // Configuración de Supabase
 const SUPABASE_URL =
@@ -36,6 +37,8 @@ const EditarPerfil = () => {
   const [foto, setFoto] = useState(null);
   const [fotoUrl, setFotoUrl] = useState("");
   const [userId, setUserId] = useState(null);
+  const [userName, setUserName] = useState("");
+  const [club, setClub] = useState({ nombre: "", logo: "" });
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -54,7 +57,8 @@ const EditarPerfil = () => {
           setNombre(data.info.nombre || "");
           setEmail(data.info.email || "");
           setFotoUrl(data.info.foto || "");
-          setUserId(data.info.user_id); // Guardamos el id para el PUT
+          setUserId(data.info.user_id);
+          setUserName(data.info.nombre || "Usuario");
         }
       } catch (error) {
         toast({
@@ -67,7 +71,37 @@ const EditarPerfil = () => {
       }
     };
 
+    const cargarClub = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        fetch("https://myhandstats.onrender.com/club", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            let clubId = null;
+            try {
+              const payload = JSON.parse(atob(token.split(".")[1]));
+              clubId = payload.club_id || payload.club || payload.id || null;
+            } catch {
+              clubId = null;
+            }
+            let clubObj = null;
+            if (Array.isArray(data.info)) {
+              clubObj = data.info.find((c) => c.id == clubId);
+            } else {
+              clubObj = data;
+            }
+            setClub({
+              nombre: clubObj?.nombre || "Club no encontrado",
+              logo: clubObj?.logo || "",
+            });
+          });
+      }
+    };
+
     cargarPerfil();
+    cargarClub();
   }, [toast]);
 
   const subirFotoPerfil = async (file, userId) => {
@@ -137,15 +171,13 @@ const EditarPerfil = () => {
   return (
     <AuthWrapper requiredRole={null}>
       <Box p={6} bg="#f0f4f5" minH="100vh">
+        <Header
+          onOpen={onOpen}
+          userName={userName}
+          club={club}
+          texto="Editar Perfil"
+        />
         <Sidebar isOpen={isOpen} onClose={onClose} />
-
-        <Flex align="center" justify="space-between" mb={8}>
-          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-          <Heading size="lg" color="teal.700">
-            Editar Perfil
-          </Heading>
-          <Box w="6" />
-        </Flex>
 
         <Flex
           direction="column"

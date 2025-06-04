@@ -22,6 +22,7 @@ import {
   Textarea,
   Flex,
   Icon,
+  Image,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FaBars, FaEdit } from "react-icons/fa";
@@ -29,6 +30,7 @@ import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 import { useNavigate } from "react-router-dom";
 import { createClient } from "@supabase/supabase-js";
+import Header from "../components/Header";
 
 // Configuración de Supabase
 const SUPABASE_URL =
@@ -44,6 +46,8 @@ const ClubInfo = () => {
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({});
   const [selectedFile, setSelectedFile] = useState(null);
+  const [userName, setUserName] = useState("");
+  const [club, setClub] = useState({ nombre: "", logo: "" });
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -90,6 +94,41 @@ const ClubInfo = () => {
       })
       .finally(() => setLoading(false));
   }, [token, toast]);
+
+  useEffect(() => {
+    if (!token) return;
+    // Cargar nombre usuario
+    fetch("https://myhandstats.onrender.com/usuario/perfil", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setUserName(data.info?.nombre || "Usuario"));
+
+    // Cargar club
+    fetch("https://myhandstats.onrender.com/club", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        let clubId = null;
+        try {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          clubId = payload.club_id || payload.club || payload.id || null;
+        } catch {
+          clubId = null;
+        }
+        let clubObj = null;
+        if (Array.isArray(data.info)) {
+          clubObj = data.info.find((c) => c.id == clubId);
+        } else {
+          clubObj = data;
+        }
+        setClub({
+          nombre: clubObj?.nombre || "Club no encontrado",
+          logo: clubObj?.logo || "",
+        });
+      });
+  }, [token]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -183,16 +222,27 @@ const ClubInfo = () => {
 
   return (
     <AuthWrapper requiredRole={"admin"}>
-      <Box p={6} bg="#f0f4f5" minH="100vh">
+      <Box p={6} bg="#f0f4f5" minH="100vh" opacity={0.97} position="relative">
+        <Image
+          src="/myHandstatsLogo.png"
+          alt="Logo MyHandStats"
+          position="fixed"
+          left="50%"
+          top="50%"
+          transform="translate(-50%, -50%)"
+          opacity={0.12}
+          zIndex={0}
+          boxSize={["250px", "350px", "450px"]}
+          pointerEvents="none"
+          userSelect="none"
+        />
+        <Header
+          onOpen={onOpen}
+          userName={userName}
+          club={club}
+          texto="Información del Club"
+        />
         <Sidebar isOpen={isOpen} onClose={onClose} />
-
-        <Flex align="center" justify="space-between" mb={8}>
-          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-          <Heading size="lg" color="teal.700">
-            Información del Club
-          </Heading>
-          <Box w="6" />
-        </Flex>
 
         {loading ? (
           <Center mt={10}>
@@ -207,6 +257,7 @@ const ClubInfo = () => {
             boxShadow="lg"
             maxW="600px"
             mx="auto"
+            opacity={0.95}
           >
             <HStack spacing={6} mb={4}>
               <Avatar

@@ -5,7 +5,6 @@ import {
   IconButton,
   Avatar,
   Button,
-  useBreakpointValue,
   Spinner,
   useDisclosure,
   Flex,
@@ -30,6 +29,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 import { createClient } from "@supabase/supabase-js";
+import Header from "../components/Header";
 
 // Configuración de Supabase
 const SUPABASE_URL =
@@ -41,9 +41,9 @@ const SUPABASE_KEY =
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const Jugadores = () => {
-  const gridCols = useBreakpointValue({ base: 1, sm: 2, md: 3, lg: 4 });
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { onOpen } = useDisclosure();
+  const [userName, setUserName] = useState("");
+  const [club, setClub] = useState({ nombre: "", logo: "" });
   const [editandoJugadorId, setEditandoJugadorId] = useState(null);
   const [equipoSeleccionado, setEquipoSeleccionado] = useState("");
   const [jugadores, setJugadores] = useState([]);
@@ -51,6 +51,7 @@ const Jugadores = () => {
   const [posiciones, setPosiciones] = useState([]);
   const [selectedFoto, setSelectedFoto] = useState(null);
   const [busqueda, setBusqueda] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false); // <-- Añade este estado
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -322,7 +323,42 @@ const Jugadores = () => {
       .catch((err) => console.error("Error al cargar posiciones:", err));
   };
 
+  // Cargar datos de usuario y club igual que en DashboardPrincipal
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    // Cargar nombre usuario
+    fetch("https://myhandstats.onrender.com/usuario/perfil", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setUserName(data.info?.nombre || "Usuario"));
+
+    // Cargar club
+    fetch("https://myhandstats.onrender.com/club", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        // Buscar el club por id del token
+        let clubId = null;
+        try {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          clubId = payload.club_id || payload.club || payload.id || null;
+        } catch {
+          clubId = null;
+        }
+        let clubObj = null;
+        if (Array.isArray(data.info)) {
+          clubObj = data.info.find((c) => c.id == clubId);
+        } else {
+          clubObj = data;
+        }
+        setClub({
+          nombre: clubObj?.nombre || "Club no encontrado",
+          logo: clubObj?.logo || "",
+        });
+      });
+    // ...otros useEffect existentes...
     cargarJugadores();
     cargarPosiciones();
   }, []);
@@ -355,15 +391,12 @@ const Jugadores = () => {
           userSelect="none"
         />
 
-        <Sidebar isOpen={isOpen} onClose={onClose} />
-
-        <Flex align="center" justify="space-between" mb={8}>
-          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-          <Text fontSize="2xl" fontWeight="bold" color="#014C4C">
-            Jugadores
-          </Text>
-          <Box w="6" />
-        </Flex>
+        <Header
+          onOpen={onOpen}
+          userName={userName}
+          club={club}
+          texto="Jugadores"
+        />
 
         {/* Buscador por nombre */}
         <Box maxW="350px" mx="auto" mb={6}>
