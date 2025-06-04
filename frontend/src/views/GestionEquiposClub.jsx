@@ -22,12 +22,14 @@ import {
   Center,
   Heading,
   useToast,
+  Image,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FaPlus, FaBars, FaEdit } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 
 const EquiposClubAdmin = () => {
   const gridCols = useBreakpointValue({ base: 1, sm: 2, md: 3, lg: 4 });
@@ -46,6 +48,8 @@ const EquiposClubAdmin = () => {
     categoria: "",
     descripcion: "",
   });
+  const [userName, setUserName] = useState("");
+  const [club, setClub] = useState({ nombre: "", logo: "" });
 
   const navigate = useNavigate();
 
@@ -70,6 +74,42 @@ const EquiposClubAdmin = () => {
     }
     setIsTokenLoading(false);
   }, [navigate]);
+
+  useEffect(() => {
+    if (token) {
+      // Cargar nombre usuario
+      fetch("https://myhandstats.onrender.com/usuario/perfil", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => setUserName(data.info?.nombre || "Usuario"));
+
+      // Cargar club
+      fetch("https://myhandstats.onrender.com/club", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          let clubId = null;
+          try {
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            clubId = payload.club_id || payload.club || payload.id || null;
+          } catch {
+            clubId = null;
+          }
+          let clubObj = null;
+          if (Array.isArray(data.info)) {
+            clubObj = data.info.find((c) => c.id == clubId);
+          } else {
+            clubObj = data;
+          }
+          setClub({
+            nombre: clubObj?.nombre || "Club no encontrado",
+            logo: clubObj?.logo || "",
+          });
+        });
+    }
+  }, [token]);
 
   const cargarEquipos = () => {
     setLoading(true);
@@ -202,7 +242,28 @@ const EquiposClubAdmin = () => {
   return (
     <AuthWrapper requiredRole={"admin"}>
       <Box p={4} position="relative">
+        <Image
+          src="/myHandstatsLogo.png"
+          alt="Logo MyHandStats"
+          position="fixed"
+          left="50%"
+          top="50%"
+          transform="translate(-50%, -50%)"
+          opacity={0.12}
+          zIndex={0}
+          boxSize={["250px", "350px", "450px"]}
+          pointerEvents="none"
+          userSelect="none"
+        />
+        <Header
+          onOpen={onOpen}
+          userName={userName}
+          club={club}
+          texto="Gestión de Equipos del Club"
+        />
         <Sidebar isOpen={isOpen} onClose={onClose} />
+        {/* Elimina el Flex con el Heading, ya que el Header lo muestra */}
+        {/* 
         <Flex align="center" justify="space-between" mb={8}>
           <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
           <Heading size="lg" color="#014C4C">
@@ -210,7 +271,7 @@ const EquiposClubAdmin = () => {
           </Heading>
           <Box w="6" />
         </Flex>
-
+        */}
         {loading ? (
           <Box textAlign="center" mt={10}>
             <Spinner size="xl" color="teal.600" />
@@ -220,7 +281,8 @@ const EquiposClubAdmin = () => {
             {equipos.map((equipo) => (
               <Box
                 key={equipo.id}
-                bg="#e0f7f7"
+                bg="white"
+                opacity={0.93}
                 borderRadius="2xl"
                 boxShadow="lg"
                 p={6}
@@ -232,8 +294,10 @@ const EquiposClubAdmin = () => {
                 _hover={{
                   transform: "translateY(-5px)",
                   boxShadow: "xl",
-                  bg: "#d3f0f0",
+                  bg: "#f0fdfa",
+                  opacity: 1,
                 }}
+                position="relative"
               >
                 <Text
                   fontWeight="bold"
@@ -250,16 +314,20 @@ const EquiposClubAdmin = () => {
                 <Text fontSize="sm" color="gray.600" mb={4} noOfLines={2}>
                   {equipo.descripcion}
                 </Text>
-
-                <Button
+                <IconButton
+                  icon={<FaEdit />}
+                  aria-label="Editar equipo"
                   size="sm"
-                  leftIcon={<FaEdit />}
-                  colorScheme="teal"
-                  variant="outline"
+                  color="#014C4C"
+                  bg="white"
+                  borderRadius="full"
+                  boxShadow="sm"
+                  position="absolute"
+                  top={3}
+                  right={3}
+                  _hover={{ bg: "#e6fffa", color: "#319795" }}
                   onClick={() => abrirModalEditar(equipo)}
-                >
-                  Editar
-                </Button>
+                />
               </Box>
             ))}
           </SimpleGrid>

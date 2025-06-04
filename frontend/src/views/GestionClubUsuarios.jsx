@@ -5,7 +5,6 @@ import {
   IconButton,
   Avatar,
   Button,
-  useBreakpointValue,
   Spinner,
   useDisclosure,
   Flex,
@@ -23,16 +22,17 @@ import {
   Select,
   Center,
   Heading,
-  useToast
+  useToast,
+  Image,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FaPlus, FaUser, FaBars } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 
 const UsuariosClubAdmin = () => {
-  const gridCols = useBreakpointValue({ base: 1, sm: 2, md: 3, lg: 4 });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,6 +51,8 @@ const UsuariosClubAdmin = () => {
   const [clubId, setClubId] = useState(null);
   const [token, setToken] = useState(null);
   const [isTokenLoading, setIsTokenLoading] = useState(true);
+  const [userName, setUserName] = useState("");
+  const [club, setClub] = useState({ nombre: "", logo: "" });
 
   const navigate = useNavigate();
 
@@ -74,6 +76,42 @@ const UsuariosClubAdmin = () => {
     }
     setIsTokenLoading(false);
   }, [navigate]);
+
+  useEffect(() => {
+    if (token) {
+      // Cargar nombre usuario
+      fetch("https://myhandstats.onrender.com/usuario/perfil", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => setUserName(data.info?.nombre || "Usuario"));
+
+      // Cargar club
+      fetch("https://myhandstats.onrender.com/club", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          let clubId = null;
+          try {
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            clubId = payload.club_id || payload.club || payload.id || null;
+          } catch {
+            clubId = null;
+          }
+          let clubObj = null;
+          if (Array.isArray(data.info)) {
+            clubObj = data.info.find((c) => c.id == clubId);
+          } else {
+            clubObj = data;
+          }
+          setClub({
+            nombre: clubObj?.nombre || "Club no encontrado",
+            logo: clubObj?.logo || "",
+          });
+        });
+    }
+  }, [token]);
 
   const cargarUsuarios = () => {
     setLoading(true);
@@ -246,7 +284,28 @@ const UsuariosClubAdmin = () => {
   return (
     <AuthWrapper requiredRole={"admin"}>
       <Box p={4} position="relative">
+        <Image
+          src="/myHandstatsLogo.png"
+          alt="Logo MyHandStats"
+          position="fixed"
+          left="50%"
+          top="50%"
+          transform="translate(-50%, -50%)"
+          opacity={0.12}
+          zIndex={0}
+          boxSize={["250px", "350px", "450px"]}
+          pointerEvents="none"
+          userSelect="none"
+        />
+        <Header
+          onOpen={onOpen}
+          userName={userName}
+          club={club}
+          texto="Gestión de Usuarios del Club"
+        />
         <Sidebar isOpen={isOpen} onClose={onClose} />
+        {/* Elimina el Flex con el Heading, ya que el Header lo muestra */}
+        {/* 
         <Flex align="center" justify="space-between" mb={8}>
           <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
           <Heading size="lg" color="#014C4C">
@@ -254,54 +313,94 @@ const UsuariosClubAdmin = () => {
           </Heading>
           <Box w="6" />
         </Flex>
-
+        */}
         {loading ? (
           <Box textAlign="center" mt={10}>
             <Spinner size="xl" color="teal.600" />
           </Box>
         ) : (
-          <SimpleGrid columns={gridCols} spacing={6}>
+          <Flex
+            wrap="wrap"
+            gap={4}
+            justify="center"
+            align="flex-start"
+          >
             {usuarios
-              .filter((usuario) => usuario.rol !== "admin") // <-- Filtra los admin
+              .filter((usuario) => usuario.rol !== "admin")
               .map((usuario) => (
                 <Box
                   key={usuario.id}
-                  bg="#e0f7f7"
-                  borderRadius="2xl"
-                  boxShadow="lg"
-                  p={6}
-                  textAlign="center"
-                  maxW="320px"
+                  bg="white"
+                  opacity={0.93}
+                  borderRadius="xl"
+                  boxShadow="0 4px 16px 0 rgba(31, 38, 135, 0.10)"
+                  p={0}
+                  maxW="260px"
                   w="100%"
                   mx="auto"
                   transition="all 0.3s ease"
                   _hover={{
                     transform: "translateY(-5px)",
                     boxShadow: "xl",
-                    bg: "#d3f0f0",
+                    bg: "#f0fdfa",
+                    opacity: 1,
                   }}
+                  position="relative"
+                  mb={2}
+                  border="1.5px solid #b2f5ea"
+                  overflow="hidden"
                 >
-                  <Avatar icon={<FaUser />} size="2xl" bg="#a8dadc" mb={4} />
-                  <Text fontWeight="bold" fontSize="lg" color="#014C4C" mb={1}>
-                    {usuario.nombre}
-                  </Text>
-                  <Text fontSize="sm" color="gray.600" mb={1}>
-                    Email: {usuario.email}
-                  </Text>
-                  <Text fontSize="sm" color="gray.600">
-                    Rol: {usuario.rol}
-                  </Text>
-                  <Button
-                    size="sm"
-                    colorScheme="teal"
-                    mt={3}
-                    onClick={() => abrirModalEdicion(usuario)}
+                  {/* Círculo decorativo sutil */}
+                  <Box
+                    position="absolute"
+                    top={-10}
+                    right={-10}
+                    bg="#319795"
+                    opacity={0.08}
+                    borderRadius="full"
+                    boxSize="60px"
+                    zIndex={0}
+                  />
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    position="relative"
+                    zIndex={1}
+                    p={5}
+                    pt={7}
                   >
-                    Editar
-                  </Button>
+                    <Avatar icon={<FaUser />} size="lg" bg="#a8dadc" mb={3} border="2px solid #38b2ac" boxShadow="md" />
+                    <Text fontWeight="bold" fontSize="lg" color="#014C4C" mb={1} letterSpacing="wide">
+                      {usuario.nombre}
+                    </Text>
+                    <Text fontSize="sm" color="gray.600" mb={1}>
+                      Email: {usuario.email}
+                    </Text>
+                    <Text fontSize="sm" color="#319795" fontWeight="semibold" mb={2}>
+                      Rol: {usuario.rol}
+                    </Text>
+                    <Button
+                      size="sm"
+                      bgGradient="linear(to-r, #319795, #38b2ac)"
+                      color="white"
+                      borderRadius="full"
+                      fontWeight="bold"
+                      px={5}
+                      mt={2}
+                      _hover={{
+                        bgGradient: "linear(to-r, #285e61, #319795)",
+                        transform: "scale(1.05)",
+                      }}
+                      boxShadow="sm"
+                      onClick={() => abrirModalEdicion(usuario)}
+                    >
+                      Editar
+                    </Button>
+                  </Box>
                 </Box>
               ))}
-          </SimpleGrid>
+          </Flex>
         )}
 
         <IconButton
