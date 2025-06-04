@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
-  Heading,
   Text,
   Button,
   Stack,
@@ -12,18 +11,24 @@ import {
   Spinner,
   Center,
   useColorModeValue,
+  Image
 } from "@chakra-ui/react";
 import { FaBars, FaUsers, FaUsersCog, FaChalkboardTeacher, FaInfoCircle } from "react-icons/fa";
 import Sidebar from '../components/Sidebar';
 import AuthWrapper from "../components/AuthWrapper";
+import Header from "../components/Header"; // <-- Añade el import
 
 const ClubAdminPanel = () => {
   const navigate = useNavigate();
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const bg = useColorModeValue("white", "gray.800"); // Cambiado a blanco para fondo claro
+  const bg = useColorModeValue("white", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
+
+  // Para el header
+  const [userName, setUserName] = useState("");
+  const [club, setClub] = useState({ nombre: "", logo: "" });
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -44,6 +49,39 @@ const ClubAdminPanel = () => {
       navigate("/login");
     }
 
+    // Cargar datos para el header
+    if (storedToken) {
+      fetch("https://myhandstats.onrender.com/usuario/perfil", {
+        headers: { Authorization: `Bearer ${storedToken}` },
+      })
+        .then((res) => res.json())
+        .then((data) => setUserName(data.info?.nombre || "Administrador"));
+
+      fetch("https://myhandstats.onrender.com/club", {
+        headers: { Authorization: `Bearer ${storedToken}` },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          let clubId = null;
+          try {
+            const payload = JSON.parse(atob(storedToken.split(".")[1]));
+            clubId = payload.club_id || payload.club || payload.id || null;
+          } catch {
+            clubId = null;
+          }
+          let clubObj = null;
+          if (Array.isArray(data.info)) {
+            clubObj = data.info.find((c) => c.id == clubId);
+          } else {
+            clubObj = data;
+          }
+          setClub({
+            nombre: clubObj?.nombre || "Club no encontrado",
+            logo: clubObj?.logo || "",
+          });
+        });
+    }
+
     setIsLoading(false);
   }, [navigate]);
 
@@ -60,21 +98,26 @@ const ClubAdminPanel = () => {
   return (
     <AuthWrapper requiredRole={null}>
       <Box minH="100vh" bg={bg} p={{ base: 2, md: 8 }} position="relative">
+        <Image
+          src="/myHandstatsLogo.png"
+          alt="Logo MyHandStats"
+          position="fixed"
+          left="50%"
+          top="50%"
+          transform="translate(-50%, -50%)"
+          opacity={0.12}
+          zIndex={0}
+          boxSize={["250px", "350px", "450px"]}
+          pointerEvents="none"
+          userSelect="none"
+        />
+        <Header
+          onOpen={onOpen}
+          userName={userName}
+          club={club}
+          texto="Panel de Administración del Club"
+        />
         <Sidebar isOpen={isOpen} onClose={onClose} />
-
-        <Flex align="center" justify="space-between" mb={8}>
-          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-          <Heading
-            size="lg"
-            color="#014C4C"
-            textAlign="center"
-            fontWeight="bold"
-            letterSpacing="wide"
-          >
-            Panel de Administración del Club
-          </Heading>
-          <Box w="6" />
-        </Flex>
 
         <Box
           bg={cardBg}

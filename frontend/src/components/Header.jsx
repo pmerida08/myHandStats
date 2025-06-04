@@ -3,7 +3,7 @@ import { Flex, Icon, Text, Avatar } from "@chakra-ui/react";
 import { FaBars } from "react-icons/fa";
 import Sidebar from "./Sidebar";
 
-const Header = ({ equipo, club, userName, onOpen }) => {
+const Header = ({ texto, club, userName }) => {
     // Obtener foto del usuario desde el token
     let foto = "";
     const token = localStorage.getItem("token");
@@ -36,18 +36,25 @@ const Header = ({ equipo, club, userName, onOpen }) => {
                 </Flex>
                 <Flex align="center" gap={3} position="absolute" left="50%" transform="translateX(-50%)">
                     <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
-                        {equipo.nombre}
+                        {texto}
                     </Text>
-                    <Avatar name={club.nombre} src={club.logo} />
+                    <Avatar
+                        name={club.nombre}
+                        src={club.logo}
+                        mt={-2}
+                        boxSize="50px"
+                        marginTop={0.5}
+                        style={{ filter: "drop-shadow(0 10px 10px rgba(0, 0, 0, 0.25))" }}
+                    />
                 </Flex>
                 <Flex align="center" gap={2}>
                     <Text fontSize="m" fontWeight="medium" color="#014C4C">
                         {userName}
                     </Text>
                     {foto ? (
-                        <Avatar size="sm" src={foto} name={userName} />
+                        <Avatar size="sm" src={foto} name={userName} /> // <-- tamaño igual que el logo
                     ) : (
-                        <Avatar size="sm" name={userName} />
+                        <Avatar size="sm" name={userName} /> // <-- tamaño igual que el logo
                     )}
                 </Flex>
             </Flex>
