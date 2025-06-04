@@ -49,7 +49,7 @@ const CambiarContraseñaForm = () => {
       return;
     }
     try {
-      await axios.post("http://localhost:8000/auth/establecer-contrasena/", {
+      await axios.post("https://myhandstats.onrender.com/auth/establecer-contrasena/", {
         token,
         nueva_contraseña: nuevaContraseña,
       });
