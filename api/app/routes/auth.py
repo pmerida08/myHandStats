@@ -11,7 +11,6 @@ SECRET_KEY = "supersecretkey"
 ALGORITHM = "HS256"
 
 router = APIRouter()
-
 class EstablecerContraseñaDTO(BaseModel):
     token: str
     nueva_contraseña: str
