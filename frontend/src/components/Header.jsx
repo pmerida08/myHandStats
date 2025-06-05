@@ -16,7 +16,7 @@ const Header = ({ texto, club }) => {
         <>
             <Flex align="center" justify="space-between" mb={8}>
                 <Flex align="center" gap={3}>
-                    
+                    <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} />
                 </Flex>
                 <Flex align="center" gap={3} position="absolute" left="50%" transform="translateX(-50%)">
                     <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
@@ -35,7 +35,6 @@ const Header = ({ texto, club }) => {
                     />
                 </Flex>
             </Flex>
-            <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} />
         </>
     );
 };

@@ -15,6 +15,7 @@ import Jugadores from "./views/Jugadores.jsx";
 import Partidos from "./views/Partidos.jsx";
 import ResumenPartido from "./views/ResumenPartido.jsx";  
 import SeleccionarEquipo from "./views/SeleccionarEquipo.jsx";
+import StatsAvanzadas from "./views/StatsAvanzadas.jsx";  
 import LandingPage from "./views/LandingPage.jsx";
 import GestionClub from "./views/GestionClub.jsx";
 import GestionClubUsuarios from "./views/GestionClubUsuarios.jsx";

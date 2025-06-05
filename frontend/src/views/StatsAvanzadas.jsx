@@ -13,7 +13,6 @@ import {
   Th,
   Td,
   useBreakpointValue,
-  useDisclosure,
   Icon,
   Avatar,
   Spinner,
@@ -26,7 +25,7 @@ import {
   Divider,
 } from "@chakra-ui/react";
 import { FaBars } from "react-icons/fa";
-import Sidebar from "../components/Sidebar";
+import Header from "../components/Header"; // Añade este import al inicio
 
 function getClubIdFromToken(token) {
   if (!token) return null;
@@ -40,7 +39,6 @@ function getClubIdFromToken(token) {
 // Carga todos los datos principales y muestra el spinner mientras loading sea true
 
 const StatsAvanzadas = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [userName, setUserName] = useState("");
   const [club, setClub] = useState({ nombre: "", logo: "" });
   const [equipo, setEquipo] = useState({ id: "", nombre: "", logo: "" });
@@ -387,54 +385,8 @@ const StatsAvanzadas = () => {
   return (
     <Box bg="white" minH="100vh" p={{ base: 1, md: 6 }}>
       {/* Header */}
-      <Sidebar isOpen={isOpen} onClose={onClose} />
-
-      <Flex align="center" justify="space-between" mb={8}>
-        <Flex align="center" gap={3}>
-          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-          {/* Logo de la aplicación al lado del icono de hamburguesa */}
-          <Image
-            src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/sign/imagenes/logo.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzUwNmYzZWZkLTg5ZDktNGI0YS1hZjMwLTdjYzQyY2Q0MjcyMCJ9.eyJ1cmwiOiJpbWFnZW5lcy9sb2dvLnBuZyIsImlhdCI6MTc0ODQxODA1OCwiZXhwIjoyMzc5MTM4MDU4fQ.P1k167Q5lOLNPH_COkQdv8FCca2cSVSmwnrE1PXUPPk"
-            alt="Logo aplicación"
-            boxSize="60px"
-            borderRadius="full"
-            objectFit="cover"
-          />
-        </Flex>
-        <Flex align="center" gap={3}>
-          <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
-            {equipo.nombre}
-          </Text>
-          <Avatar name={club.nombre} src={club.logo} />
-          <Text fontSize="sm" color="gray.500">
-            Estadísticas Avanzadas
-          </Text>
-        </Flex>
-
-        <Flex align="center" gap={2}>
-          <Text fontSize="m" fontWeight={"medium"} color="#014C4C">
-            {userName}
-          </Text>
-          {/* Mostrar avatar de usuario si existe foto en el token */}
-          {(() => {
-            const token = localStorage.getItem("token");
-            let foto = "";
-            if (token) {
-              try {
-                const payload = JSON.parse(atob(token.split(".")[1]));
-                foto = payload.foto || "";
-              } catch (error) {
-                console.error("Error al decodificar el token:", error);
-              }
-            }
-            return foto ? (
-              <Avatar size="sm" src={foto} name={userName} />
-            ) : (
-              <Avatar size="sm" name={userName} />
-            );
-          })()}
-        </Flex>
-      </Flex>
+      <Header userName={userName} club={club} texto="Estadísticas Avanzadas" />
+      
 
       {/* Tabs */}
       <Tabs
