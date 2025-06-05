@@ -138,9 +138,10 @@ const UsuariosClubAdmin = () => {
     const usuarioAEnviar = {
       nombre: nuevoUsuario.nombre,
       email: nuevoUsuario.email,
-      rol: nuevoUsuario.rol,
-      clubs_id: clubId,
+      rol: nuevoUsuario.rol
     };
+
+    console.log("Enviando usuario:", usuarioAEnviar);
 
     fetch("https://myhandstats.onrender.com/club/crear-por-admin", {
       method: "POST",
@@ -182,24 +183,10 @@ const UsuariosClubAdmin = () => {
   };
 
   const editarUsuario = () => {
-    if (nuevoUsuario.contraseña && nuevoUsuario.contraseña !== nuevoUsuario.confirmarContraseña) {
-      toast({
-        title: "Las contraseñas no coinciden.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
+    // Solo permite cambiar el rol
     const usuarioEditado = {
-      nombre: nuevoUsuario.nombre,
-      email: nuevoUsuario.email,
       rol: nuevoUsuario.rol,
-      ...(nuevoUsuario.contraseña && { password: nuevoUsuario.contraseña }),
     };
-
-    console.log("Usuario editado:", usuarioEditado);
 
     fetch(`https://myhandstats.onrender.com/club/usuario/${usuarioSeleccionado.id}`, {
       method: "PUT",
@@ -215,7 +202,7 @@ const UsuariosClubAdmin = () => {
       })
       .then(() => {
         toast({
-          title: "Usuario actualizado exitosamente",
+          title: "Rol actualizado exitosamente",
           status: "success",
           duration: 3000,
           isClosable: true,
@@ -224,8 +211,6 @@ const UsuariosClubAdmin = () => {
         setNuevoUsuario({
           nombre: "",
           email: "",
-          contraseña: "",
-          confirmarContraseña: "",
           rol: "",
         });
         setModoEdicion(false);
@@ -250,8 +235,6 @@ const UsuariosClubAdmin = () => {
     setNuevoUsuario({
       nombre: usuario.nombre,
       email: usuario.email,
-      contraseña: "",
-      confirmarContraseña: "",
       rol: usuario.rol,
     });
     setIsModalOpen(true);
@@ -433,21 +416,23 @@ const UsuariosClubAdmin = () => {
             <ModalCloseButton />
             <ModalBody>
               <VStack spacing={4}>
-                <FormControl>
+                <FormControl isDisabled={modoEdicion}>
                   <Input
                     name="nombre"
                     placeholder="Nombre del usuario"
                     value={nuevoUsuario.nombre}
                     onChange={handleInputChange}
+                    isReadOnly={modoEdicion}
                   />
                 </FormControl>
-                <FormControl>
+                <FormControl isDisabled={modoEdicion}>
                   <Input
                     name="email"
                     type="email"
                     placeholder="Email"
                     value={nuevoUsuario.email}
                     onChange={handleInputChange}
+                    isReadOnly={modoEdicion}
                   />
                 </FormControl>
                 <FormControl>
