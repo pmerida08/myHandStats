@@ -386,7 +386,6 @@ const StatsAvanzadas = () => {
     <Box bg="white" minH="100vh" p={{ base: 1, md: 6 }}>
       {/* Header */}
       <Header userName={userName} club={club} texto="Estadísticas Avanzadas" />
-      
 
       {/* Tabs */}
       <Tabs
