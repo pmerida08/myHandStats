@@ -17,7 +17,7 @@ import EditarPerfil  from "./views/Perfil.jsx";
 import StatsJugador from "./views/StatsJugador.jsx";
 import GestionClubEntrenadores from "./views/GestionClubEntrenadores.jsx";
 import NotFound from "./views/NotFound.jsx";
-import CrearUsuarioFrom from "./views/CrearUsuarioFrom.jsx";
+import CrearUsuarioForm from "./views/CrearUsuarioForm.jsx";
 
 import './index.css';
 import StatsAvanzadas from "./views/StatsAvanzadas.jsx";
@@ -43,7 +43,7 @@ function App() {
         <Route path="/club/info" element={<GestionInfoClub />} />
         <Route path="/perfil" element={<EditarPerfil />} />
         <Route path="/club/entrenadores" element={<GestionClubEntrenadores />} />
-        <Route path="/establecer-contraseña" element={<CrearUsuarioFrom />}/>
+        <Route path="/establecer-contraseña" element={<CrearUsuarioForm />}/>
         
         {/* Catch-all route for 404 Not Found */}
         <Route path="*" element={<NotFound />} />
