@@ -7,3 +7,4 @@ google-auth
 requests
 google-auth
 python-jose
+jose
