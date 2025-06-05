@@ -96,6 +96,19 @@ const Partidos = () => {
   return (
     <AuthWrapper requiredRole={null}>
       <Box p={4} minH="100vh" bg="white" position="relative">
+{/*         <Image
+          src="/myHandstatsLogo.png"
+          alt="Logo MyHandStats"
+          position="fixed"
+          left="50%"
+          top="50%"
+          transform="translate(-50%, -50%)"
+          opacity={0.1}
+          zIndex={0}
+          boxSize={["250px", "350px", "450px"]}
+          pointerEvents="none"
+          userSelect="none"
+        /> */}
         <Image
           src="/myHandstatsLogo.png"
           alt="Logo MyHandStats"
