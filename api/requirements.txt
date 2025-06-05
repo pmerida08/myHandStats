@@ -6,4 +6,4 @@ supabase
 google-auth
 requests
 google-auth
-jose
+python-jose
