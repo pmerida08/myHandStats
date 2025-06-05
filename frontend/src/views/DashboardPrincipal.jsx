@@ -15,7 +15,7 @@ import {
   Image,
 } from "@chakra-ui/react";
 import { FaBars, FaArrowUp, FaArrowDown } from "react-icons/fa";
-import Sidebar from "../components/Sidebar";
+
 import { Doughnut, Bar } from "react-chartjs-2";
 import {
   Chart,
