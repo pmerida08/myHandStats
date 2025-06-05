@@ -1,12 +1,20 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.services.auth import obtener_info_desde_token
 from typing import List
-from app.models.usuario import UsuarioOut, UsuarioCreate, UsuarioUpdate
+from app.models.usuario import UsuarioOut, UsuarioCreate, UsuarioUpdate, CrearUsuarioAdminDTO
 from app.models.equipo import EquipoOut, EquipoCreate
 from app.models.entrenador import EntrenadorOut, EntrenadorCreate
 from app.utils.hashing import hash_password
 from app.models.club import ClubUpdate, ClubOut
 from app.supabase_client import supabase
+from app.utils.email import enviar_correo_establecer_contraseña
+from jose import jwt
+from datetime import datetime, timedelta, timezone
+import secrets
+import string
+
+SECRET_KEY = "supersecretkey"
+ALGORITHM = "HS256"
 
 router = APIRouter()
 
@@ -154,46 +162,76 @@ def registrar_nuevo_usuario_club(usuario: UsuarioCreate, datos_token: dict = Dep
     return nuevo_usuario
 
 
-# @router.post("/entrenador/register", response_model=EntrenadorOut)
-# def registrar_nuevo_entrenador_club(entrenador: EntrenadorCreate, datos_token: dict = Depends(obtener_info_desde_token)):
-#     if datos_token["rol"] != "admin":
-#         raise HTTPException(status_code=403, detail="Solo administradores pueden registrar nuevos entrenadores")
 
-#     data = entrenador.dict()
-#     # No poner clubs_id en esta tabla, quitar esta línea
-#     # data["clubs_id"] = datos_token["clubs_id"]
+@router.post("/crear-por-admin")
+def crear_usuario_por_admin(dto: CrearUsuarioAdminDTO, datos_token: dict = Depends(obtener_info_desde_token)):
+    # Solo los administradores pueden crear usuarios
+    if datos_token["rol"] != "admin":
+        raise HTTPException(status_code=403, detail="Solo los administradores pueden crear usuarios")
 
-#     response = supabase.table("entrenadores").insert(data).execute()
-#     if getattr(response, "error", None):
-#         raise HTTPException(status_code=400, detail=f"Error al crear el entrenador: {response.error.message}")
+    # Verificar que el email no esté registrado
+    existe = supabase.table("usuarios").select("id").eq("email", dto.email).execute()
+    if existe.data and len(existe.data) > 0:
+        raise HTTPException(status_code=400, detail="El email ya está registrado")
 
-#     nuevo_entrenador = response.data[0]
+    # Asigna una contraseña temporal (por ejemplo, una cadena aleatoria o vacía hasheada)
+    longitud = 12
+    caracteres = string.ascii_letters + string.digits
+    contraseña_aleatoria = ''.join(secrets.choice(caracteres) for _ in range(longitud))
+    password_temporal = hash_password(contraseña_aleatoria)
 
-#     # Guardar relación en club_entrenador
-#     relacion = {
-#         "club_id": datos_token["clubs_id"],
-#         "entrenador_id": nuevo_entrenador["id"]
-#     }
-#     rel_response = supabase.table("club_entrenador").insert(relacion).execute()
-#     if getattr(rel_response, "error", None):
-#         raise HTTPException(status_code=400, detail=f"Error al guardar la relación club-entrenador: {rel_response.error.message}")
+    data = {
+        "nombre": dto.nombre,
+        "email": dto.email,
+        "rol": dto.rol,
+        "clubs_id": datos_token["clubs_id"],
+        "password": password_temporal
+    }
+    response = supabase.table("usuarios").insert(data).execute()
+    if getattr(response, "error", None):
+        raise HTTPException(status_code=400, detail=f"Error al crear el usuario: {response.error.message}")
 
-#     return nuevo_entrenador
+    nuevo_usuario = response.data[0]
+
+    # Si el rol es entrenador, crea la relación en entrenadores y club_entrenador
+    if dto.rol == "entrenador":
+        entrenador_data = {
+            "nombre": nuevo_usuario["nombre"],
+            "email": nuevo_usuario["email"],
+            "usuario_id": nuevo_usuario["id"],
+        }
+        entrenador_response = supabase.table("entrenadores").insert(entrenador_data).execute()
+        if getattr(entrenador_response, "error", None):
+            raise HTTPException(status_code=400, detail=f"Error al crear el entrenador: {entrenador_response.error.message}")
+
+        relacion = {
+            "club_id": datos_token["clubs_id"],
+            "entrenador_id": entrenador_response.data[0]["id"]
+        }
+        rel_response = supabase.table("club_entrenador").insert(relacion).execute()
+        if getattr(rel_response, "error", None):
+            raise HTTPException(status_code=400, detail=f"Error al guardar la relación club-entrenador: {rel_response.error.message}")
+
+    # --- GENERAR TOKEN Y ENVIAR CORREO ---
+    # El token expira en 1 hora
+    ahora = datetime.now(timezone.utc)
+    expiracion = ahora + timedelta(hours=1)
+    token_data = {
+        "sub": str(nuevo_usuario["id"]),
+        "tipo": "establecer_contrasena",
+        "exp": int(expiracion.timestamp())
+    }
+    token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+    enviar_correo_establecer_contraseña(nuevo_usuario["email"], token)
+
+    print("UTC ahora:", ahora)
+    print("exp del token:", expiracion)
+    print("Timestamp ahora:", int(ahora.timestamp()))
+    print("Timestamp expiración:", int(expiracion.timestamp()))
 
 
+    return {"mensaje": "Usuario creado correctamente"}
 
-
-# @router.delete("/{club_id}")
-# def eliminar_club(club_id: int):
-#     response = supabase.table("clubes").delete().eq("id", club_id).execute()
-
-#     if getattr(response, "error", None):
-#         raise HTTPException(status_code=400, detail=f"Error al eliminar el club: {response.error.message}")
-
-#     if response.data == 0:
-#         raise HTTPException(status_code=404, detail="Club no encontrado")
-
-#     return {"message": "Club eliminado correctamente"}
 
 
 @router.put("/")
@@ -226,6 +264,7 @@ def actualizar_equipo(equipo_id: int, equipo_data: EquipoCreate, datos_token: di
 
     return response.data[0]
 
+
 @router.put("/usuario/{usuario_id}")
 def actualizar_usuario(usuario_id: int, usuario_data: UsuarioUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
     # Solo los administradores pueden actualizar el usuario
@@ -241,6 +280,7 @@ def actualizar_usuario(usuario_id: int, usuario_data: UsuarioUpdate, datos_token
     data = usuario_data.dict(exclude_unset=True)
     if "password" in data and data["password"]:
         from app.utils.hashing import hash_password
+
         data["password"] = hash_password(data["password"])
     response = supabase.table("usuarios").update(data).eq("id", usuario_id).execute()
 

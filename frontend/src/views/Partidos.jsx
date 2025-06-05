@@ -15,7 +15,7 @@ import { FaBars } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import { useNavigate } from "react-router-dom";
 import AuthWrapper from "../components/AuthWrapper";
-import Header from "../components/Header"; // <-- Añade el import
+import Header from "../components/Header";
 
 const Partidos = () => {
   const [partidos, setPartidos] = useState([]);
