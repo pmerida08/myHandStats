@@ -271,18 +271,26 @@ def actualizar_usuario(usuario_id: int, usuario_data: UsuarioUpdate, datos_token
     if datos_token["rol"] != "admin":
         raise HTTPException(status_code=403, detail="Solo los administradores pueden actualizar el usuario")
     
-    # Comprobar si el usuario pertenece al club
-    usuario = supabase.table("usuarios").select("*").eq("id", usuario_id).eq("clubs_id", datos_token["clubs_id"]).execute()
-    if not usuario.data or len(usuario.data) == 0:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado o no pertenece al club")
-
-    # Actualizar el usuario con el id_club del token
     data = usuario_data.dict(exclude_unset=True)
-    if "password" in data and data["password"]:
-        from app.utils.hashing import hash_password
-
-        data["password"] = hash_password(data["password"])
     response = supabase.table("usuarios").update(data).eq("id", usuario_id).execute()
+
+    # Obtener el usuario actualizado para comparar el rol anterior y el nuevo
+    usuario_actual = supabase.table("usuarios").select("rol").eq("id", usuario_id).execute()
+    if not usuario_actual.data:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    rol_actual = usuario_actual.data[0]["rol"]
+    rol_nuevo = usuario_data.rol if "rol" in usuario_data.dict(exclude_unset=True) else rol_actual
+
+    # Si el rol cambia de "entrenador" a otro, eliminar de entrenadores y club_entrenador
+    if rol_actual == "entrenador" and rol_nuevo != "entrenador":
+        # Buscar el entrenador relacionado
+        entrenador = supabase.table("entrenadores").select("id").eq("usuario_id", usuario_id).execute()
+        if entrenador.data:
+            entrenador_id = entrenador.data[0]["id"]
+            # Eliminar relación en club_entrenador
+            supabase.table("club_entrenador").delete().eq("entrenador_id", entrenador_id).execute()
+            # Eliminar de entrenadores
+            supabase.table("entrenadores").delete().eq("id", entrenador_id).execute()
 
     if not response.data:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
