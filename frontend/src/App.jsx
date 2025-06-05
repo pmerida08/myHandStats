@@ -43,7 +43,7 @@ function App() {
         <Route path="/club/info" element={<GestionInfoClub />} />
         <Route path="/perfil" element={<EditarPerfil />} />
         <Route path="/club/entrenadores" element={<GestionClubEntrenadores />} />
-        <Route path="/establecer-contraseña" element={<CrearUsuarioForm />}/>
+        <Route path="/establecer-contraseña" element={<CrearUsuarioFrom />}/>
         
         {/* Catch-all route for 404 Not Found */}
         <Route path="*" element={<NotFound />} />
