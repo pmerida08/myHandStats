@@ -167,23 +167,6 @@ const StatsAvanzadas = () => {
 
   // Cuarto useEffect: solo cuando hay jugadorSeleccionado
   // https://myhandstats.onrender.com/equipo/27/jugador/7/partidos/
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const jugadorId = localStorage.getItem("jugador_seleccionado");
-    if (!jugadorId) return;
-    const equipoId = localStorage.getItem("id_equipo");
-    fetch(
-      `https://myhandstats.onrender.com/equipo/${equipoId}/jugador/${jugadorId}/partidos/`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => {})
-      .catch(() => {
-        // Maneja el error
-      });
-  }, [jugadorSeleccionado]);
 
   // Ajuste de padding para móvil
   const boxPadding = useBreakpointValue({ base: 2, md: 6 });
