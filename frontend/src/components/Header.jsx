@@ -11,6 +11,7 @@ const Header = ({ texto, club }) => {
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
+<<<<<<< HEAD
   return (
     <>
       <Flex align="center" justify="space-between" mb={8}>
@@ -46,6 +47,41 @@ const Header = ({ texto, club }) => {
       <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} />
     </>
   );
+=======
+    return (
+        <>
+            <Flex align="center" justify="space-between" mb={8}>
+                <Flex align="center" gap={3}>
+                    {/* Logo de la aplicación al lado del icono de hamburguesa */}
+                </Flex>
+                <Flex align="center" gap={3} position="absolute" left="50%" transform="translateX(-50%)">
+                    <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
+                        {texto}
+                    </Text>
+                    <Avatar
+                        name={club.nombre}
+                        src={club.logo}
+                        mt={-2}
+                        boxSize="50px"
+                        marginTop={0.5}
+                        style={{ filter: "drop-shadow(0 10px 10px rgba(0, 0, 0, 0.25))" }}
+                    />
+                </Flex>
+                <Flex align="center" gap={2}>
+                    <Text fontSize="m" fontWeight="medium" color="#014C4C">
+                        {userName}
+                    </Text>
+                    {foto ? (
+                        <Avatar size="sm" src={foto} name={userName} /> // <-- tamaño igual que el logo
+                    ) : (
+                        <Avatar size="sm" name={userName} /> // <-- tamaño igual que el logo
+                    )}
+                </Flex>
+            </Flex>
+            <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} />
+        </>
+    );
+>>>>>>> a46fdb657a899407f348b763f67619640a713615
 };
 
 export default Header;
