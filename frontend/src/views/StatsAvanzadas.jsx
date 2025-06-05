@@ -779,7 +779,11 @@ const StatsAvanzadas = () => {
                     </Td>
                     <Td>
                       {(() => {
-                        // Suma todos los lanzamientos menos los de 7m
+                        // Paradas de 7m
+                        const paradas7m =
+                          (row.lanzamiento_7m || 0) - (row.goles7m || 0);
+
+                        // Paradas totales (excluyendo 7m)
                         const lanzamientos =
                           (row.lanzamiento_c || 0) +
                           (row.lanzamiento_pi || 0) +
@@ -788,7 +792,6 @@ const StatsAvanzadas = () => {
                           (row.lanzamiento_ld || 0) +
                           (row.lanzamiento_li || 0);
 
-                        // Suma todos los goles menos los de 7m
                         const goles =
                           (row.goles_c || 0) +
                           (row.goles_pi || 0) +
@@ -800,8 +803,8 @@ const StatsAvanzadas = () => {
                         // Paradas = lanzamientos - goles
                         const paradas = lanzamientos - goles;
 
-                        // Evita mostrar NaN
-                        return `${paradas} / ${lanzamientos}`;
+                        // Muestra paradas de 7m y totales
+                        return `${paradas7m} / ${paradas}`;
                       })()}
                     </Td>
                   </Tr>
@@ -1297,8 +1300,24 @@ const StatsAvanzadas = () => {
                       <Tbody>
                         <Tr>
                           <Td>{jugador.recuperaciones || 0}</Td>
-                          <Td>{jugador.paradas || 0}</Td>
-                          <Td>{jugador.paradas7m || 0}</Td>
+                          <Td>
+                            {(jugador.lanzamiento_c || 0) +
+                              (jugador.lanzamiento_pi || 0) +
+                              (jugador.lanzamiento_ed || 0) +
+                              (jugador.lanzamiento_ei || 0) +
+                              (jugador.lanzamiento_ld || 0) +
+                              (jugador.lanzamiento_li || 0) -
+                              ((jugador.goles_c || 0) +
+                                (jugador.goles_pi || 0) +
+                                (jugador.golesed || 0) +
+                                (jugador.golesei || 0) +
+                                (jugador.golesld || 0) +
+                                (jugador.golesli || 0))}
+                          </Td>
+                          <Td>
+                            {(jugador.lanzamiento_7m || 0) -
+                              (jugador.goles7m || 0)}
+                          </Td>
                           <Td>{jugador.faltas || 0}</Td>
                           <Td>{jugador.tarjetas_amarillas || 0}</Td>
                           <Td>{jugador.tarjetas_rojas || 0}</Td>
