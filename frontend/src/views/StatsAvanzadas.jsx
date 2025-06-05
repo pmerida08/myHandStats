@@ -25,7 +25,6 @@ import {
   AccordionIcon,
   Divider,
 } from "@chakra-ui/react";
-import { FaBars } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 
 function getClubIdFromToken(token) {
@@ -387,11 +386,9 @@ const StatsAvanzadas = () => {
   return (
     <Box bg="white" minH="100vh" p={{ base: 1, md: 6 }}>
       {/* Header */}
-      <Sidebar isOpen={isOpen} onClose={onClose} />
 
       <Flex align="center" justify="space-between" mb={8}>
         <Flex align="center" gap={3}>
-          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
           {/* Logo de la aplicación al lado del icono de hamburguesa */}
           <Image
             src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/sign/imagenes/logo.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5XzUwNmYzZWZkLTg5ZDktNGI0YS1hZjMwLTdjYzQyY2Q0MjcyMCJ9.eyJ1cmwiOiJpbWFnZW5lcy9sb2dvLnBuZyIsImlhdCI6MTc0ODQxODA1OCwiZXhwIjoyMzc5MTM4MDU4fQ.P1k167Q5lOLNPH_COkQdv8FCca2cSVSmwnrE1PXUPPk"
