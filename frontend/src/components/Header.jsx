@@ -26,12 +26,6 @@ const Header = ({ texto, club, userName }) => {
         <>
             <Flex align="center" justify="space-between" mb={8}>
                 <Flex align="center" gap={3}>
-                    <Icon
-                        as={FaBars}
-                        boxSize={6}
-                        onClick={handleSidebarOpen}
-                        cursor="pointer"
-                    />
                     {/* Logo de la aplicación al lado del icono de hamburguesa */}
                 </Flex>
                 <Flex align="center" gap={3} position="absolute" left="50%" transform="translateX(-50%)">
