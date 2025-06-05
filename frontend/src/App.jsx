@@ -17,7 +17,7 @@ import EditarPerfil  from "./views/Perfil.jsx";
 import StatsJugador from "./views/StatsJugador.jsx";
 import GestionClubEntrenadores from "./views/GestionClubEntrenadores.jsx";
 import NotFound from "./views/NotFound.jsx";
-import CrearUsuarioForm from "./views/CrearUsuarioFrom.jsx";
+import CrearUsuarioForm from "./views/CrearUsuarioForm.jsx";
 
 import './index.css';
 import StatsAvanzadas from "./views/StatsAvanzadas.jsx";
