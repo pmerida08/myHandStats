@@ -781,7 +781,14 @@ const StatsAvanzadas = () => {
                       {row.goles7m} / {row.lanzamiento_7m}
                     </Td>
                     <Td>
-                      {row.paradas7m} / {row.paradas}{" "}
+                      {row.lanzamiento_7m - row.goles7m} /{" "}
+                      {row.lanzamiento_c -
+                        row.goles_c +
+                        (row.lanzamiento_pi - row.goles_pi) +
+                        (row.lanzamiento_ed - row.golesed) +
+                        (row.lanzamiento_ei - row.golesei) +
+                        (row.lanzamiento_ld - row.golesld) +
+                        (row.lanzamiento_li - row.golesli)}
                     </Td>
                   </Tr>
                 ))}
