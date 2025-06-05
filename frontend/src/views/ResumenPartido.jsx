@@ -11,6 +11,7 @@ import {
   FaUndo,
   FaHandPaper,
   FaSquare,
+  FaRegQuestionCircle
 } from "react-icons/fa";
 import {
   Box,
@@ -32,6 +33,7 @@ import {
   HStack,
   VStack,
   Divider,
+
 } from "@chakra-ui/react";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
