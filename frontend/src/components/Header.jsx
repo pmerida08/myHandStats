@@ -10,20 +10,13 @@ const Header = ({ texto, club }) => {
     // Estado para controlar la apertura del Sidebar
     const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-    const handleSidebarOpen = () => setSidebarOpen(true);
     const handleSidebarClose = () => setSidebarOpen(false);
 
     return (
         <>
             <Flex align="center" justify="space-between" mb={8}>
                 <Flex align="center" gap={3}>
-                    <Icon
-                        as={FaBars}
-                        boxSize={6}
-                        onClick={handleSidebarOpen}
-                        cursor="pointer"
-                    />
-                    {/* Logo de la aplicación al lado del icono de hamburguesa */}
+                    
                 </Flex>
                 <Flex align="center" gap={3} position="absolute" left="50%" transform="translateX(-50%)">
                     <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
