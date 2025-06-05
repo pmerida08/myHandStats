@@ -12,7 +12,6 @@ import {
   Image
 } from "@chakra-ui/react";
 import { FaBars } from "react-icons/fa";
-import Sidebar from "../components/Sidebar";
 import { useNavigate } from "react-router-dom";
 import AuthWrapper from "../components/AuthWrapper";
 import Header from "../components/Header";
@@ -128,7 +127,6 @@ const Partidos = () => {
           club={club}
           texto="Partidos"
         />
-        <Sidebar isOpen={isOpen} onClose={onClose} />
 
         {/* Elimina el Flex con el título si lo tienes duplicado */}
         {/* 
