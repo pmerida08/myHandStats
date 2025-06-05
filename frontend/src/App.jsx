@@ -24,6 +24,7 @@ import EditarPerfil  from "./views/Perfil.jsx";
 import StatsJugador from "./views/StatsJugador.jsx";
 import GestionClubEntrenadores from "./views/GestionClubEntrenadores.jsx";
 import NotFound from "./views/NotFound.jsx";
+import StatsAvanzadas from "./views/StatsAvanzadas.jsx";
 
 function App() {
   return (
