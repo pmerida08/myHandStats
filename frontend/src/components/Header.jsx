@@ -3,18 +3,9 @@ import { Flex, Icon, Text, Avatar } from "@chakra-ui/react";
 import { FaBars } from "react-icons/fa";
 import Sidebar from "./Sidebar";
 
-const Header = ({ texto, club, userName }) => {
+const Header = ({ texto, club }) => {
     // Obtener foto del usuario desde el token
-    let foto = "";
-    const token = localStorage.getItem("token");
-    if (token) {
-        try {
-            const payload = JSON.parse(atob(token.split(".")[1]));
-            foto = payload.foto || "";
-        } catch {
-            foto = "";
-        }
-    }
+
 
     // Estado para controlar la apertura del Sidebar
     const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -38,7 +29,10 @@ const Header = ({ texto, club, userName }) => {
                     <Text fontSize="2xl" fontWeight="bold" color="#014C4C" mb={0}>
                         {texto}
                     </Text>
-                    <Avatar
+
+                </Flex>
+                <Flex align="center" gap={2}>
+                                      <Avatar
                         name={club.nombre}
                         src={club.logo}
                         mt={-2}
@@ -46,16 +40,6 @@ const Header = ({ texto, club, userName }) => {
                         marginTop={0.5}
                         style={{ filter: "drop-shadow(0 10px 10px rgba(0, 0, 0, 0.25))" }}
                     />
-                </Flex>
-                <Flex align="center" gap={2}>
-                    <Text fontSize="m" fontWeight="medium" color="#014C4C">
-                        {userName}
-                    </Text>
-                    {foto ? (
-                        <Avatar size="sm" src={foto} name={userName} /> // <-- tamaño igual que el logo
-                    ) : (
-                        <Avatar size="sm" name={userName} /> // <-- tamaño igual que el logo
-                    )}
                 </Flex>
             </Flex>
             <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} />
