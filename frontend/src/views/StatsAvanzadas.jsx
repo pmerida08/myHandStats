@@ -18,6 +18,12 @@ import {
   Avatar,
   Spinner,
   Image,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
+  Divider,
 } from "@chakra-ui/react";
 import { FaBars } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
@@ -46,6 +52,8 @@ const StatsAvanzadas = () => {
   const [partidoSeleccionado, setPartidoSeleccionado] = useState(null);
   const [statsPartidoSeleccionado, setStatsPartidoSeleccionado] =
     useState(null);
+
+  const [jugadorSeleccionado, setJugadorSeleccionado] = useState(null);
 
   // Estado para saber qué tab está activo
   const [tabIndex, setTabIndex] = useState(0);
@@ -140,6 +148,42 @@ const StatsAvanzadas = () => {
       })
       .catch(() => setStatsPartidoSeleccionado(null));
   }, [partidoSeleccionado]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const equipoId = localStorage.getItem("id_equipo");
+
+    fetch(`https://myhandstats.onrender.com/equipo/${equipoId}/jugadores/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setJugadores(data);
+      })
+      .catch((error) => {
+        console.error("Error al cargar los jugadores:", error);
+      });
+  }, [equipo]);
+
+  // Cuarto useEffect: solo cuando hay jugadorSeleccionado
+  // https://myhandstats.onrender.com/equipo/27/jugador/7/partidos/
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const jugadorId = localStorage.getItem("jugador_seleccionado");
+    if (!jugadorId) return;
+    const equipoId = localStorage.getItem("id_equipo");
+    fetch(
+      `https://myhandstats.onrender.com/equipo/${equipoId}/jugador/${jugadorId}/partidos/`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {})
+      .catch(() => {
+        // Maneja el error
+      });
+  }, [jugadorSeleccionado]);
 
   // Ajuste de padding para móvil
   const boxPadding = useBreakpointValue({ base: 2, md: 6 });
@@ -461,30 +505,6 @@ const StatsAvanzadas = () => {
             px={{ base: 2, md: 4 }}
           >
             Por Jugador
-          </Tab>
-          <Tab
-            _selected={{
-              color: "#014C4C",
-              borderBottom: "2px solid #014C4C",
-              fontWeight: "bold",
-              bg: "gray.50",
-            }}
-            fontSize={{ base: "sm", md: "md" }}
-            px={{ base: 2, md: 4 }}
-          >
-            Jugadores
-          </Tab>
-          <Tab
-            _selected={{
-              color: "#014C4C",
-              borderBottom: "2px solid #014C4C",
-              fontWeight: "bold",
-              bg: "gray.50",
-            }}
-            fontSize={{ base: "sm", md: "md" }}
-            px={{ base: 2, md: 4 }}
-          >
-            Tiros
           </Tab>
         </TabList>
       </Tabs>
@@ -821,7 +841,9 @@ const StatsAvanzadas = () => {
                 }
                 return (
                   <option key={partido.id} value={partido.id}>
-                    {`Rival: ${partido.equiporival_id || ""} - ${fechaFormateada}`}
+                    {`Rival: ${
+                      partido.equiporival_id || ""
+                    } - ${fechaFormateada}`}
                   </option>
                 );
               })}
@@ -831,339 +853,345 @@ const StatsAvanzadas = () => {
           {/* Totales de estadísticas del partido */}
           {partidoSeleccionado && (
             <Box mb={4}>
-              {Array.isArray(statsPartidoSeleccionado) && statsPartidoSeleccionado.length > 0 ? (() => {
-                // Agrupa y suma los datos por categorías
-                const sum = (campo) =>
-                  statsPartidoSeleccionado.reduce(
-                    (acc, jugador) => acc + (Number(jugador[campo]) || 0),
+              {Array.isArray(statsPartidoSeleccionado) &&
+              statsPartidoSeleccionado.length > 0 ? (
+                (() => {
+                  // Agrupa y suma los datos por categorías
+                  const sum = (campo) =>
+                    statsPartidoSeleccionado.reduce(
+                      (acc, jugador) => acc + (Number(jugador[campo]) || 0),
+                      0
+                    );
+
+                  // Ofensiva
+                  const lanzamientos = [
+                    sum("lanzamiento_7m"),
+                    sum("lanzamiento_ed"),
+                    sum("lanzamiento_ei"),
+                    sum("lanzamiento_ld"),
+                    sum("lanzamiento_li"),
+                    sum("lanzamiento_c"),
+                    sum("lanzamiento_pi"),
+                    sum("lanzamiento_ext_li"),
+                    sum("lanzamiento_ext_ld"),
+                    sum("lanzamiento_ext_c"),
+                  ];
+                  const totalLanzamientos = lanzamientos.reduce(
+                    (a, b) => a + b,
                     0
                   );
 
-                // Ofensiva
-                const lanzamientos = [
-                  sum("lanzamiento_7m"),
-                  sum("lanzamiento_ed"),
-                  sum("lanzamiento_ei"),
-                  sum("lanzamiento_ld"),
-                  sum("lanzamiento_li"),
-                  sum("lanzamiento_c"),
-                  sum("lanzamiento_pi"),
-                  sum("lanzamiento_ext_li"),
-                  sum("lanzamiento_ext_ld"),
-                  sum("lanzamiento_ext_c"),
-                ];
-                const totalLanzamientos = lanzamientos.reduce((a, b) => a + b, 0);
+                  const goles = [
+                    sum("golesli"),
+                    sum("golesld"),
+                    sum("golesei"),
+                    sum("golesed"),
+                    sum("golesc"),
+                    sum("goles7m"),
+                    sum("golespi"),
+                  ];
+                  const totalGoles = goles.reduce((a, b) => a + b, 0);
 
-                const goles = [
-                  sum("golesli"),
-                  sum("golesld"),
-                  sum("golesei"),
-                  sum("golesed"),
-                  sum("golesc"),
-                  sum("goles7m"),
-                  sum("golespi"),
-                ];
-                const totalGoles = goles.reduce((a, b) => a + b, 0);
+                  // Defensiva - Pérdidas
+                  const perdidas = [
+                    sum("fallo_pase"),
+                    sum("fallo_recepcion"),
+                    sum("pasos"),
+                    sum("falta_en_ataque"),
+                    sum("dobles"),
+                    sum("invasion_area"),
+                  ];
 
-                // Defensiva - Pérdidas
-                const perdidas = [
-                  sum("fallo_pase"),
-                  sum("fallo_recepcion"),
-                  sum("pasos"),
-                  sum("falta_en_ataque"),
-                  sum("dobles"),
-                  sum("invasion_area"),
-                ];
+                  // Defensiva - Recuperación
+                  const recuperacion = [sum("blocaje"), sum("robo")];
 
-                // Defensiva - Recuperación
-                const recuperacion = [sum("blocaje"), sum("robo")];
+                  // Defensiva - Lanzamientos en Contra
+                  const lanzamientosEnContra = [
+                    sum("lanzamiento_en_contra_ei"),
+                    sum("lanzamiento_en_contra_ed"),
+                    sum("lanzamiento_en_contra_li"),
+                    sum("lanzamiento_en_contra_ld"),
+                    sum("lanzamiento_en_contra_c"),
+                    sum("lanzamiento_en_contra_pi"),
+                    sum("lanzamiento_en_contra_7m"),
+                  ];
 
-                // Defensiva - Lanzamientos en Contra
-                const lanzamientosEnContra = [
-                  sum("lanzamiento_en_contra_ei"),
-                  sum("lanzamiento_en_contra_ed"),
-                  sum("lanzamiento_en_contra_li"),
-                  sum("lanzamiento_en_contra_ld"),
-                  sum("lanzamiento_en_contra_c"),
-                  sum("lanzamiento_en_contra_pi"),
-                  sum("lanzamiento_en_contra_7m"),
-                ];
+                  // Defensiva - Goles en Contra
+                  const golesEnContra = [
+                    sum("gol_en_contra_ei"),
+                    sum("gol_en_contra_ed"),
+                    sum("gol_en_contra_li"),
+                    sum("gol_en_contra_ld"),
+                    sum("gol_en_contra_c"),
+                    sum("gol_en_contra_pi"),
+                    sum("gol_en_contra_7m"),
+                  ];
 
-                // Defensiva - Goles en Contra
-                const golesEnContra = [
-                  sum("gol_en_contra_ei"),
-                  sum("gol_en_contra_ed"),
-                  sum("gol_en_contra_li"),
-                  sum("gol_en_contra_ld"),
-                  sum("gol_en_contra_c"),
-                  sum("gol_en_contra_pi"),
-                  sum("gol_en_contra_7m"),
-                ];
+                  // Amonestaciones
+                  const amonestaciones = [
+                    sum("tarjetas_amarillas"),
+                    sum("tarjetas_azules"),
+                    sum("tarjetas_rojas"),
+                    sum("exclusion_2_min"),
+                  ];
 
-                // Amonestaciones
-                const amonestaciones = [
-                  sum("tarjetas_amarillas"),
-                  sum("tarjetas_azules"),
-                  sum("tarjetas_rojas"),
-                  sum("exclusion_2_min"),
-                ];
-
-                return (
-                  <Box>
-                    {/* Ofensiva - Lanzamientos */}
-                    <Box
-                      border="2px solid #319795"
-                      borderRadius="md"
-                      p={3}
-                      mb={4}
-                      maxW="100%"
-                      textAlign="center"
-                    >
-                      <Text fontWeight="bold" mb={2} color="#014C4C">
-                        Ofensiva - Lanzamientos
-                      </Text>
-                      <Table size="sm" variant="simple">
-                        <Thead>
-                          <Tr>
-                            <Th>Total</Th>
-                            <Th>7M</Th>
-                            <Th>ED</Th>
-                            <Th>EI</Th>
-                            <Th>LD</Th>
-                            <Th>LI</Th>
-                            <Th>C</Th>
-                            <Th>PI</Th>
-                            <Th>Ext LI</Th>
-                            <Th>Ext LD</Th>
-                            <Th>Ext C</Th>
-                          </Tr>
-                        </Thead>
-                        <Tbody>
-                          <Tr>
-                            <Td>{totalLanzamientos}</Td>
-                            <Td>{lanzamientos[0]}</Td>
-                            <Td>{lanzamientos[1]}</Td>
-                            <Td>{lanzamientos[2]}</Td>
-                            <Td>{lanzamientos[3]}</Td>
-                            <Td>{lanzamientos[4]}</Td>
-                            <Td>{lanzamientos[5]}</Td>
-                            <Td>{lanzamientos[6]}</Td>
-                            <Td>{lanzamientos[7]}</Td>
-                            <Td>{lanzamientos[8]}</Td>
-                            <Td>{lanzamientos[9]}</Td>
-                          </Tr>
-                        </Tbody>
-                      </Table>
+                  return (
+                    <Box>
+                      {/* Ofensiva - Lanzamientos */}
+                      <Box
+                        border="2px solid #319795"
+                        borderRadius="md"
+                        p={3}
+                        mb={4}
+                        maxW="100%"
+                        textAlign="center"
+                      >
+                        <Text fontWeight="bold" mb={2} color="#014C4C">
+                          Ofensiva - Lanzamientos
+                        </Text>
+                        <Table size="sm" variant="simple">
+                          <Thead>
+                            <Tr>
+                              <Th>Total</Th>
+                              <Th>7M</Th>
+                              <Th>ED</Th>
+                              <Th>EI</Th>
+                              <Th>LD</Th>
+                              <Th>LI</Th>
+                              <Th>C</Th>
+                              <Th>PI</Th>
+                              <Th>Ext LI</Th>
+                              <Th>Ext LD</Th>
+                              <Th>Ext C</Th>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            <Tr>
+                              <Td>{totalLanzamientos}</Td>
+                              <Td>{lanzamientos[0]}</Td>
+                              <Td>{lanzamientos[1]}</Td>
+                              <Td>{lanzamientos[2]}</Td>
+                              <Td>{lanzamientos[3]}</Td>
+                              <Td>{lanzamientos[4]}</Td>
+                              <Td>{lanzamientos[5]}</Td>
+                              <Td>{lanzamientos[6]}</Td>
+                              <Td>{lanzamientos[7]}</Td>
+                              <Td>{lanzamientos[8]}</Td>
+                              <Td>{lanzamientos[9]}</Td>
+                            </Tr>
+                          </Tbody>
+                        </Table>
+                      </Box>
+                      {/* Ofensiva - Goles */}
+                      <Box
+                        border="2px solid #319795"
+                        borderRadius="md"
+                        p={3}
+                        mb={4}
+                        maxW="100%"
+                        textAlign="center"
+                      >
+                        <Text fontWeight="bold" mb={2} color="#014C4C">
+                          Ofensiva - Goles
+                        </Text>
+                        <Table size="sm" variant="simple">
+                          <Thead>
+                            <Tr>
+                              <Th>Total</Th>
+                              <Th>LI</Th>
+                              <Th>LD</Th>
+                              <Th>EI</Th>
+                              <Th>ED</Th>
+                              <Th>C</Th>
+                              <Th>7M</Th>
+                              <Th>PI</Th>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            <Tr>
+                              <Td>{totalGoles}</Td>
+                              <Td>{goles[0]}</Td>
+                              <Td>{goles[1]}</Td>
+                              <Td>{goles[2]}</Td>
+                              <Td>{goles[3]}</Td>
+                              <Td>{goles[4]}</Td>
+                              <Td>{goles[5]}</Td>
+                              <Td>{goles[6]}</Td>
+                            </Tr>
+                          </Tbody>
+                        </Table>
+                      </Box>
+                      {/* Defensiva - Pérdidas */}
+                      <Box
+                        border="2px solid #319795"
+                        borderRadius="md"
+                        p={3}
+                        mb={4}
+                        maxW="100%"
+                        textAlign="center"
+                      >
+                        <Text fontWeight="bold" mb={2} color="#014C4C">
+                          Defensiva - Pérdidas
+                        </Text>
+                        <Table size="sm" variant="simple">
+                          <Thead>
+                            <Tr>
+                              <Th>Fallo Pase</Th>
+                              <Th>Fallo Recepción</Th>
+                              <Th>Pasos</Th>
+                              <Th>Falta Ataque</Th>
+                              <Th>Dobles</Th>
+                              <Th>Invasión Área</Th>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            <Tr>
+                              <Td>{perdidas[0]}</Td>
+                              <Td>{perdidas[1]}</Td>
+                              <Td>{perdidas[2]}</Td>
+                              <Td>{perdidas[3]}</Td>
+                              <Td>{perdidas[4]}</Td>
+                              <Td>{perdidas[5]}</Td>
+                            </Tr>
+                          </Tbody>
+                        </Table>
+                      </Box>
+                      {/* Defensiva - Recuperación */}
+                      <Box
+                        border="2px solid #319795"
+                        borderRadius="md"
+                        p={3}
+                        mb={4}
+                        maxW="100%"
+                        textAlign="center"
+                      >
+                        <Text fontWeight="bold" mb={2} color="#014C4C">
+                          Defensiva - Recuperación
+                        </Text>
+                        <Table size="sm" variant="simple">
+                          <Thead>
+                            <Tr>
+                              <Th>Blocaje</Th>
+                              <Th>Robo</Th>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            <Tr>
+                              <Td>{recuperacion[0]}</Td>
+                              <Td>{recuperacion[1]}</Td>
+                            </Tr>
+                          </Tbody>
+                        </Table>
+                      </Box>
+                      {/* Defensiva - Lanzamientos en Contra */}
+                      <Box
+                        border="2px solid #319795"
+                        borderRadius="md"
+                        p={3}
+                        mb={4}
+                        maxW="100%"
+                        textAlign="center"
+                      >
+                        <Text fontWeight="bold" mb={2} color="#014C4C">
+                          Defensiva - Lanzamientos en Contra
+                        </Text>
+                        <Table size="sm" variant="simple">
+                          <Thead>
+                            <Tr>
+                              <Th>EI</Th>
+                              <Th>ED</Th>
+                              <Th>LI</Th>
+                              <Th>LD</Th>
+                              <Th>C</Th>
+                              <Th>PI</Th>
+                              <Th>7M</Th>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            <Tr>
+                              <Td>{lanzamientosEnContra[0]}</Td>
+                              <Td>{lanzamientosEnContra[1]}</Td>
+                              <Td>{lanzamientosEnContra[2]}</Td>
+                              <Td>{lanzamientosEnContra[3]}</Td>
+                              <Td>{lanzamientosEnContra[4]}</Td>
+                              <Td>{lanzamientosEnContra[5]}</Td>
+                              <Td>{lanzamientosEnContra[6]}</Td>
+                            </Tr>
+                          </Tbody>
+                        </Table>
+                      </Box>
+                      {/* Defensiva - Goles en Contra */}
+                      <Box
+                        border="2px solid #319795"
+                        borderRadius="md"
+                        p={3}
+                        mb={4}
+                        maxW="100%"
+                        textAlign="center"
+                      >
+                        <Text fontWeight="bold" mb={2} color="#014C4C">
+                          Defensiva - Goles en Contra
+                        </Text>
+                        <Table size="sm" variant="simple">
+                          <Thead>
+                            <Tr>
+                              <Th>EI</Th>
+                              <Th>ED</Th>
+                              <Th>LI</Th>
+                              <Th>LD</Th>
+                              <Th>C</Th>
+                              <Th>PI</Th>
+                              <Th>7M</Th>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            <Tr>
+                              <Td>{golesEnContra[0]}</Td>
+                              <Td>{golesEnContra[1]}</Td>
+                              <Td>{golesEnContra[2]}</Td>
+                              <Td>{golesEnContra[3]}</Td>
+                              <Td>{golesEnContra[4]}</Td>
+                              <Td>{golesEnContra[5]}</Td>
+                              <Td>{golesEnContra[6]}</Td>
+                            </Tr>
+                          </Tbody>
+                        </Table>
+                      </Box>
+                      {/* Amonestaciones */}
+                      <Box
+                        border="2px solid #319795"
+                        borderRadius="md"
+                        p={3}
+                        mb={4}
+                        maxW="100%"
+                        textAlign="center"
+                      >
+                        <Text fontWeight="bold" mb={2} color="#014C4C">
+                          Amonestaciones
+                        </Text>
+                        <Table size="sm" variant="simple">
+                          <Thead>
+                            <Tr>
+                              <Th>Amarillas</Th>
+                              <Th>Azules</Th>
+                              <Th>Rojas</Th>
+                              <Th>2 Min</Th>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            <Tr>
+                              <Td>{amonestaciones[0]}</Td>
+                              <Td>{amonestaciones[1]}</Td>
+                              <Td>{amonestaciones[2]}</Td>
+                              <Td>{amonestaciones[3]}</Td>
+                            </Tr>
+                          </Tbody>
+                        </Table>
+                      </Box>
                     </Box>
-                    {/* Ofensiva - Goles */}
-                    <Box
-                      border="2px solid #319795"
-                      borderRadius="md"
-                      p={3}
-                      mb={4}
-                      maxW="100%"
-                      textAlign="center"
-                    >
-                      <Text fontWeight="bold" mb={2} color="#014C4C">
-                        Ofensiva - Goles
-                      </Text>
-                      <Table size="sm" variant="simple">
-                        <Thead>
-                          <Tr>
-                            <Th>Total</Th>
-                            <Th>LI</Th>
-                            <Th>LD</Th>
-                            <Th>EI</Th>
-                            <Th>ED</Th>
-                            <Th>C</Th>
-                            <Th>7M</Th>
-                            <Th>PI</Th>
-                          </Tr>
-                        </Thead>
-                        <Tbody>
-                          <Tr>
-                            <Td>{totalGoles}</Td>
-                            <Td>{goles[0]}</Td>
-                            <Td>{goles[1]}</Td>
-                            <Td>{goles[2]}</Td>
-                            <Td>{goles[3]}</Td>
-                            <Td>{goles[4]}</Td>
-                            <Td>{goles[5]}</Td>
-                            <Td>{goles[6]}</Td>
-                          </Tr>
-                        </Tbody>
-                      </Table>
-                    </Box>
-                    {/* Defensiva - Pérdidas */}
-                    <Box
-                      border="2px solid #319795"
-                      borderRadius="md"
-                      p={3}
-                      mb={4}
-                      maxW="100%"
-                      textAlign="center"
-                    >
-                      <Text fontWeight="bold" mb={2} color="#014C4C">
-                        Defensiva - Pérdidas
-                      </Text>
-                      <Table size="sm" variant="simple">
-                        <Thead>
-                          <Tr>
-                            <Th>Fallo Pase</Th>
-                            <Th>Fallo Recepción</Th>
-                            <Th>Pasos</Th>
-                            <Th>Falta Ataque</Th>
-                            <Th>Dobles</Th>
-                            <Th>Invasión Área</Th>
-                          </Tr>
-                        </Thead>
-                        <Tbody>
-                          <Tr>
-                            <Td>{perdidas[0]}</Td>
-                            <Td>{perdidas[1]}</Td>
-                            <Td>{perdidas[2]}</Td>
-                            <Td>{perdidas[3]}</Td>
-                            <Td>{perdidas[4]}</Td>
-                            <Td>{perdidas[5]}</Td>
-                          </Tr>
-                        </Tbody>
-                      </Table>
-                    </Box>
-                    {/* Defensiva - Recuperación */}
-                    <Box
-                      border="2px solid #319795"
-                      borderRadius="md"
-                      p={3}
-                      mb={4}
-                      maxW="100%"
-                      textAlign="center"
-                    >
-                      <Text fontWeight="bold" mb={2} color="#014C4C">
-                        Defensiva - Recuperación
-                      </Text>
-                      <Table size="sm" variant="simple">
-                        <Thead>
-                          <Tr>
-                            <Th>Blocaje</Th>
-                            <Th>Robo</Th>
-                          </Tr>
-                        </Thead>
-                        <Tbody>
-                          <Tr>
-                            <Td>{recuperacion[0]}</Td>
-                            <Td>{recuperacion[1]}</Td>
-                          </Tr>
-                        </Tbody>
-                      </Table>
-                    </Box>
-                    {/* Defensiva - Lanzamientos en Contra */}
-                    <Box
-                      border="2px solid #319795"
-                      borderRadius="md"
-                      p={3}
-                      mb={4}
-                      maxW="100%"
-                      textAlign="center"
-                    >
-                      <Text fontWeight="bold" mb={2} color="#014C4C">
-                        Defensiva - Lanzamientos en Contra
-                      </Text>
-                      <Table size="sm" variant="simple">
-                        <Thead>
-                          <Tr>
-                            <Th>EI</Th>
-                            <Th>ED</Th>
-                            <Th>LI</Th>
-                            <Th>LD</Th>
-                            <Th>C</Th>
-                            <Th>PI</Th>
-                            <Th>7M</Th>
-                          </Tr>
-                        </Thead>
-                        <Tbody>
-                          <Tr>
-                            <Td>{lanzamientosEnContra[0]}</Td>
-                            <Td>{lanzamientosEnContra[1]}</Td>
-                            <Td>{lanzamientosEnContra[2]}</Td>
-                            <Td>{lanzamientosEnContra[3]}</Td>
-                            <Td>{lanzamientosEnContra[4]}</Td>
-                            <Td>{lanzamientosEnContra[5]}</Td>
-                            <Td>{lanzamientosEnContra[6]}</Td>
-                          </Tr>
-                        </Tbody>
-                      </Table>
-                    </Box>
-                    {/* Defensiva - Goles en Contra */}
-                    <Box
-                      border="2px solid #319795"
-                      borderRadius="md"
-                      p={3}
-                      mb={4}
-                      maxW="100%"
-                      textAlign="center"
-                    >
-                      <Text fontWeight="bold" mb={2} color="#014C4C">
-                        Defensiva - Goles en Contra
-                      </Text>
-                      <Table size="sm" variant="simple">
-                        <Thead>
-                          <Tr>
-                            <Th>EI</Th>
-                            <Th>ED</Th>
-                            <Th>LI</Th>
-                            <Th>LD</Th>
-                            <Th>C</Th>
-                            <Th>PI</Th>
-                            <Th>7M</Th>
-                          </Tr>
-                        </Thead>
-                        <Tbody>
-                          <Tr>
-                            <Td>{golesEnContra[0]}</Td>
-                            <Td>{golesEnContra[1]}</Td>
-                            <Td>{golesEnContra[2]}</Td>
-                            <Td>{golesEnContra[3]}</Td>
-                            <Td>{golesEnContra[4]}</Td>
-                            <Td>{golesEnContra[5]}</Td>
-                            <Td>{golesEnContra[6]}</Td>
-                          </Tr>
-                        </Tbody>
-                      </Table>
-                    </Box>
-                    {/* Amonestaciones */}
-                    <Box
-                      border="2px solid #319795"
-                      borderRadius="md"
-                      p={3}
-                      mb={4}
-                      maxW="100%"
-                      textAlign="center"
-                    >
-                      <Text fontWeight="bold" mb={2} color="#014C4C">
-                        Amonestaciones
-                      </Text>
-                      <Table size="sm" variant="simple">
-                        <Thead>
-                          <Tr>
-                            <Th>Amarillas</Th>
-                            <Th>Azules</Th>
-                            <Th>Rojas</Th>
-                            <Th>2 Min</Th>
-                          </Tr>
-                        </Thead>
-                        <Tbody>
-                          <Tr>
-                            <Td>{amonestaciones[0]}</Td>
-                            <Td>{amonestaciones[1]}</Td>
-                            <Td>{amonestaciones[2]}</Td>
-                            <Td>{amonestaciones[3]}</Td>
-                          </Tr>
-                        </Tbody>
-                      </Table>
-                    </Box>
-                  </Box>
-                );
-              })() : (
+                  );
+                })()
+              ) : (
                 <Flex align="center" justify="center" minH="60px">
                   <Text color="gray.500" fontWeight="bold" textAlign="center">
                     No se pudieron encontrar estadísticas del partido
@@ -1176,22 +1204,135 @@ const StatsAvanzadas = () => {
       )}
       {tabIndex === 2 && (
         <Box>
-          {/* Aquí el contenido de Por Jugador */}
-          <Text>Estadísticas por jugador</Text>
-          {/* Aquí se podría mostrar un listado de jugadores */}
-          
-        </Box>
-      )}
-      {tabIndex === 3 && (
-        <Box>
-          {/* Aquí el contenido de Jugadores */}
-          <Text>Listado de jugadores</Text>
-        </Box>
-      )}
-      {tabIndex === 4 && (
-        <Box>
-          {/* Aquí el contenido de Tiros */}
-          <Text>Estadísticas de tiros</Text>
+          <Text fontWeight="bold" mb={4} color="#014C4C">
+            Estadísticas por jugador
+          </Text>
+          <Accordion allowMultiple>
+            {jugadores.map((jugador) => (
+              <AccordionItem
+                key={jugador.id}
+                border="1px solid #31979530"
+                borderRadius="md"
+                mb={4}
+              >
+                <h2>
+                  <AccordionButton _expanded={{ bg: "gray.50" }}>
+                    <Box as="span" flex="1" textAlign="left" fontWeight="bold">
+                      {jugador.nombre}{" "}
+                      <Text
+                        as="span"
+                        color="gray.500"
+                        fontWeight="normal"
+                      >{`#${jugador.dorsal}`}</Text>
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4} bg="white">
+                  {/* Ataque */}
+                  <Box mb={4}>
+                    <Text fontWeight="semibold" mb={2} color="#014C4C">
+                      Ataque
+                    </Text>
+                    <Table size="sm" variant="simple">
+                      <Thead>
+                        <Tr>
+                          <Th>Lanzamientos</Th>
+                          <Th>Goles</Th>
+                          <Th>Pérdidas</Th>
+                          <Th>Faltas</Th>
+                          <Th>A Puerta</Th>
+                          <Th>Goles 7M</Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        <Tr>
+                          <Td>
+                            {(jugador.lanzamiento_7m || 0) +
+                              (jugador.lanzamiento_ed || 0) +
+                              (jugador.lanzamiento_ei || 0) +
+                              (jugador.lanzamiento_ld || 0) +
+                              (jugador.lanzamiento_li || 0) +
+                              (jugador.lanzamiento_c || 0) +
+                              (jugador.lanzamiento_pi || 0) +
+                              (jugador.lanzamiento_ext_li || 0) +
+                              (jugador.lanzamiento_ext_ld || 0) +
+                              (jugador.lanzamiento_ext_c || 0)}
+                          </Td>
+                          <Td>
+                            {(jugador.golesli || 0) +
+                              (jugador.golesld || 0) +
+                              (jugador.golesei || 0) +
+                              (jugador.golesed || 0) +
+                              (jugador.golesc || 0) +
+                              (jugador.goles7m || 0) +
+                              (jugador.golespi || 0)}
+                          </Td>
+                          <Td>{jugador.perdidas || 0}</Td>
+                          <Td>{jugador.faltas || 0}</Td>
+                          <Td>{jugador.lanzamientos || 0}</Td>
+                          <Td>{jugador.goles7m || 0}</Td>
+                        </Tr>
+                      </Tbody>
+                    </Table>
+                  </Box>
+                  {/* Defensa */}
+                  <Box mb={4}>
+                    <Text fontWeight="semibold" mb={2} color="#014C4C">
+                      Defensa
+                    </Text>
+                    <Table size="sm" variant="simple">
+                      <Thead>
+                        <Tr>
+                          <Th>Recuperación</Th>
+                          <Th>Paradas</Th>
+                          <Th>Paradas 7M</Th>
+                          <Th>Faltas</Th>
+                          <Th>Amarillas</Th>
+                          <Th>Rojas</Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        <Tr>
+                          <Td>{jugador.recuperaciones || 0}</Td>
+                          <Td>{jugador.paradas || 0}</Td>
+                          <Td>{jugador.paradas7m || 0}</Td>
+                          <Td>{jugador.faltas || 0}</Td>
+                          <Td>{jugador.tarjetas_amarillas || 0}</Td>
+                          <Td>{jugador.tarjetas_rojas || 0}</Td>
+                        </Tr>
+                      </Tbody>
+                    </Table>
+                  </Box>
+                  {/* Sanciones */}
+                  <Box mb={4}>
+                    <Text fontWeight="semibold" mb={2} color="#014C4C">
+                      Sanciones
+                    </Text>
+                    <Table size="sm" variant="simple">
+                      <Thead>
+                        <Tr>
+                          <Th>2 Minutos</Th>
+                          <Th>Amarillas</Th>
+                          <Th>Rojas</Th>
+                          <Th>Azul</Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        <Tr>
+                          <Td>{jugador.exclusion_2_min || 0}</Td>
+                          <Td>{jugador.tarjetas_amarillas || 0}</Td>
+                          <Td>{jugador.tarjetas_rojas || 0}</Td>
+                          <Td>{jugador.tarjetas_azules || 0}</Td>
+                        </Tr>
+                      </Tbody>
+                    </Table>
+                  </Box>
+                  {/* Puedes añadir aquí más tablas o grids para posiciones de lanzamiento, etc. */}
+                </AccordionPanel>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </Box>
       )}
     </Box>
