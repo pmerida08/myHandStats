@@ -13,7 +13,7 @@ import {
   Th,
   Td,
   useBreakpointValue,
-  useDisclosure,
+  // useDisclosure,
   Icon,
   Avatar,
   Spinner,
@@ -39,7 +39,7 @@ function getClubIdFromToken(token) {
 // Carga todos los datos principales y muestra el spinner mientras loading sea true
 
 const StatsAvanzadas = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  // const { isOpen, onOpen, onClose } = useDisclosure();
   const [userName, setUserName] = useState("");
   const [club, setClub] = useState({ nombre: "", logo: "" });
   const [equipo, setEquipo] = useState({ id: "", nombre: "", logo: "" });
@@ -778,14 +778,31 @@ const StatsAvanzadas = () => {
                       {row.goles7m} / {row.lanzamiento_7m}
                     </Td>
                     <Td>
-                      {row.lanzamiento_7m - row.goles7m} /{" "}
-                      {row.lanzamiento_c -
-                        row.goles_c +
-                        (row.lanzamiento_pi - row.goles_pi) +
-                        (row.lanzamiento_ed - row.golesed) +
-                        (row.lanzamiento_ei - row.golesei) +
-                        (row.lanzamiento_ld - row.golesld) +
-                        (row.lanzamiento_li - row.golesli)}
+                      {(() => {
+                        // Suma todos los lanzamientos menos los de 7m
+                        const lanzamientos =
+                          (row.lanzamiento_c || 0) +
+                          (row.lanzamiento_pi || 0) +
+                          (row.lanzamiento_ed || 0) +
+                          (row.lanzamiento_ei || 0) +
+                          (row.lanzamiento_ld || 0) +
+                          (row.lanzamiento_li || 0);
+
+                        // Suma todos los goles menos los de 7m
+                        const goles =
+                          (row.goles_c || 0) +
+                          (row.goles_pi || 0) +
+                          (row.golesed || 0) +
+                          (row.golesei || 0) +
+                          (row.golesld || 0) +
+                          (row.golesli || 0);
+
+                        // Paradas = lanzamientos - goles
+                        const paradas = lanzamientos - goles;
+
+                        // Evita mostrar NaN
+                        return `${paradas} / ${lanzamientos}`;
+                      })()}
                     </Td>
                   </Tr>
                 ))}
