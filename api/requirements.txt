@@ -6,3 +6,4 @@ supabase
 google-auth
 requests
 google-auth
+jose
