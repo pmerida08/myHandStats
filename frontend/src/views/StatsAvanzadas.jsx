@@ -53,8 +53,6 @@ const StatsAvanzadas = () => {
   const [statsPartidoSeleccionado, setStatsPartidoSeleccionado] =
     useState(null);
 
-  const [jugadorSeleccionado, setJugadorSeleccionado] = useState(null);
-
   // Estado para saber qué tab está activo
   const [tabIndex, setTabIndex] = useState(0);
 
