@@ -170,7 +170,7 @@ const EditarPerfil = () => {
 
   return (
     <AuthWrapper requiredRole={null}>
-      <Box p={6} bg="#f0f4f5" minH="100vh">
+      <Box p={6} bg="#fff" minH="100vh">
         <Header
           onOpen={onOpen}
           userName={userName}
