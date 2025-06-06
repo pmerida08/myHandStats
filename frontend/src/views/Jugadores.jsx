@@ -375,7 +375,7 @@ const Jugadores = () => {
     <AuthWrapper requiredRole={null}>
       <Box p={4} position="relative">
         <Image
-          src="/myHandstatsLogo.png"
+          src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/public/imagenes//logo.avif"
           alt="Logo MyHandStats"
           position="fixed"
           left="50%"

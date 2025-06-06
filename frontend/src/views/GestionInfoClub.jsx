@@ -222,7 +222,7 @@ const ClubInfo = () => {
     <AuthWrapper requiredRole={"admin"}>
       <Box p={6} bg="#f0f4f5" minH="100vh" opacity={0.97} position="relative">
         <Image
-          src="/myHandstatsLogo.png"
+          src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/public/imagenes//logo.avif"
           alt="Logo MyHandStats"
           position="fixed"
           left="50%"
