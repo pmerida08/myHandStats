@@ -235,8 +235,9 @@ def obtener_jugadores_partido_equipo(equipo_id: int, partido_id: int, datos_toke
 
     response = supabase.table("jugadores_partido").select("*").eq("partidos_id", partido_id).execute()
 
+    # CAMBIO: Si no hay jugadores, devuelve lista vacía (200 OK)
     if not response.data or len(response.data) == 0:
-        raise HTTPException(status_code=404, detail="No se encontraron jugadores para este partido")
+        return []
 
     return response.data
 

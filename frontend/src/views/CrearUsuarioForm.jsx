@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -89,7 +89,7 @@ const CambiarContraseñaForm = () => {
       >
         <Center mb={4}>
           <Image
-            src="/myHandstatsLogo.png"
+            src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/public/imagenes//logo.avif"
             alt="Logo MyHandStats"
             boxSize="80px"
             objectFit="contain"

@@ -7,8 +7,6 @@ import {
   useBreakpointValue,
   Spinner,
   useDisclosure,
-  Flex,
-  Icon,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -20,12 +18,11 @@ import {
   Input,
   VStack,
   Center,
-  Heading,
   useToast,
   Image,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { FaPlus, FaBars, FaEdit } from "react-icons/fa";
+import { FaPlus, FaEdit } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 import { useNavigate } from "react-router-dom";

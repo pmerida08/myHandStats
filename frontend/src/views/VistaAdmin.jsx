@@ -1,9 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
-  Box, Button, Flex, Icon, Text, Menu, MenuButton,
-  MenuList, MenuItem, Spinner
-} from '@chakra-ui/react';
-import { FaBars, FaPlus, FaChevronDown } from 'react-icons/fa';
+  Box,
+  Button,
+  Flex,
+  Icon,
+  Text,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Spinner,
+} from "@chakra-ui/react";
+import { FaBars, FaPlus, FaChevronDown } from "react-icons/fa";
 
 const VistaAdmin = () => {
   const [equipos, setEquipos] = useState([]);
@@ -42,7 +50,12 @@ const VistaAdmin = () => {
 
       {/* Menú ordenar por */}
       <Menu>
-        <MenuButton as={Button} variant="ghost" rightIcon={<FaChevronDown />} color="#014C4C">
+        <MenuButton
+          as={Button}
+          variant="ghost"
+          rightIcon={<FaChevronDown />}
+          color="#014C4C"
+        >
           Ordenar por
         </MenuButton>
         <MenuList>
@@ -59,18 +72,24 @@ const VistaAdmin = () => {
           <>
             <Text mb={4}>Aún no tienes equipos</Text>
             <Button
-                bg="#014C4C"
-                color="white"
-                borderRadius="md"
-                size="lg"
-                _hover={{ bg: "#016666" }}
-                >
-                <Icon as={FaPlus} />
-                </Button>
+              bg="#014C4C"
+              color="white"
+              borderRadius="md"
+              size="lg"
+              _hover={{ bg: "#016666" }}
+            >
+              <Icon as={FaPlus} />
+            </Button>
           </>
         ) : (
           equipos.map((equipo, idx) => (
-            <Box key={idx} p={4} border="1px solid #ccc" borderRadius="md" mb={3}>
+            <Box
+              key={idx}
+              p={4}
+              border="1px solid #ccc"
+              borderRadius="md"
+              mb={3}
+            >
               <Text>{equipo.nombre}</Text>
             </Box>
           ))

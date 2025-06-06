@@ -7,7 +7,7 @@ export default function NotFound() {
   return (
     <Box textAlign="center" py={10} px={6}>
       <Image
-        src="/myHandstatsLogo.png"
+        src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/public/imagenes//logo.avif"
         alt="MyHandStats Logo"
         boxSize="100px"
         mx="auto"

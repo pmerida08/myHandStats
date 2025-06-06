@@ -1,14 +1,12 @@
 import {
   Box,
   Text,
-  SimpleGrid,
   IconButton,
   Avatar,
   Button,
   Spinner,
   useDisclosure,
   Flex,
-  Icon,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -24,9 +22,8 @@ import {
   Image,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { FaPlus, FaUser, FaBars, FaUserEdit } from "react-icons/fa";
+import { FaPlus, FaUser, FaUserEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 import { createClient } from "@supabase/supabase-js";
 import Header from "../components/Header";
@@ -378,7 +375,7 @@ const Jugadores = () => {
     <AuthWrapper requiredRole={null}>
       <Box p={4} position="relative">
         <Image
-          src="/myHandstatsLogo.png"
+          src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/public/imagenes//logo.avif"
           alt="Logo MyHandStats"
           position="fixed"
           left="50%"

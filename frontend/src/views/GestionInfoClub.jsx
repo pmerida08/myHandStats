@@ -1,7 +1,6 @@
 import {
   Box,
   Text,
-  Heading,
   VStack,
   HStack,
   Avatar,
@@ -21,11 +20,10 @@ import {
   FormControl,
   Textarea,
   Flex,
-  Icon,
   Image,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { FaBars, FaEdit } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 import { useNavigate } from "react-router-dom";
@@ -224,7 +222,7 @@ const ClubInfo = () => {
     <AuthWrapper requiredRole={"admin"}>
       <Box p={6} bg="#f0f4f5" minH="100vh" opacity={0.97} position="relative">
         <Image
-          src="/myHandstatsLogo.png"
+          src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/public/imagenes//logo.avif"
           alt="Logo MyHandStats"
           position="fixed"
           left="50%"

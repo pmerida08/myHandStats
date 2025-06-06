@@ -5,15 +5,13 @@ import {
   Text,
   Button,
   Stack,
-  Icon,
-  Flex,
   useDisclosure,
   Spinner,
   Center,
   useColorModeValue,
   Image
 } from "@chakra-ui/react";
-import { FaBars, FaUsers, FaUsersCog, FaChalkboardTeacher, FaInfoCircle } from "react-icons/fa";
+import { FaUsers, FaUsersCog, FaChalkboardTeacher, FaInfoCircle } from "react-icons/fa";
 import Sidebar from '../components/Sidebar';
 import AuthWrapper from "../components/AuthWrapper";
 import Header from "../components/Header"; // <-- Añade el import
@@ -99,7 +97,7 @@ const ClubAdminPanel = () => {
     <AuthWrapper requiredRole={null}>
       <Box minH="100vh" bg={bg} p={{ base: 2, md: 8 }} position="relative">
         <Image
-          src="/myHandstatsLogo.png"
+          src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/public/imagenes//logo.avif"
           alt="Logo MyHandStats"
           position="fixed"
           left="50%"
