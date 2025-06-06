@@ -100,3 +100,44 @@ def update_accion_partido(
         raise HTTPException(status_code=404, detail="Accion partido not found")
     
     return response.data[0]
+
+@router.delete("/{id}")
+def delete_accion_partido( id: int, datos_token: dict = Depends(obtener_info_desde_token)):
+    # Obtener la acción de partido para verificar permisos
+    accion = supabase.table("acciones_partido").select("jugadores_partido_id").eq("id", id).execute()
+    if getattr(accion, "error", None):
+        raise HTTPException(status_code=500, detail="Error fetching data from Supabase")
+    if not accion.data:
+        raise HTTPException(status_code=404, detail="Accion partido not found")
+
+    # Obtener el jugador_partido
+    jugador_partido = supabase.table("jugadores_partido").select("jugadores_id").eq("id", accion.data[0]["jugadores_partido_id"]).execute()
+    if getattr(jugador_partido, "error", None):
+        raise HTTPException(status_code=500, detail="Error fetching data from Supabase")
+    if not jugador_partido.data:
+        raise HTTPException(status_code=404, detail="Jugador partido not found")
+
+    # Obtener el equipo del jugador
+    jugador = supabase.table("jugadores").select("equipos_id").eq("id", jugador_partido.data[0]["jugadores_id"]).execute()
+    if getattr(jugador, "error", None):
+        raise HTTPException(status_code=500, detail="Error fetching data from Supabase")
+    if not jugador.data:
+        raise HTTPException(status_code=404, detail="Jugador not found")
+   
+    # print (jugador.data[0]["equipos_id"])
+    # Obtener el club del equipo
+    equipo = supabase.table("equipos").select("clubs_id").eq("id", jugador.data[0]["equipos_id"]).execute()
+    if getattr(equipo, "error", None):
+        raise HTTPException(status_code=500, detail="Error fetching data from Supabase")
+    if not equipo.data:
+        raise HTTPException(status_code=404, detail="Equipo not found")
+
+    print (equipo.data[0]["clubs_id"], datos_token["clubs_id"])
+    if equipo.data[0]["clubs_id"] != datos_token["clubs_id"]:
+        raise HTTPException(status_code=403, detail="No tienes permiso para borrar esta acción de partido")
+
+    # Borrar la acción de partido
+    response = supabase.table("acciones_partido").delete().eq("id", id).execute()
+    if getattr(response, "error", None):
+        raise HTTPException(status_code=500, detail="Error deleting data from Supabase")
+    return {"detail": "Accion partido borrada correctamente"}
