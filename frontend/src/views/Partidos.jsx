@@ -15,12 +15,14 @@ import { FaBars } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import AuthWrapper from "../components/AuthWrapper";
 import Header from "../components/Header";
+  import { useCallback } from "react";
+
 
 const Partidos = () => {
   const [partidos, setPartidos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filtroMes, setFiltroMes] = useState("todos");
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { onOpen} = useDisclosure();
   const navigate = useNavigate();
 
   // Para el header
@@ -65,7 +67,8 @@ const Partidos = () => {
       });
   }, [token]);
 
-  const fetchPartidos = () => {
+
+  const fetchPartidos = useCallback(() => {
     if (!equipo_id) return;
     setLoading(true);
     fetch(`https://myhandstats.onrender.com/equipo/${equipo_id}/partidos`, {
@@ -86,28 +89,15 @@ const Partidos = () => {
       })
       .catch((err) => console.error("Error al cargar partidos", err))
       .finally(() => setLoading(false));
-  };
+  }, [equipo_id, token]);
 
   useEffect(() => {
     fetchPartidos();
-  }, [equipo_id]);
+  }, [fetchPartidos]);
 
   return (
     <AuthWrapper requiredRole={null}>
       <Box p={4} minH="100vh" bg="white" position="relative">
-{/*         <Image
-          src="/myHandstatsLogo.png"
-          alt="Logo MyHandStats"
-          position="fixed"
-          left="50%"
-          top="50%"
-          transform="translate(-50%, -50%)"
-          opacity={0.1}
-          zIndex={0}
-          boxSize={["250px", "350px", "450px"]}
-          pointerEvents="none"
-          userSelect="none"
-        /> */}
         <Image
           src="/myHandstatsLogo.png"
           alt="Logo MyHandStats"
@@ -127,17 +117,6 @@ const Partidos = () => {
           club={club}
           texto="Partidos"
         />
-
-        {/* Elimina el Flex con el título si lo tienes duplicado */}
-        {/* 
-        <Flex align="center" justify="space-between" mb={6}>
-          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-          <Text fontSize="2xl" fontWeight="bold" color="#014C4C">
-            Partidos
-          </Text>
-          <Box w="6" />
-        </Flex>
-        */}
 
         {/* Filtro por mes */}
         <Flex mb={4} gap={4} align="center" flexWrap="wrap" justify="center">
@@ -182,6 +161,12 @@ const Partidos = () => {
         {loading ? (
           <Flex justify="center" mt={10}>
             <Spinner size="xl" />
+          </Flex>
+        ) : partidos.length === 0 ? (
+          <Flex justify="center" mt={10}>
+            <Text color="gray.500" fontWeight="bold" fontSize="xl">
+              No existen partidos todavía.
+            </Text>
           </Flex>
         ) : (
           <Flex
