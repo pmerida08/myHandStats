@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { Flex, Icon, Text, Avatar } from "@chakra-ui/react";
 import { FaBars } from "react-icons/fa";
-/* import Sidebar from "./Sidebar";
- */
+import Sidebar from "./Sidebar";
+
 const Header = ({ texto, club }) => {
     // Obtener foto del usuario desde el token
 
 
     // Estado para controlar la apertura del Sidebar
-/*     const [isSidebarOpen, setSidebarOpen] = useState(false);
- */
+    const [isSidebarOpen, setSidebarOpen] = useState(false);
+
     const handleSidebarClose = () => setSidebarOpen(false);
 
     return (
@@ -35,13 +35,9 @@ const Header = ({ texto, club }) => {
                     />
                 </Flex>
             </Flex>
-<<<<<<< HEAD
-        </>
-=======
 {/*             <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} /> */}        
 
             </>
->>>>>>> 734274492743b5171e50dd4b543e113e7cc1db06
     );
 };
 
