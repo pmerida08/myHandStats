@@ -292,8 +292,8 @@ const SeleccionEquipo = () => {
             zIndex={1}
             position="relative"
           >
-            <Text fontSize="xl" mb={4} color="gray.600">
-              No hay equipos disponibles.
+            <Text color="gray.500" fontWeight="bold" fontSize="xl">
+              No existen equipos todavía.
             </Text>
             {esAdmin && <CrearEquipoCard />}
           </Center>

@@ -1,13 +1,14 @@
 import {
   Box,
   Text,
+  SimpleGrid,
   IconButton,
   Avatar,
   Button,
   Spinner,
   useDisclosure,
   Flex,
-
+  Icon,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -20,11 +21,12 @@ import {
   VStack,
   Select,
   Center,
+  Heading,
   useToast,
   Image,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { FaPlus, FaUser } from "react-icons/fa";
+import { FaPlus, FaUser, FaBars } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 import { useNavigate } from "react-router-dom";
@@ -260,7 +262,7 @@ const UsuariosClubAdmin = () => {
     <AuthWrapper requiredRole={"admin"}>
       <Box p={4} position="relative">
         <Image
-          src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/public/imagenes//logo.avif"
+          src="/myHandstatsLogo.png"
           alt="Logo MyHandStats"
           position="fixed"
           left="50%"
@@ -292,6 +294,12 @@ const UsuariosClubAdmin = () => {
         {loading ? (
           <Box textAlign="center" mt={10}>
             <Spinner size="xl" color="teal.600" />
+          </Box>
+        ) : usuarios.filter((usuario) => usuario.rol !== "admin").length === 0 ? (
+          <Box textAlign="center" mt={10}>
+            <Text color="gray.500" fontWeight="bold" fontSize="xl">
+              No existen usuarios todavía.
+            </Text>
           </Box>
         ) : (
           <Flex

@@ -52,44 +52,83 @@ const Sidebar = () => {
 
   // Menú completo con acceso a todas las rutas
   const menuItems = useMemo(
-    () => [
-      {
-        label: "Dashboard",
-        icon: FaTachometerAlt,
-        to: "/dashboard",
-      },
-      {
-        label: "Jugadores",
-        icon: FaUsers,
-        to: "/jugadores",
-      },
-      {
-        label: "Partidos",
-        icon: FaFutbol,
-        to: "/partidos",
-      },
-      {
-        label: "Seleccionar Equipo",
-        icon: FaHome,
-        to: "/seleccionar-equipo",
-      },
-      {
-        label: "Club",
-        icon: FaBuilding,
-        to: "/club",
-      },
-      {
-        label: "Estadísticas avanzadas",
-        icon: FaChartBar,
-        to: "/estadisticas",
-      },
-      {
-        label: "Perfil",
-        icon: FaUserCircle,
-        to: "/perfil",
-      },
-    ],
-    []
+    () => {
+      // Si el usuario es entrenador, no mostrar el icono/menú de Club
+      if (user?.rol === "entrenador") {
+        return [
+          {
+            label: "Dashboard",
+            icon: FaTachometerAlt,
+            to: "/dashboard",
+          },
+          {
+            label: "Jugadores",
+            icon: FaUsers,
+            to: "/jugadores",
+          },
+          {
+            label: "Partidos",
+            icon: FaFutbol,
+            to: "/partidos",
+          },
+          {
+            label: "Seleccionar Equipo",
+            icon: FaHome,
+            to: "/seleccionar-equipo",
+          },
+          // No Club aquí
+          {
+            label: "Estadísticas avanzadas",
+            icon: FaChartBar,
+            to: "/estadisticas",
+          },
+          {
+            label: "Perfil",
+            icon: FaUserCircle,
+            to: "/perfil",
+          },
+        ];
+      }
+      // Menú normal para otros roles
+      return [
+        {
+          label: "Dashboard",
+          icon: FaTachometerAlt,
+          to: "/dashboard",
+        },
+        {
+          label: "Jugadores",
+          icon: FaUsers,
+          to: "/jugadores",
+        },
+        {
+          label: "Partidos",
+          icon: FaFutbol,
+          to: "/partidos",
+        },
+        {
+          label: "Seleccionar Equipo",
+          icon: FaHome,
+          to: "/seleccionar-equipo",
+        },
+        {
+          label: "Club",
+          icon: FaBuilding,
+          to: "/club",
+        },
+        {
+          label: "Estadísticas avanzadas",
+          icon: FaChartBar,
+          to: "/estadisticas",
+        },
+        {
+          label: "Perfil",
+          icon: FaUserCircle,
+          to: "/perfil",
+        },
+      ];
+    },
+    [user?.rol]
   );
 
   useEffect(() => {
@@ -120,7 +159,8 @@ const Sidebar = () => {
       .then((data) => {
         setUser({
           nombre: data.info.nombre,
-          foto: data.info.foto,
+          foto: data.info.foto, 
+          rol: data.info.rol,
         });
       })
       .catch((err) => {
