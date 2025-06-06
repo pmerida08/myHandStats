@@ -13,18 +13,13 @@ import {
   Th,
   Td,
   useBreakpointValue,
-  Icon,
-  Avatar,
   Spinner,
-  Image,
   Accordion,
   AccordionItem,
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
-  Divider,
 } from "@chakra-ui/react";
-import { FaBars } from "react-icons/fa";
 import Header from "../components/Header"; // Añade este import al inicio
 
 function getClubIdFromToken(token) {

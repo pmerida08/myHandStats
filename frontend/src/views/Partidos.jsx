@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Text,
@@ -11,7 +11,6 @@ import {
   Icon,
   Image
 } from "@chakra-ui/react";
-import { FaBars } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import AuthWrapper from "../components/AuthWrapper";
 import Header from "../components/Header";

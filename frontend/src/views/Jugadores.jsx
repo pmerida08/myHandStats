@@ -1,14 +1,12 @@
 import {
   Box,
   Text,
-  SimpleGrid,
   IconButton,
   Avatar,
   Button,
   Spinner,
   useDisclosure,
   Flex,
-  Icon,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -24,9 +22,8 @@ import {
   Image,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { FaPlus, FaUser, FaBars, FaUserEdit } from "react-icons/fa";
+import { FaPlus, FaUser, FaUserEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 import { createClient } from "@supabase/supabase-js";
 import Header from "../components/Header";

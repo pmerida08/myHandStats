@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -14,7 +14,6 @@ import {
   Heading,
 } from "@chakra-ui/react";
 import Sidebar from "../components/Sidebar";
-import { FaBars } from "react-icons/fa";
 import { useDisclosure } from "@chakra-ui/react";
 import AuthWrapper from "../components/AuthWrapper";
 import Header from "../components/Header";

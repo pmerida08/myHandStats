@@ -6,16 +6,13 @@ import {
   VStack,
   FormControl,
   FormLabel,
-  Heading,
   useToast,
   Flex,
-  Icon,
   useDisclosure,
   Center,
 } from "@chakra-ui/react";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
-import { FaBars } from "react-icons/fa";
 import AuthWrapper from "../components/AuthWrapper";
 import { createClient } from "@supabase/supabase-js";
 import Header from "../components/Header";
@@ -46,11 +43,14 @@ const EditarPerfil = () => {
     const cargarPerfil = async () => {
       const token = localStorage.getItem("token");
       try {
-        const res = await fetch("https://myhandstats.onrender.com/usuario/perfil", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await fetch(
+          "https://myhandstats.onrender.com/usuario/perfil",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         const data = await res.json();
         if (data.info) {
           setUsuario(data.info);
@@ -131,18 +131,21 @@ const EditarPerfil = () => {
       }
 
       // PUT al endpoint correcto con el id del usuario
-      const res = await fetch(`https://myhandstats.onrender.com/usuario/${userId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          nombre,
-          foto: nuevaFotoUrl,
-          password: contraseña ? contraseña : undefined,
-        }),
-      });
+      const res = await fetch(
+        `https://myhandstats.onrender.com/usuario/${userId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            nombre,
+            foto: nuevaFotoUrl,
+            password: contraseña ? contraseña : undefined,
+          }),
+        }
+      );
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -199,15 +202,17 @@ const EditarPerfil = () => {
               fontSize="3xl"
             >
               {/* Iniciales si no hay foto */}
-              {(!fotoUrl || fotoUrl === "foto.jpg") && nombre && (() => {
-                const partes = nombre.trim().split(" ").filter(Boolean);
-                if (partes.length === 1) {
-                  return partes[0][0].toUpperCase();
-                } else if (partes.length > 1) {
-                  return (partes[0][0] + partes[1][0]).toUpperCase();
-                }
-                return "";
-              })()}
+              {(!fotoUrl || fotoUrl === "foto.jpg") &&
+                nombre &&
+                (() => {
+                  const partes = nombre.trim().split(" ").filter(Boolean);
+                  if (partes.length === 1) {
+                    return partes[0][0].toUpperCase();
+                  } else if (partes.length > 1) {
+                    return (partes[0][0] + partes[1][0]).toUpperCase();
+                  }
+                  return "";
+                })()}
             </Avatar>
           </Center>
 

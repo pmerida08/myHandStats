@@ -1,7 +1,6 @@
 import {
   Box,
   Text,
-  Heading,
   VStack,
   HStack,
   Avatar,
@@ -21,11 +20,10 @@ import {
   FormControl,
   Textarea,
   Flex,
-  Icon,
   Image,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { FaBars, FaEdit } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 import { useNavigate } from "react-router-dom";

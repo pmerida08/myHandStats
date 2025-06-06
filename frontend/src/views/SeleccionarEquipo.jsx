@@ -1,12 +1,9 @@
 import {
   Box,
-  Heading,
-  SimpleGrid,
   Spinner,
   Text,
   Button,
   Flex,
-  Icon,
   useDisclosure,
   Center,
   Modal,
@@ -24,7 +21,6 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaBars } from "react-icons/fa";
 import AuthWrapper from "../components/AuthWrapper";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";

@@ -5,15 +5,13 @@ import {
   Text,
   Button,
   Stack,
-  Icon,
-  Flex,
   useDisclosure,
   Spinner,
   Center,
   useColorModeValue,
   Image
 } from "@chakra-ui/react";
-import { FaBars, FaUsers, FaUsersCog, FaChalkboardTeacher, FaInfoCircle } from "react-icons/fa";
+import { FaUsers, FaUsersCog, FaChalkboardTeacher, FaInfoCircle } from "react-icons/fa";
 import Sidebar from '../components/Sidebar';
 import AuthWrapper from "../components/AuthWrapper";
 import Header from "../components/Header"; // <-- Añade el import
