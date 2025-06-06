@@ -7,7 +7,6 @@ import {
   VStack,
   Divider,
   useColorModeValue,
-  useBreakpointValue,
   HStack,
   IconButton,
   Avatar,
@@ -36,9 +35,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const baseSidebarWidth = useBreakpointValue({ base: "0px", md: "260px" });
-  const sidebarWidth =
-    baseSidebarWidth === "0px" ? "0px" : isCollapsed ? "60px" : "260px";
+  const sidebarWidth = isCollapsed ? "60px" : "260px";
 
   const bgCard = useColorModeValue("white", "gray.900");
   const shadowCard = useColorModeValue("xl", "dark-lg");
@@ -151,9 +148,7 @@ const Sidebar = () => {
       overflowY="auto"
       transition="width 0.2s"
       display={
-        baseSidebarWidth === "0px" ||
-        location.pathname === "/" ||
-        location.pathname === "/registrar"
+        location.pathname === "/" || location.pathname === "/registrar"
           ? "none"
           : "block"
       }
