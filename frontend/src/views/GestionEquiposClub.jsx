@@ -1,10 +1,8 @@
 import {
   Box,
   Text,
-  SimpleGrid,
   IconButton,
   Button,
-  useBreakpointValue,
   Spinner,
   useDisclosure,
   Modal,
@@ -29,7 +27,6 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 
 const EquiposClubAdmin = () => {
-  const gridCols = useBreakpointValue({ base: 1, sm: 2, md: 3, lg: 4 });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -273,8 +270,20 @@ const EquiposClubAdmin = () => {
           <Box textAlign="center" mt={10}>
             <Spinner size="xl" color="teal.600" />
           </Box>
+        ) : equipos.length === 0 ? (
+          <Box textAlign="center" mt={10}>
+            <Text color="gray.500" fontWeight="bold" fontSize="xl">
+              No existen equipos todavía.
+            </Text>
+          </Box>
         ) : (
-          <SimpleGrid columns={gridCols} spacing={6}>
+          <Box
+            display="flex"
+            flexWrap="wrap"
+            gap={6}
+            justifyContent="center"
+            alignItems="stretch"
+          >
             {equipos.map((equipo) => (
               <Box
                 key={equipo.id}
@@ -295,6 +304,7 @@ const EquiposClubAdmin = () => {
                   opacity: 1,
                 }}
                 position="relative"
+                m={2}
               >
                 <Text
                   fontWeight="bold"
@@ -327,7 +337,7 @@ const EquiposClubAdmin = () => {
                 />
               </Box>
             ))}
-          </SimpleGrid>
+          </Box>
         )}
 
         <IconButton

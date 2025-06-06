@@ -19,6 +19,7 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
+  Image,
 } from "@chakra-ui/react";
 import Header from "../components/Header"; // Añade este import al inicio
 
@@ -403,6 +404,20 @@ const StatsAvanzadas = () => {
     <Box bg="white" minH="100vh" p={{ base: 1, md: 6 }}>
       {/* Header */}
       <Header userName={userName} club={club} texto="Estadísticas Avanzadas" />
+
+      <Image
+        src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/public/imagenes//logo.avif"
+        alt="Logo MyHandStats"
+        position="fixed"
+        left="50%"
+        top="50%"
+        transform="translate(-50%, -50%)"
+        opacity={0.12}
+        zIndex={0}
+        boxSize={["250px", "350px", "450px"]}
+        pointerEvents="none"
+        userSelect="none"
+      />
 
       {/* Tabs */}
       <Tabs
