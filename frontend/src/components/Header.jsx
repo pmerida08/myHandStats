@@ -35,13 +35,7 @@ const Header = ({ texto, club }) => {
                     />
                 </Flex>
             </Flex>
-<<<<<<< HEAD
         </>
-=======
-{/*             <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} /> */}        
-
-            </>
->>>>>>> 734274492743b5171e50dd4b543e113e7cc1db06
     );
 };
 

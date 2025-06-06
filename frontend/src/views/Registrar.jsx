@@ -8,6 +8,7 @@ import {
   Stack,
   Text,
   Image,
+  Spinner,
 } from '@chakra-ui/react'
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
@@ -28,16 +29,16 @@ const Registrar = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')
+  const [loading, setLoading] = useState(false) // Loader
   const navigate = useNavigate()
 
   const handleRegistrar = async (e) => {
     e.preventDefault()
-
     if (password !== repeatPassword) {
       alert('Las contraseñas no coinciden')
       return
     }
-
+    setLoading(true)
     try {
       const res = await fetch('https://myhandstats.onrender.com/register', {
         method: 'POST',
@@ -51,6 +52,7 @@ const Registrar = () => {
 
       if (!res.ok) {
         alert(data.detail || 'Error al registrarse')
+        setLoading(false)
         return
       }
 
@@ -60,9 +62,11 @@ const Registrar = () => {
       console.error(error)
       alert('Error de conexión con el servidor')
     }
+    setLoading(false)
   }
 
   const handleGoogleRegister = async (credentialResponse) => {
+    setLoading(true)
     try {
       const googleToken = credentialResponse.credential
       const res = await fetch('https://myhandstats.onrender.com/register/google', {
@@ -79,6 +83,7 @@ const Registrar = () => {
     } catch (error) {
       alert(error.message || 'Error al registrarse con Google')
     }
+    setLoading(false)
   }
 
   return (
@@ -107,49 +112,56 @@ const Registrar = () => {
               ¡Forma parte de MyHandStats y registra tus estadísticas de juego!
             </Text>
 
-            <form onSubmit={handleRegistrar}>
-              <Stack spacing={4} mb={4}>
-                <FormControl>
-                  <Input
-                    placeholder="Nombre completo"
-                    type="text"
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                    bg="gray.100"
-                  />
-                </FormControl>
-                <FormControl>
-                  <Input
-                    placeholder="tucorreo@gmail.com"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    bg="gray.100"
-                  />
-                </FormControl>
-                <FormControl>
-                  <Input
-                    placeholder="******"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    bg="gray.100"
-                  />
-                </FormControl>
-                <FormControl>
-                  <Input
-                    placeholder="******"
-                    type="password"
-                    value={repeatPassword}
-                    onChange={(e) => setRepeatPassword(e.target.value)}
-                    bg="gray.100"
-                  />
-                </FormControl>
-                <Button type="submit" colorScheme="red" bg="#014C4C" color="white">
-                  Registrarse
-                </Button>
-              </Stack>
-            </form>
+            {loading ? (
+              <Box my={8}>
+                <Spinner size="xl" color="#014C4C" />
+                <Text mt={4} color="gray.500">Registrando usuario...</Text>
+              </Box>
+            ) : (
+              <form onSubmit={handleRegistrar}>
+                <Stack spacing={4} mb={4}>
+                  <FormControl>
+                    <Input
+                      placeholder="Nombre completo"
+                      type="text"
+                      value={nombre}
+                      onChange={(e) => setNombre(e.target.value)}
+                      bg="gray.100"
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <Input
+                      placeholder="tucorreo@gmail.com"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      bg="gray.100"
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <Input
+                      placeholder="******"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      bg="gray.100"
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <Input
+                      placeholder="******"
+                      type="password"
+                      value={repeatPassword}
+                      onChange={(e) => setRepeatPassword(e.target.value)}
+                      bg="gray.100"
+                    />
+                  </FormControl>
+                  <Button type="submit" colorScheme="red" bg="#014C4C" color="white">
+                    Registrarse
+                  </Button>
+                </Stack>
+              </form>
+            )}
 
             <Box mt={4}>
               <GoogleLogin
@@ -161,6 +173,7 @@ const Registrar = () => {
                 shape="pill"
                 theme="outline"
                 size="large"
+                disabled={loading}
               />
             </Box>
 
