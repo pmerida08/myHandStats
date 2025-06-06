@@ -119,44 +119,46 @@ const Partidos = () => {
         />
 
         {/* Filtro por mes */}
-        <Flex mb={4} gap={4} align="center" flexWrap="wrap" justify="center">
-          <Text fontWeight="medium">Filtrar por mes:</Text>
-          <Box>
-            <select
-              onChange={(e) => setFiltroMes(e.target.value)}
-              value={filtroMes}
-              style={{
-                padding: "8px 16px",
-                borderRadius: "999px",
-                border: "1.5px solid #319795",
-                background: "#f0fdfa",
-                color: "#014C4C",
-                fontWeight: "bold",
-                outline: "none",
-                fontSize: "1rem",
-                boxShadow: "0 1px 4px rgba(49,151,149,0.08)",
-                transition: "border-color 0.2s, box-shadow 0.2s",
-                cursor: "pointer",
-              }}
-              onFocus={e => e.target.style.borderColor = "#014C4C"}
-              onBlur={e => e.target.style.borderColor = "#319795"}
-            >
-              <option value="todos">Todos</option>
-              <option value="0">Enero</option>
-              <option value="1">Febrero</option>
-              <option value="2">Marzo</option>
-              <option value="3">Abril</option>
-              <option value="4">Mayo</option>
-              <option value="5">Junio</option>
-              <option value="6">Julio</option>
-              <option value="7">Agosto</option>
-              <option value="8">Septiembre</option>
-              <option value="9">Octubre</option>
-              <option value="10">Noviembre</option>
-              <option value="11">Diciembre</option>
-            </select>
-          </Box>
-        </Flex>
+        {partidos.length > 0 && (
+          <Flex mb={4} gap={4} align="center" flexWrap="wrap" justify="center">
+            <Text fontWeight="medium">Filtrar por mes:</Text>
+            <Box>
+              <select
+                onChange={(e) => setFiltroMes(e.target.value)}
+                value={filtroMes}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "999px",
+                  border: "1.5px solid #319795",
+                  background: "#f0fdfa",
+                  color: "#014C4C",
+                  fontWeight: "bold",
+                  outline: "none",
+                  fontSize: "1rem",
+                  boxShadow: "0 1px 4px rgba(49,151,149,0.08)",
+                  transition: "border-color 0.2s, box-shadow 0.2s",
+                  cursor: "pointer",
+                }}
+                onFocus={e => e.target.style.borderColor = "#014C4C"}
+                onBlur={e => e.target.style.borderColor = "#319795"}
+              >
+                <option value="todos">Todos</option>
+                <option value="0">Enero</option>
+                <option value="1">Febrero</option>
+                <option value="2">Marzo</option>
+                <option value="3">Abril</option>
+                <option value="4">Mayo</option>
+                <option value="5">Junio</option>
+                <option value="6">Julio</option>
+                <option value="7">Agosto</option>
+                <option value="8">Septiembre</option>
+                <option value="9">Octubre</option>
+                <option value="10">Noviembre</option>
+                <option value="11">Diciembre</option>
+              </select>
+            </Box>
+          </Flex>
+        )}
 
         {loading ? (
           <Flex justify="center" mt={10}>

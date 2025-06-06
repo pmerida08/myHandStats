@@ -399,20 +399,28 @@ const Jugadores = () => {
         />
 
         {/* Buscador por nombre */}
-        <Box maxW="350px" mx="auto" mb={6}>
-          <Input
-            placeholder="Buscar jugador por nombre..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-            bg="white"
-            borderColor="#b2f5ea"
-            _focus={{ borderColor: "#319795", boxShadow: "0 0 0 1px #319795" }}
-          />
-        </Box>
+        {jugadores.length > 0 && (
+          <Box maxW="350px" mx="auto" mb={6}>
+            <Input
+              placeholder="Buscar jugador por nombre..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              bg="white"
+              borderColor="#b2f5ea"
+              _focus={{ borderColor: "#319795", boxShadow: "0 0 0 1px #319795" }}
+            />
+          </Box>
+        )}
 
         {loading ? (
           <Box textAlign="center" mt={10}>
             <Spinner size="xl" color="teal.600" />
+          </Box>
+        ) : jugadores.length === 0 ? (
+          <Box textAlign="center" mt={10}>
+            <Text color="gray.500" fontWeight="bold" fontSize="xl">
+              No existen jugadores todavía.
+            </Text>
           </Box>
         ) : (
           <Flex wrap="wrap" gap={8} justify="center" align="flex-start">
