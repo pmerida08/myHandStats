@@ -432,6 +432,17 @@ def crear_jugador_equipo(id_equipo: int, jugador: JugadorCreate, datos_token: di
     if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
         raise HTTPException(status_code=403, detail="No tienes permiso para crear jugadores para este equipo")
 
+    # Comprobar si el equipo ya tiene 30 jugadores
+    jugadores_count = supabase.table("jugadores").select("id", count="exact").eq("equipos_id", id_equipo).execute()
+    if jugadores_count.count is not None and jugadores_count.count >= 30:
+        raise HTTPException(status_code=400, detail="El equipo ya tiene el máximo de 30 jugadores")
+
+    # Comprobar si el dorsal ya está registrado en el equipo
+    dorsal = jugador.dorsal
+    existe_dorsal = supabase.table("jugadores").select("id").eq("equipos_id", id_equipo).eq("dorsal", dorsal).execute()
+    if existe_dorsal.data and len(existe_dorsal.data) > 0:
+        raise HTTPException(status_code=400, detail="Ya existe un jugador con ese dorsal en este equipo")
+
     posiciones = jugador.posiciones
     jugador_dict = jugador.dict(exclude={"posiciones"})
     jugador_dict["fecha_nac"] = jugador_dict["fecha_nac"].isoformat()
