@@ -1,36 +1,48 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Text,
   Flex,
   Button,
-  SimpleGrid,
   useDisclosure,
   Spinner,
   VStack,
   Icon,
-  Image
+  Image,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  useToast,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import AuthWrapper from "../components/AuthWrapper";
 import Header from "../components/Header";
-  import { useCallback } from "react";
-
 
 const Partidos = () => {
   const [partidos, setPartidos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filtroMes, setFiltroMes] = useState("todos");
-  const { onOpen} = useDisclosure();
+  const { onOpen } = useDisclosure();
   const navigate = useNavigate();
 
   // Para el header
   const [userName, setUserName] = useState("");
   const [club, setClub] = useState({ nombre: "", logo: "" });
 
+  // Para eliminar partido
+  const [partidoAEliminar, setPartidoAEliminar] = useState(null);
+  const [isModalEliminarOpen, setIsModalEliminarOpen] = useState(false);
+  const [eliminando, setEliminando] = useState(false);
+  const toast = useToast();
+
   const token = localStorage.getItem("token");
   const equipo_id = localStorage.getItem("id_equipo");
   const nombreEquipo = localStorage.getItem("nombre_equipo") ?? "Mi Equipo";
+  const [rol, setRol] = useState("");
 
   // Cargar datos de usuario y club igual que en Dashboard
   useEffect(() => {
@@ -39,7 +51,10 @@ const Partidos = () => {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
-      .then((data) => setUserName(data.info?.nombre || "Usuario"));
+      .then((data) => {
+        setUserName(data.info?.nombre || "Usuario");
+        setRol(data.info?.rol || "");
+      });
 
     fetch("https://myhandstats.onrender.com/club", {
       headers: { Authorization: `Bearer ${token}` },
@@ -65,7 +80,6 @@ const Partidos = () => {
         });
       });
   }, [token]);
-
 
   const fetchPartidos = useCallback(() => {
     if (!equipo_id) return;
@@ -93,6 +107,58 @@ const Partidos = () => {
   useEffect(() => {
     fetchPartidos();
   }, [fetchPartidos]);
+
+  // Función para eliminar partido
+  const eliminarPartido = async () => {
+    if (!partidoAEliminar) return;
+    setEliminando(true);
+    try {
+      const res = await fetch(
+        `https://myhandstats.onrender.com/equipo/${equipo_id}/partido/${partidoAEliminar.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!res.ok) {
+        let msg = "No se pudo eliminar el partido";
+        try {
+          const data = await res.json();
+          if (data.detail) msg = data.detail;
+        } catch {}
+        toast({
+          title: "Error",
+          description: msg,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "Partido eliminado",
+          description: "El partido se ha eliminado correctamente.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        fetchPartidos();
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el partido.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+    } finally {
+      setEliminando(false);
+      setIsModalEliminarOpen(false);
+      setPartidoAEliminar(null);
+    }
+  };
 
   return (
     <AuthWrapper requiredRole={null}>
@@ -249,7 +315,7 @@ const Partidos = () => {
                       </VStack>
                     </Flex>
 
-                    <Flex justify="flex-end">
+                    <Flex justify="flex-end" gap={2}>
                       <Button
                         size="sm"
                         variant="outline"
@@ -260,12 +326,50 @@ const Partidos = () => {
                       >
                         Ver Partido
                       </Button>
+                      {rol === "admin" && (
+                        <Button
+                          size="sm"
+                          colorScheme="red"
+                          variant="outline"
+                          isLoading={eliminando && partidoAEliminar?.id === partido.id}
+                          onClick={() => {
+                            setPartidoAEliminar(partido);
+                            setIsModalEliminarOpen(true);
+                          }}
+                        >
+                          Eliminar
+                        </Button>
+                      )}
                     </Flex>
                   </Box>
                 );
               })}
           </Flex>
         )}
+
+        {/* Modal de confirmación para eliminar partido */}
+        <Modal isOpen={isModalEliminarOpen} onClose={() => setIsModalEliminarOpen(false)} isCentered>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Confirmar eliminación</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              ¿Estás seguro de que quieres eliminar este partido? Esta acción no se puede deshacer.
+            </ModalBody>
+            <ModalFooter>
+              <Button onClick={() => setIsModalEliminarOpen(false)} mr={3}>
+                Cancelar
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={eliminarPartido}
+                isLoading={eliminando}
+              >
+                Eliminar
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Box>
     </AuthWrapper>
   );

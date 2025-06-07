@@ -744,3 +744,63 @@ def actualizar_posicion_jugador(
         return respuesta.data[0]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al actualizar la posición: {str(e)}")
+    
+
+# @router.delete("/{equipo_id}/jugador/{jugador_id}")
+# def eliminar_jugador_equipo(equipo_id: int, jugador_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
+#     if datos_token["rol"] != "admin":
+#         raise HTTPException(status_code=403, detail="No tienes permiso para eliminar jugadores")
+
+#     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
+#     if not equipo_data.data:
+#         raise HTTPException(status_code=404, detail="Equipo no encontrado")
+    
+#     if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
+#         raise HTTPException(status_code=403, detail="No tienes permiso para eliminar jugadores de este equipo")
+
+#     # Verificar que el jugador está asociado al equipo
+#     jugador_data = supabase.table("jugadores").select("*").eq("id", jugador_id).eq("equipos_id", equipo_id).execute()
+#     if not jugador_data.data or len(jugador_data.data) == 0:
+#         raise HTTPException(status_code=404, detail="Jugador no encontrado")
+
+#     try:
+#         respuesta = supabase.table("jugadores").delete().eq("id", jugador_id).execute()
+#         if not respuesta.data:
+#             raise HTTPException(status_code=404, detail="Jugador no encontrado")
+#         return {"mensaje": "Jugador eliminado correctamente"}
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Error al eliminar el jugador: {str(e)}")
+
+
+@router.delete("/{equipo_id}/partido/{partido_id}")
+def eliminar_partido_equipo(equipo_id: int, partido_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
+    equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
+    if not equipo_data.data:
+        raise HTTPException(status_code=404, detail="Equipo no encontrado")
+    
+    if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
+        raise HTTPException(status_code=403, detail="No tienes permiso para eliminar partidos de este equipo")
+
+    # Verificar que el partido está asociado al equipo
+    partido_data = supabase.table("partidos").select("*").eq("id", partido_id).eq("equipos_id", equipo_id).execute()
+    if not partido_data.data or len(partido_data.data) == 0:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+
+    try:
+        # 1. Obtener los jugadores_partido asociados a este partido
+        jugadores_partido = supabase.table("jugadores_partido").select("id").eq("partidos_id", partido_id).execute()
+        jugadores_partido_ids = [jp["id"] for jp in jugadores_partido.data] if jugadores_partido.data else []
+
+        # 2. Eliminar las acciones asociadas a esos jugadores_partido
+        if jugadores_partido_ids:
+            supabase.table("acciones_partido").delete().in_("jugadores_partido_id", jugadores_partido_ids).execute()
+            # 3. Eliminar los jugadores_partido asociados al partido
+            supabase.table("jugadores_partido").delete().eq("partidos_id", partido_id).execute()
+
+        # 4. Eliminar el partido
+        respuesta = supabase.table("partidos").delete().eq("id", partido_id).execute()
+        if not respuesta.data:
+            raise HTTPException(status_code=404, detail="Partido no encontrado")
+        return {"mensaje": "Partido eliminado correctamente"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al eliminar el partido: {str(e)}")
