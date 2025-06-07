@@ -4,6 +4,7 @@ from datetime import datetime, date
 from app.models.posicion import PosicionOut
 from typing import List
 
+# Modelo para la entidad Jugador
 class Jugador(BaseModel):
     id: int 
     fecha_nac: date
@@ -66,6 +67,7 @@ class Jugador(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelos para crear, actualizar, eliminar y leer datos de jugadores
 class JugadorCreate(BaseModel):
     fecha_nac: date
     nombre: str
@@ -126,6 +128,7 @@ class JugadorCreate(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelo para actualizar datos de jugadores (los campos son opcionales)
 class JugadorUpdate(BaseModel):
     fecha_nac: Optional[str] = None
     nombre: Optional[str] = None
@@ -185,6 +188,7 @@ class JugadorUpdate(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelo para eliminar jugadores (solo necesita el ID)
 class JugadorOut(BaseModel):
     id: int
     fecha_nac: date
