@@ -35,6 +35,7 @@ import {
 } from "@chakra-ui/react";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
+import Header from "../components/Header"; // Añade este import
 
 const ResumenPartido = () => {
   const { partido_id } = useParams();
@@ -48,6 +49,10 @@ const ResumenPartido = () => {
   const [loading, setLoading] = useState(true);
   const [tabSeleccionado, setTabSeleccionado] = useState("Resumen");
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  // Añade estado para el usuario y club
+  const [userName, setUserName] = useState("");
+  const [club, setClub] = useState({ nombre: "", logo: "" });
 
   useEffect(() => {
     if (!equipo_id || !partido_id || !token) return;
@@ -112,6 +117,40 @@ const ResumenPartido = () => {
 
     fetchDatos();
   }, [equipo_id, partido_id, token]);
+
+  useEffect(() => {
+    if (token) {
+      fetch("https://myhandstats.onrender.com/usuario/perfil", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => setUserName(data.info?.nombre || "Usuario"));
+
+      fetch("https://myhandstats.onrender.com/club", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          let clubId = null;
+          try {
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            clubId = payload.club_id || payload.club || payload.id || null;
+          } catch {
+            clubId = null;
+          }
+          let clubObj = null;
+          if (Array.isArray(data.info)) {
+            clubObj = data.info.find((c) => c.id == clubId);
+          } else {
+            clubObj = data;
+          }
+          setClub({
+            nombre: clubObj?.nombre || "Club no encontrado",
+            logo: clubObj?.logo || "",
+          });
+        });
+    }
+  }, [token]);
 
   if (loading || !partido) {
     return (
@@ -228,18 +267,13 @@ const ResumenPartido = () => {
     <AuthWrapper requiredRole={null}>
       <Flex>
         <Box flex="1" bg="white" p={6}>
+          <Header
+            onOpen={onOpen}
+            userName={userName}
+            club={club}
+            texto="Resumen del Partido"
+          />
           <Sidebar isOpen={isOpen} onClose={onClose} />
-          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-
-          <Box textAlign="center" mb={6}>
-            <Text fontSize="xl" fontWeight="bold">
-              Estadísticas Del Partido
-            </Text>
-            <Text color="gray.600">Liga</Text>
-            <Text fontSize="sm" color="gray.500">
-              Jornada 1 - {fechaFormateada}
-            </Text>
-          </Box>
 
           <Flex justify="center" align="center" mb={6} gap={8}>
             <Box textAlign="center">
