@@ -198,9 +198,25 @@ const Jugadores = () => {
         }
       );
 
-      console.log("Respuesta del servidor:", res);
-
-      if (!res.ok) throw new Error("No se pudo crear el jugador");
+      if (!res.ok) {
+        let errorMsg = "No se pudo crear el jugador";
+        try {
+          const errorData = await res.json();
+          if (errorData && errorData.detail) {
+            errorMsg = errorData.detail;
+          }
+        } catch {
+          errorMsg = "Error desconocido al crear el jugador";
+        }
+        toast({
+          title: "Error",
+          description: errorMsg,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+        return;
+      }
 
       setIsModalOpen(false);
       setJugadorForm({
@@ -211,7 +227,21 @@ const Jugadores = () => {
         foto: null,
       });
       cargarJugadores();
+      toast({
+        title: "Jugador creado",
+        description: "El jugador se ha creado correctamente.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     } catch (err) {
+      toast({
+        title: "Error",
+        description: "No se pudo crear el jugador. Inténtalo de nuevo.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
       console.error("Error al crear jugador:", err);
     }
   };
