@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
+
 class AccionFase(BaseModel):
     acciones_partido_id: int
     fase_juego_id: int
