@@ -127,7 +127,9 @@ const Partidos = () => {
         try {
           const data = await res.json();
           if (data.detail) msg = data.detail;
-        } catch {}
+        } catch {
+          msg = "Error desconocido al eliminar el partido";
+        }
         toast({
           title: "Error",
           description: msg,
@@ -145,7 +147,7 @@ const Partidos = () => {
         });
         fetchPartidos();
       }
-    } catch (err) {
+    } catch {
       toast({
         title: "Error",
         description: "No se pudo eliminar el partido.",

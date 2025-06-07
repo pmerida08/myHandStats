@@ -26,7 +26,7 @@ import {
   Image,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { FaPlus, FaUser, FaBars } from "react-icons/fa";
+import { FaPlus, FaUser, FaBars, FaTrash } from "react-icons/fa"; // Añade FaTrash
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 import { useNavigate } from "react-router-dom";
@@ -333,17 +333,53 @@ const UsuariosClubAdmin = () => {
                   border="1.5px solid #b2f5ea"
                   overflow="hidden"
                 >
-                  {/* Círculo decorativo sutil */}
-                  <Box
+                  {/* Botón eliminar usuario arriba a la derecha */}
+                  <IconButton
+                    icon={<FaTrash />}
+                    colorScheme="red"
+                    variant="ghost"
+                    size="sm"
+                    aria-label="Eliminar usuario"
                     position="absolute"
-                    top={-10}
-                    right={-10}
-                    bg="#319795"
-                    opacity={0.08}
+                    top={2}
+                    right={2}
+                    zIndex={2}
                     borderRadius="full"
-                    boxSize="60px"
-                    zIndex={0}
+                    _hover={{ bg: "red.100", color: "red.600" }}
+                    onClick={() => {
+                      if (window.confirm("¿Seguro que quieres eliminar este usuario?")) {
+                        fetch(`https://myhandstats.onrender.com/club/usuario/${usuario.id}`, {
+                          method: "DELETE",
+                          headers: {
+                            Authorization: `Bearer ${token}`,
+                          },
+                        })
+                          .then((res) => {
+                            if (!res.ok) throw new Error("No se pudo eliminar el usuario");
+                            return res.json();
+                          })
+                          .then(() => {
+                            toast({
+                              title: "Usuario eliminado",
+                              status: "success",
+                              duration: 3000,
+                              isClosable: true,
+                            });
+                            cargarUsuarios();
+                          })
+                          .catch((err) => {
+                            toast({
+                              title: "Error al eliminar usuario",
+                              description: err.message,
+                              status: "error",
+                              duration: 4000,
+                              isClosable: true,
+                            });
+                          });
+                      }
+                    }}
                   />
+
                   <Box
                     display="flex"
                     flexDirection="column"

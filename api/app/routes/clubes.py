@@ -296,3 +296,37 @@ def actualizar_usuario(usuario_id: int, usuario_data: UsuarioUpdate, datos_token
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
     return response.data[0]
+
+
+@router.delete("/usuario/{usuario_id}")
+def eliminar_usuario(usuario_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
+    # Solo los administradores pueden eliminar usuarios
+    if datos_token["rol"] != "admin":
+        raise HTTPException(status_code=403, detail="Solo los administradores pueden eliminar usuarios")
+
+    # Verificar si el usuario existe
+    response = supabase.table("usuarios").select("*").eq("id", usuario_id).execute()
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    usuario = response.data[0]
+
+    # Si el usuario es entrenador, eliminar también de entrenadores, club_entrenador y equipo_entrenador
+    if usuario["rol"] == "entrenador":
+        entrenador = supabase.table("entrenadores").select("id").eq("usuario_id", usuario_id).execute()
+        if entrenador.data:
+            entrenador_id = entrenador.data[0]["id"]
+            # Eliminar relación en club_entrenador
+            supabase.table("club_entrenador").delete().eq("entrenador_id", entrenador_id).execute()
+            # Eliminar relación en equipo_entrenador
+            supabase.table("equipo_entrenador").delete().eq("entrenador_id", entrenador_id).execute()
+            # Eliminar de entrenadores
+            supabase.table("entrenadores").delete().eq("id", entrenador_id).execute()
+
+    # Eliminar el usuario
+    delete_response = supabase.table("usuarios").delete().eq("id", usuario_id).execute()
+
+    if getattr(delete_response, "error", None):
+        raise HTTPException(status_code=400, detail=f"Error al eliminar el usuario: {delete_response.error.message}")
+
+    return {"mensaje": "Usuario eliminado correctamente"}
