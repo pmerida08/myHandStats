@@ -45,7 +45,7 @@ const avatars = [
   'https://randomuser.me/api/portraits/lego/1.jpg',
 ]
 
-const clientId = import.meta.env.GOOGLE_CLIENT_ID;
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const Registrar = () => {
   const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')

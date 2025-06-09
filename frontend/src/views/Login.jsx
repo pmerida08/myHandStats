@@ -1,8 +1,8 @@
 /**
  * Login
- * 
+ *
  * Vista de inicio de sesión para usuarios de MyHandStats.
- * 
+ *
  * Características:
  * - Permite iniciar sesión con email y contraseña.
  * - Permite iniciar sesión con Google (OAuth).
@@ -10,13 +10,13 @@
  * - Guarda el token JWT en localStorage al iniciar sesión correctamente.
  * - Redirige al usuario a la selección de equipo tras el login.
  * - Diseño visual atractivo con Chakra UI y avatares decorativos.
- * 
+ *
  * Componentes principales:
  * - Formulario de login tradicional.
  * - Botón de login con Google.
  * - Mensajes de error y feedback visual.
  * - Avatares decorativos y llamada a la acción para unirse a la plataforma.
- * 
+ *
  * Uso:
  * - Accesible para cualquier usuario (no requiere autenticación previa).
  * - Navegación a registro y selección de equipo tras login exitoso.
@@ -39,8 +39,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
-
-
 import avatar1 from "../assets/avatars/avatar_1.png";
 import avatar2 from "../assets/avatars/avatar_2.png";
 import avatar3 from "../assets/avatars/avatar_3.png";
@@ -49,7 +47,8 @@ import avatar4 from "../assets/avatars/avatar_4.png";
 // Avatares falsos
 const avatars = [avatar1, avatar2, avatar3, avatar4];
 
-const clientId = "580062200389-hblem47late6qfggkg4iv8gnba20ih91.apps.googleusercontent.com"; // tu client ID
+const clientId =
+  import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.GOOGLE_CLIENT_ID;
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -89,13 +88,16 @@ const Login = () => {
     setError("");
     try {
       const googleToken = credentialResponse.credential;
-      const response = await fetch("https://myhandstats.onrender.com/login/google", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ credential: googleToken }),
-      });
+      const response = await fetch(
+        "https://myhandstats.onrender.com/login/google",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ credential: googleToken }),
+        }
+      );
       if (!response.ok) {
         throw new Error("Error al iniciar sesión con Google");
       }
