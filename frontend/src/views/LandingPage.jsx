@@ -56,9 +56,6 @@ import fase4 from "../assets/fase4wireframe.png";
 import prueba from "../assets/dashboardwireframe.png";
 
 
-console.log("VITE_GOOGLE_CLIENT_ID:", import.meta.env.VITE_GOOGLE_CLIENT_ID);
-
-
 const primaryColor = "#014C4C";
 const primaryColorHover = "#013838";
 
