@@ -47,8 +47,7 @@ import avatar4 from "../assets/avatars/avatar_4.png";
 // Avatares falsos
 const avatars = [avatar1, avatar2, avatar3, avatar4];
 
-const clientId =
-  import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.GOOGLE_CLIENT_ID;
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 const Login = () => {
   const [email, setEmail] = useState("");
