@@ -86,9 +86,10 @@ def obtener_entrenadores_equipo(equipo_id: int, datos_token: dict = Depends(obte
 
     return response.data
 
-
+# Endpoint para obtener un entrenador específico de un equipo
 @router.get("/{equipo_id}/entrenador/{entrenador_id}", response_model=EntrenadorOut)
 def obtener_entrenador_equipo(equipo_id: int, entrenador_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
+    # Verificar que el equipo existe y pertenece al club del usuario
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
     if not equipo_data.data:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
@@ -107,10 +108,10 @@ def obtener_entrenador_equipo(equipo_id: int, entrenador_id: int, datos_token: d
 
     return entrenador_data.data[0]
 
+# Endpoint para obtener los jugadores de un equipo
 @router.get("/{equipo_id}/jugadores/", response_model=List[JugadorOut])
 def obtener_jugadores_equipo(equipo_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
-
     if not equipo_data.data:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
     if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
@@ -148,17 +149,16 @@ def obtener_jugadores_equipo(equipo_id: int, datos_token: dict = Depends(obtener
         if posicion_obj:
             posiciones_map[pos["jugador_id"]].append(posicion_obj)
 
-    # Añadir la(s) posición(es) al jugador
+    # Añadir la posición al jugador
     for jugador in jugadores:
         jugador["posiciones"] = posiciones_map.get(jugador["id"], [])
 
     return jugadores
 
-
+# Endpoint para obtener un jugador específico de un equipo
 @router.get("/{equipo_id}/jugador/{jugador_id}", response_model=JugadorOut)
 def obtener_jugador_equipo(equipo_id: int, jugador_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
-
     if not equipo_data.data:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
     
@@ -189,7 +189,7 @@ def obtener_jugador_equipo(equipo_id: int, jugador_id: int, datos_token: dict = 
 
     return jugador
 
-
+# Endpoint para obtener un partido específico de un equipo
 @router.get("/{equipo_id}/partido/{partido_id}", response_model=PartidoOut)
 def obtener_partido_equipo(equipo_id: int, partido_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
@@ -207,7 +207,7 @@ def obtener_partido_equipo(equipo_id: int, partido_id: int, datos_token: dict = 
 
     return partido_data.data[0]
 
-
+# Endpoint para obtener los partidos de un equipo
 @router.get("/{equipo_id}/partidos/", response_model=List[PartidoOut])
 def obtener_partidos_equipo(equipo_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
@@ -225,6 +225,7 @@ def obtener_partidos_equipo(equipo_id: int, datos_token: dict = Depends(obtener_
 
     return response.data
 
+# Endpoints para obtener jugadores_partido y acciones_partido de un equipo
 @router.get("/{equipo_id}/partido/{partido_id}/jugadores_partido/" , response_model=List[JugadorPartidoOut])
 def obtener_jugadores_partido_equipo(equipo_id: int, partido_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
@@ -242,13 +243,13 @@ def obtener_jugadores_partido_equipo(equipo_id: int, partido_id: int, datos_toke
 
     response = supabase.table("jugadores_partido").select("*").eq("partidos_id", partido_id).execute()
 
-    # CAMBIO: Si no hay jugadores, devuelve lista vacía (200 OK)
+    # Si no hay jugadores, devuelve lista vacía
     if not response.data or len(response.data) == 0:
         return []
 
     return response.data
 
-
+# Endpoint para obtener un jugador_partido específico de un equipo
 @router.get("/{equipo_id}/partido/{partido_id}/jugador_partido/{jugador_partido_id}", response_model=JugadorPartidoOut)
 def obtener_jugador_partido_equipo(equipo_id: int, partido_id: int, jugador_partido_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
@@ -271,6 +272,7 @@ def obtener_jugador_partido_equipo(equipo_id: int, partido_id: int, jugador_part
 
     return jugador_partido_data.data[0]
 
+# Endpoint para obtener los partidos de un jugador en un equipo
 @router.get("/{equipo_id}/jugador/{jugador_id}/partidos/", response_model=List[PartidoOut])
 def obtener_partidos_jugador_equipo(equipo_id: int, jugador_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     jugador = supabase.table("jugadores").select("*").eq("id", jugador_id).execute()
@@ -299,7 +301,7 @@ def obtener_partidos_jugador_equipo(equipo_id: int, jugador_id: int, datos_token
         raise HTTPException(status_code=404, detail="No se encontraron partidos para este jugador")
     return partidos_data.data
 
-
+# Endpoint para obtener las acciones de un partido de un equipo
 @router.get("/{equipo_id}/partido/{partido_id}/acciones_partido/", response_model=List[AccionesPartidoOut])
 def obtener_acciones_partido_equipo(equipo_id: int, partido_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
@@ -328,7 +330,7 @@ def obtener_acciones_partido_equipo(equipo_id: int, partido_id: int, datos_token
 
     return acciones.data
 
-
+# Endpoint para obtener una acción específica de un partido de un equipo
 @router.get("/{equipo_id}/partido/{partido_id}/accion_partido/{accion_partido_id}", response_model=AccionesPartidoOut)
 def obtener_accion_partido_equipo(equipo_id: int, partido_id: int, accion_partido_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
@@ -356,7 +358,7 @@ def obtener_accion_partido_equipo(equipo_id: int, partido_id: int, accion_partid
     
     return accion.data[0]
 
-
+# Endpoint para obtener los jugadores_partido de un equipo
 @router.get("/{equipo_id}/jugadores_partidos/", response_model=List[JugadorPartidoOut])
 def obtener_jugadores_partidos_equipo(equipo_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
@@ -381,7 +383,7 @@ def obtener_jugadores_partidos_equipo(equipo_id: int, datos_token: dict = Depend
 
     return jugadores_partido.data
 
-
+# Endpoint para obtener los entrenadores de un equipo
 @router.get("/{equipo_id}/entrenadores_equipo/", response_model=List[EquipoEntrenador])
 def obtener_entrenadores_equipo(equipo_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
@@ -409,7 +411,7 @@ def obtener_entrenadores_equipo(equipo_id: int, datos_token: dict = Depends(obte
 
 #     return response.data[0]
 
-
+# Endpoint para crear un partido de un equipo
 @router.post("/{id_equipo}/partido/", response_model=PartidoOut)
 def crear_partido(id_equipo: int, partido: PartidoCreate, datos_token: dict = Depends(obtener_info_desde_token)):
    
@@ -432,6 +434,7 @@ def crear_partido(id_equipo: int, partido: PartidoCreate, datos_token: dict = De
     response = supabase.table("partidos").insert(data).execute()
     return response.data[0]
 
+# Endpoint para crear un jugador de un equipo
 @router.post("/{id_equipo}/jugador/", response_model=JugadorOut)
 def crear_jugador_equipo(id_equipo: int, jugador: JugadorCreate, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", id_equipo).execute()
@@ -487,7 +490,7 @@ def crear_jugador_equipo(id_equipo: int, jugador: JugadorCreate, datos_token: di
 
     return jugador_raw
 
-
+# Endpoint para crear un entrenador de un equipo
 @router.post("/{equipo_id}/entrenador/", response_model=EntrenadorOut)
 def crear_entrenador(equipo_id: int, entrenador: EntrenadorCreate, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
@@ -516,6 +519,7 @@ def crear_entrenador(equipo_id: int, entrenador: EntrenadorCreate, datos_token: 
 
     return response.data[0]
 
+# Endpoint para crear un jugador_partido de un equipo
 @router.post("/{equipo_id}/partido/{partido_id}/jugador_partido/", response_model=JugadorPartidoOut)
 def crear_jugador_partido_equipo(equipo_id: int, partido_id: int, jugador_partido: JugadorPartidoCreate, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
@@ -546,7 +550,7 @@ def crear_jugador_partido_equipo(equipo_id: int, partido_id: int, jugador_partid
 
     return response.data[0]
 
-
+# Endpoint para crear un entrenador de un equipo
 @router.post("/equipo_entrenador/{equipo_id}", response_model=EquipoEntrenador)
 def crear_equipo_entrenador(equipo_id: int, equipo_entrenador: EquipoEntrenadorCreate, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
@@ -581,6 +585,7 @@ def crear_equipo_entrenador(equipo_id: int, equipo_entrenador: EquipoEntrenadorC
 
 #     return {"message": "Equipo eliminado correctamente"}
     
+# Endpoint para eliminar un jugador de un equipo
 @router.delete("/{equipo_id}/entrenador_equipo/{entrenador_id}")
 def eliminar_entrenador_equipo(equipo_id: int, entrenador_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
@@ -603,7 +608,7 @@ def eliminar_entrenador_equipo(equipo_id: int, entrenador_id: int, datos_token: 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al eliminar el entrenador: {str(e)}")   
 
-
+# Endpoint para actualizar un jugador de un equipo
 @router.put("/{equipo_id}/jugador/{id}")
 def actualizar_jugador(id: int, jugador: JugadorUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
     jugador_data = supabase.table("jugadores").select("*").eq("id", id).execute()
@@ -634,7 +639,7 @@ def actualizar_jugador(id: int, jugador: JugadorUpdate, datos_token: dict = Depe
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al actualizar jugador: {str(e)}")
 
-
+# Endpoint para actualizar un entrenador de un equipo
 @router.put("/{equipo_id}/entrenador/{entrenador_id}", response_model=EntrenadorOut)
 def actualizar_entrenador( 
     equipo_id: int,
@@ -665,7 +670,7 @@ def actualizar_entrenador(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al actualizar el entrenador: {str(e)}")
     
-
+# Endpoint para actualizar un partido de un equipo
 @router.put("/{equipo_id}/partido/{partido_id}", response_model=PartidoOut)
 def actualizar_partido_equipo(equipo_id: int, partido_id: int, partido: PartidoCreate, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
@@ -690,7 +695,7 @@ def actualizar_partido_equipo(equipo_id: int, partido_id: int, partido: PartidoC
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al actualizar el partido: {str(e)}")
     
-
+# Endpoint para actualizar un jugador_partido de un equipo
 @router.put("/{equipo_id}/partido/{partido_id}/jugador_partido/{jugador_partido_id}", response_model=JugadorPartidoOut)
 def actualizar_jugador_partido_equipo(equipo_id: int, partido_id: int, jugador_partido_id: int, jugador_partido: JugadorPartidoUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
@@ -720,14 +725,9 @@ def actualizar_jugador_partido_equipo(equipo_id: int, partido_id: int, jugador_p
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al actualizar el jugador del partido: {str(e)}")
     
-
+# Endpoint para actualizar la posición de un jugador en un equipo
 @router.put("/{equipo_id}/jugador/{jugador_id}/posicion", response_model=JugadorPosicionOut)
-def actualizar_posicion_jugador(
-    equipo_id: int,
-    jugador_id: int,
-    datos_posicion: JugadorPosicionUpdate,
-    datos_token: dict = Depends(obtener_info_desde_token)
-):
+def actualizar_posicion_jugador(equipo_id: int, jugador_id: int, datos_posicion: JugadorPosicionUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
     # Verificar que el jugador pertenece al equipo y club
     jugador = supabase.table("jugadores").select("*").eq("id", jugador_id).eq("equipos_id", equipo_id).execute()
     if not jugador.data:
@@ -740,11 +740,13 @@ def actualizar_posicion_jugador(
     if equipo.data[0]["clubs_id"] != datos_token["clubs_id"]:
         raise HTTPException(status_code=403, detail="No tienes permiso para editar a este jugador")
 
+    # Verificar que el jugador tiene una relación de posición
     datos_update = datos_posicion.model_dump(exclude_unset=True)
     if not datos_update:
         raise HTTPException(status_code=400, detail="No se enviaron campos para actualizar")
 
     try:
+        # Actualizar la relación de posición del jugador
         respuesta = supabase.table("jugador_posicion").update(datos_update).eq("jugador_id", jugador_id).execute()
         if not respuesta.data:
             raise HTTPException(status_code=404, detail="No existe relación de posición para este jugador")
@@ -778,7 +780,7 @@ def actualizar_posicion_jugador(
 #     except Exception as e:
 #         raise HTTPException(status_code=500, detail=f"Error al eliminar el jugador: {str(e)}")
 
-
+# Endpoint para eliminar un partido de un equipo
 @router.delete("/{equipo_id}/partido/{partido_id}")
 def eliminar_partido_equipo(equipo_id: int, partido_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
