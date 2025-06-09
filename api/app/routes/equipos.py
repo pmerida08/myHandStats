@@ -193,7 +193,6 @@ def obtener_jugador_equipo(equipo_id: int, jugador_id: int, datos_token: dict = 
 @router.get("/{equipo_id}/partido/{partido_id}", response_model=PartidoOut)
 def obtener_partido_equipo(equipo_id: int, partido_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
-
     if not equipo_data.data:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
     
@@ -253,7 +252,6 @@ def obtener_jugadores_partido_equipo(equipo_id: int, partido_id: int, datos_toke
 @router.get("/{equipo_id}/partido/{partido_id}/jugador_partido/{jugador_partido_id}", response_model=JugadorPartidoOut)
 def obtener_jugador_partido_equipo(equipo_id: int, partido_id: int, jugador_partido_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
-
     if not equipo_data.data:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
     
