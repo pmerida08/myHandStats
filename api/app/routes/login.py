@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Obtener el CLIENT_ID de Google desde las variables de entorno
-GOOGLE_CLIENT_ID = os.getenv("VITE_GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 
 # Verificar si GOOGLE_CLIENT_ID está configurado
 router = APIRouter()
