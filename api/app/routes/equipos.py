@@ -1,43 +1,50 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List
-from app.models.equipo import EquipoUpdate, EquipoOut
+from app.models.equipo import EquipoOut
 from app.models.jugador import JugadorOut, JugadorCreate, JugadorUpdate
 from app.models.partido import PartidoOut, PartidoCreate
 from app.models.entrenador import EntrenadorOut, EntrenadorCreate, EntrenadorUpdate
 from app.models.jugador_partido import JugadorPartidoOut, JugadorPartidoCreate, JugadorPartidoUpdate
-from app.models.acciones_partido import AccionesPartidoOut, AccionesPartidoCreate, AccionesPartidoUpdate
-from app.models.jugador_posicion import JugadorPosicionOut, JugadorPosicionCreate, JugadorPosicionUpdate
-from app.models.equipo_entrenador import EquipoEntrenador, EquipoEntrenadorCreate, EquipoEntrenadorUpdate
+from app.models.acciones_partido import AccionesPartidoOut
+from app.models.jugador_posicion import JugadorPosicionOut, JugadorPosicionUpdate
+from app.models.equipo_entrenador import EquipoEntrenador, EquipoEntrenadorCreate
 from app.supabase_client import supabase
 from app.services.auth import obtener_info_desde_token
 from datetime import datetime
 
-
+# Importar el cliente de Supabase
 router = APIRouter()
 
-
+# Endpoint para obtener todos los equipos de un club
 @router.get("/", response_model=List[EquipoOut])
 def obtener_equipos_club(datos_token: dict = Depends(obtener_info_desde_token)):
+    # Comprobar el rol del usuario, si no es entrenador, obtener todos los equipos del club
     if datos_token["rol"] != "entrenador":
         response = supabase.table("equipos").select("*").eq("clubs_id", datos_token["clubs_id"]).execute()
+    # Si es entrenador, obtener solo los equipos asociados
     else:
+        # Obtener los IDs de los entrenadores asociados al email del token
         entrenadores = supabase.table("entrenadores").select("id").eq("email", datos_token["email"]).execute()
         if not entrenadores.data:
             return []
+        # Obtener los IDs de los entrenadores
         entrenador_ids = [e["id"] for e in entrenadores.data]
         equipo_entrenador = supabase.table("equipo_entrenador").select("equipo_id").in_("entrenador_id", entrenador_ids).execute()
         if not equipo_entrenador.data:
             return []
+        # Obtener los IDs de los equipos asociados a esos entrenadores
         equipo_ids = [ee["equipo_id"] for ee in equipo_entrenador.data]
         response = supabase.table("equipos").select("*").eq("clubs_id", datos_token["clubs_id"]).in_("id", equipo_ids).execute()
     return response.data
 
-
+# Endpoint para obtener un equipo específico por ID
 @router.get("/{equipo_id}", response_model=EquipoOut)
 def obtener_equipo(equipo_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
+    # Comprobar si el usuario es entrenador o no y obtener el equipo correspondiente
     if datos_token["rol"] != "entrenador":
         equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
     else:
+        # Obtener los IDs de los entrenadores asociados al email del token
         entrenadores = supabase.table("entrenadores").select("id").eq("email", datos_token["email"]).execute()
         if not entrenadores.data:
             raise HTTPException(status_code=404, detail="Entrenador no encontrado")
@@ -56,7 +63,7 @@ def obtener_equipo(equipo_id: int, datos_token: dict = Depends(obtener_info_desd
 
     return equipo_data.data[0]
 
-        
+# Endpoints para obtener entrenadores y jugadores de un equipo
 @router.get("/{equipo_id}/entrenadores/", response_model=List[EntrenadorOut])
 def obtener_entrenadores_equipo(equipo_id: int, datos_token: dict = Depends(obtener_info_desde_token)):
     equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()

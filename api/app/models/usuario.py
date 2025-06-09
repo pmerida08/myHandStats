@@ -86,3 +86,16 @@ class RegisterRequest(BaseModel):
 
     class Config:
         orm_mode = True
+
+# Modelo para establecer una nueva contraseña
+class EstablecerContraseñaDTO(BaseModel):
+    token: str
+    nueva_contraseña: str
+    
+# Modelo para la solicitud de inicio de sesión con Google
+class GoogleLoginRequest(BaseModel):
+    credential: str
+    
+# Modelo para la solicitud de registro con Google
+class GoogleRegisterRequest(BaseModel):
+    credential: str

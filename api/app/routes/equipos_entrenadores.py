@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from typing import List
-from app.models.equipo_entrenador import EquipoEntrenador, EquipoEntrenadorCreate, EquipoEntrenadorUpdate, EquipoEntrenadorOut
+from app.models.equipo_entrenador import EquipoEntrenadorCreate, EquipoEntrenadorUpdate, EquipoEntrenadorOut
 from app.supabase_client import supabase
 
 

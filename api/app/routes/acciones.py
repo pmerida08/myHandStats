@@ -5,11 +5,9 @@ from app.supabase_client import supabase
 
 router = APIRouter()
 
+# Get para obtener todas las acciones 
 @router.get("/", response_model=List[Acciones])
 def obtener_acciones():
-    """
-    Obtener todas las acciones.
-    """
     response = supabase.table("acciones").select("*").execute()
 
     if getattr(response, "error", None):
@@ -17,11 +15,9 @@ def obtener_acciones():
 
     return response.data
 
+# Get para obtener una acción tipo de acción
 @router.get("/filtrar", response_model=List[Acciones])
 def filtrar_acciones_por_tipo(tipo_accion: str = Query(..., description="Tipo de acción a filtrar")):
-    """
-    Filtrar acciones por tipo de acción.
-    """
     response = supabase.table("acciones").select("*").eq("tipo_accion", tipo_accion).execute()
 
     if getattr(response, "error", None):

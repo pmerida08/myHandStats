@@ -3,16 +3,18 @@ from app.models.usuario import UsuarioUpdate, UsuarioOut
 from app.supabase_client import supabase
 from app.services.auth import obtener_info_desde_token
 from app.utils.hashing import hash_password
-
+ 
+# Importar el cliente de Supabase
 router = APIRouter()
 
-
+# Endpoint para actualizar un usuario
 @router.put("/{id}", response_model=UsuarioOut)
 def actualizar_usuario(id: int, usuario: UsuarioUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
     # Verificaciones de autorización
     if datos_token["rol"] == "admin":
         # Puede editar cualquier usuario de su club
         usuario_a_editar = supabase.table("usuarios").select("clubs_id").eq("id", id).execute()
+        # Verificar si el usuario existe y pertenece al club del token
         if not usuario_a_editar.data or usuario_a_editar.data[0]["clubs_id"] != datos_token["clubs_id"]:
             raise HTTPException(status_code=403, detail="No puedes editar usuarios de otro club")
     elif datos_token["user_id"] != id:
@@ -42,7 +44,7 @@ def actualizar_usuario(id: int, usuario: UsuarioUpdate, datos_token: dict = Depe
 
 #     return {"message": "Usuario eliminado correctamente"}
 
-
+# Endpoint para obtener el perfil del usuario
 @router.get("/perfil", tags=["Usuarios"])
 def obtener_perfil(info: str = Depends(obtener_info_desde_token)):
     return {"info": info}
