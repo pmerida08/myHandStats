@@ -45,8 +45,7 @@ const avatars = [
   'https://randomuser.me/api/portraits/lego/1.jpg',
 ]
 
-const clientId = '580062200389-hblem47late6qfggkg4iv8gnba20ih91.apps.googleusercontent.com'
-
+const clientId = import.meta.env.GOOGLE_CLIENT_ID;
 const Registrar = () => {
   const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')
