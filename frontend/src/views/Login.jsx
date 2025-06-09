@@ -48,7 +48,7 @@ import avatar4 from "../assets/avatars/avatar_4.png";
 const avatars = [avatar1, avatar2, avatar3, avatar4];
 
 const clientId =
-  import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.GOOGLE_CLIENT_ID;
+  import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.GOOGLE_CLIENT_ID || "580062200389-hblem47late6qfggkg4iv8gnba20ih91.apps.googleusercontent.com";
 
 const Login = () => {
   const [email, setEmail] = useState("");
