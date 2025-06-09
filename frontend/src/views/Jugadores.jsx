@@ -48,8 +48,13 @@ import { createClient } from "@supabase/supabase-js";
 import Header from "../components/Header";
 
 // Configuración de Supabase
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://rdpazmfdbcundrogccsb.supabase.co";
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkcGF6bWZkYmN1bmRyb2djY3NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1MTA4MjksImV4cCI6MjA2MjA4NjgyOX0.sSfVgFsJvoFYnl-jc-wJabyYUisgwgDv1jwU9rpzsw4";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  throw new Error("Missing Supabase environment variables");
+}
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const Jugadores = () => {
