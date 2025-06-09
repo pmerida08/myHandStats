@@ -44,6 +44,7 @@ import {
 } from "chart.js";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
+import Header from "../components/Header"; // Añade este import
 
 ChartJS.register(
   BarElement,
@@ -61,10 +62,15 @@ function StatsJugador() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const chartBoxBg = useColorModeValue("white", "gray.700");
 
+  // Estado para usuario y club
+  const [userName, setUserName] = useState("");
+  const [club, setClub] = useState({ nombre: "", logo: "" });
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const id_equipo = localStorage.getItem("id_equipo");
 
+    // Cargar datos del jugador
     fetch(
       `https://myhandstats.onrender.com/equipo/${id_equipo}/jugador/${jugador_id}`,
       {
@@ -79,6 +85,38 @@ function StatsJugador() {
       })
       .catch((err) => console.error("Error al cargar estadísticas:", err))
       .finally(() => setLoading(false));
+
+    // Cargar nombre usuario
+    fetch("https://myhandstats.onrender.com/usuario/perfil", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setUserName(data.info?.nombre || "Usuario"));
+
+    // Cargar club
+    fetch("https://myhandstats.onrender.com/club", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        let clubId = null;
+        try {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          clubId = payload.club_id || payload.club || payload.id || null;
+        } catch {
+          clubId = null;
+        }
+        let clubObj = null;
+        if (Array.isArray(data.info)) {
+          clubObj = data.info.find((c) => c.id == clubId);
+        } else {
+          clubObj = data;
+        }
+        setClub({
+          nombre: clubObj?.nombre || "Club no encontrado",
+          logo: clubObj?.logo || "",
+        });
+      });
   }, [jugador_id]);
 
   if (loading) {
@@ -141,16 +179,15 @@ function StatsJugador() {
   return (
     <AuthWrapper requiredRole={null}>
       <Box p={4} position="relative">
+        {/* Header añadido */}
+        <Header
+          onOpen={onOpen}
+          userName={userName}
+          club={club}
+          texto="Estadísticas del Jugador"
+        />
         <Sidebar isOpen={isOpen} onClose={onClose} />
         <Box>
-          {/* Header mejor alineado */}
-          <Flex align="center" justify="space-between" mb={8}>
-            <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-            <Text fontSize="2xl" fontWeight="bold" color="#014C4C">
-              Estadísticas del Jugador
-            </Text>
-            <Box w="6" />
-          </Flex>
 
           <Card
            
