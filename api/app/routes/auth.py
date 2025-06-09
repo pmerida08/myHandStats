@@ -3,10 +3,9 @@ from jose import jwt, JWTError
 from pydantic import BaseModel
 from app.utils.hashing import hash_password
 from app.supabase_client import supabase
-from datetime import datetime
 import os
 from dotenv import load_dotenv
-from models.usuario import EstablecerContraseñaDTO
+from app.models.usuario import EstablecerContraseñaDTO
 
 # Cargar las variables de entorno
 load_dotenv()
