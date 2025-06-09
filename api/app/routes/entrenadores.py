@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
-from typing import List
-from app.models.entrenador import Entrenador, EntrenadorCreate, EntrenadorUpdate, EntrenadorDelete, EntrenadorOut
+from app.models.entrenador import EntrenadorUpdate
 from app.supabase_client import supabase
 
+# Importar el cliente de Supabase
 router = APIRouter()
 
 # @router.get("/", response_model=List[Entrenador])
@@ -25,34 +25,35 @@ router = APIRouter()
 
 #     return response.data[0]
 
-@router.delete("/{entrenador_id}")
-def eliminar_entrenador(entrenador_id: int):
-    response = supabase.table("entrenadores").delete().eq("id", entrenador_id).execute()
+# Endpoint para borrar un entrenador por ID
+# @router.delete("/{entrenador_id}")
+# def eliminar_entrenador(entrenador_id: int):
+#     response = supabase.table("entrenadores").delete().eq("id", entrenador_id).execute()
 
-    if getattr(response, "error", None):
-        raise HTTPException(status_code=400, detail=f"Error al eliminar el entrenador: {response.error.message}")
+#     if getattr(response, "error", None):
+#         raise HTTPException(status_code=400, detail=f"Error al eliminar el entrenador: {response.error.message}")
 
-    if response.data == 0:
-        raise HTTPException(status_code=404, detail="Entrenador no encontrado")
+#     if response.data == 0:
+#         raise HTTPException(status_code=404, detail="Entrenador no encontrado")
 
-    return {"message": "Entrenador eliminado correctamente"}
+#     return {"message": "Entrenador eliminado correctamente"}
 
-@router.put("/{id}")
-def actualizar_entrenador(id: int, entrenador: EntrenadorUpdate):
-    datos_actualizados = entrenador.dict(exclude_unset=True)
+# @router.put("/{id}")
+# def actualizar_entrenador(id: int, entrenador: EntrenadorUpdate):
+#     datos_actualizados = entrenador.dict(exclude_unset=True)
 
-    if not datos_actualizados:
-        raise HTTPException(status_code=400, detail="No se proporcionaron datos para actualizar")
+#     if not datos_actualizados:
+#         raise HTTPException(status_code=400, detail="No se proporcionaron datos para actualizar")
     
-    entrenador_existente = supabase.table("entrenadores").select("*").eq("id", id).execute()
-    if not entrenador_existente.data or len(entrenador_existente.data) == 0:
-        raise HTTPException(status_code=404, detail="Entrenador no encontrado")
+#     entrenador_existente = supabase.table("entrenadores").select("*").eq("id", id).execute()
+#     if not entrenador_existente.data or len(entrenador_existente.data) == 0:
+#         raise HTTPException(status_code=404, detail="Entrenador no encontrado")
     
-    try:
-        respuesta = supabase.table("entrenadores").update(datos_actualizados).eq("id", id).execute()
-        if getattr(respuesta, "error", None):
-            raise HTTPException(status_code=400, detail=f"Error al actualizar el entrenador: {respuesta.error.message}")
+#     try:
+#         respuesta = supabase.table("entrenadores").update(datos_actualizados).eq("id", id).execute()
+#         if getattr(respuesta, "error", None):
+#             raise HTTPException(status_code=400, detail=f"Error al actualizar el entrenador: {respuesta.error.message}")
         
-        return {"message": "Entrenador actualizado correctamente"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+#         return {"message": "Entrenador actualizado correctamente"}
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")

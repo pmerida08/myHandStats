@@ -1,20 +1,23 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from app.models.usuario import UsuarioCreate, UsuarioOut
+from app.models.usuario import UsuarioCreate, UsuarioOut, GoogleRegisterRequest
 from app.supabase_client import supabase
 from app.utils.hashing import hash_password
-from app.services.auth import generar_token  # debes tener esta función definida
 from google.oauth2 import id_token
 from google.auth.transport import requests
 import os
 from dotenv import load_dotenv
 
+# Cargar las variables de entorno desde el archivo .env
 load_dotenv()
 
-router = APIRouter()
-
+# Obtener el CLIENT_ID de Google desde las variables de entorno
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 
+# Importar el cliente de Supabase
+router = APIRouter()
+
+# Endpoint para registrar un nuevo usuario
 @router.post("/", response_model=UsuarioOut)
 def crear_usuario(usuario: UsuarioCreate):
     try:
@@ -50,13 +53,7 @@ def crear_usuario(usuario: UsuarioCreate):
         raise HTTPException(status_code=500, detail="Error al registrar el usuario")
 
 
-# -----------------------------------------
-# REGISTRO CON GOOGLE
-# -----------------------------------------
-
-class GoogleRegisterRequest(BaseModel):
-    credential: str
-
+# Endpoint para registrar un usuario con Google
 @router.post("/google", response_model=UsuarioOut)
 def registrar_con_google(payload: GoogleRegisterRequest):
     try:

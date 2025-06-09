@@ -3,9 +3,11 @@ from typing import List
 from app.models.jugador_partido import JugadorPartido, JugadorPartidoCreate, JugadorPartidoUpdate, JugadorPartidoOut
 from app.supabase_client import supabase
 
+# Importar el cliente de Supabase
 router = APIRouter()
 
-@router.get("/", response_model=List[JugadorPartido]) # NO VA
+# Endpoint para obtener todos los jugadores_partidos
+@router.get("/", response_model=List[JugadorPartido])
 def get_jugadores_partidos():
     response = supabase.table("jugadores_partidos").select("*, jugador_id:jugadores(nombre), partido_id:partidos(fecha)").execute()
 

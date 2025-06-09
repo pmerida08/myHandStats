@@ -124,7 +124,7 @@ def delete_accion_partido( id: int, datos_token: dict = Depends(obtener_info_des
     if not jugador.data:
         raise HTTPException(status_code=404, detail="Jugador not found")
    
-    # print (jugador.data[0]["equipos_id"])
+
     # Obtener el club del equipo
     equipo = supabase.table("equipos").select("clubs_id").eq("id", jugador.data[0]["equipos_id"]).execute()
     if getattr(equipo, "error", None):
