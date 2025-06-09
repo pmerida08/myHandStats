@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
+# Modelo para la entidad Club
 class Club(BaseModel):
     id: int
     nombre: str
@@ -14,6 +15,7 @@ class Club(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelos para crear, actualizar, eliminar y leer datos de clubes
 class ClubCreate(BaseModel):
     nombre: str
     descripcion: str
@@ -25,6 +27,7 @@ class ClubCreate(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelo para actualizar datos de Club (los campos son opcionales)
 class ClubUpdate(BaseModel):
     nombre: Optional[str] = None
     descripcion: Optional[str] = None
@@ -35,12 +38,14 @@ class ClubUpdate(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelo para eliminar Club (solo necesita el ID)
 class ClubDelete(BaseModel):
     id: int
 
     class Config:
         orm_mode = True
-    
+
+# Modelo para la respuesta de Club (para salida)    
 class ClubOut(BaseModel):
     id: int
     nombre: str

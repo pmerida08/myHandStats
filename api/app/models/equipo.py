@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
+# Modelo para la entidad Equipo
 class Equipo(BaseModel):
     id: int
     nombre: str
@@ -14,6 +15,7 @@ class Equipo(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelo para la creación de equipos
 class EquipoCreate(BaseModel):
     nombre: str
     categoria: str
@@ -24,6 +26,7 @@ class EquipoCreate(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelo para actualizar equipos
 class EquipoUpdate(BaseModel):
     nombre: Optional[str] = None
     categoria: Optional[str] = None
@@ -33,12 +36,14 @@ class EquipoUpdate(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelo para eliminar equipos
 class EquipoDelete(BaseModel):
     id: int
 
     class Config:
         orm_mode = True
 
+# Modelo para la respuesta de los equipos (para salida)
 class EquipoOut(BaseModel):
     id: int
     nombre: str

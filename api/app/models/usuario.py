@@ -8,7 +8,7 @@ class UsuarioCreate(BaseModel):
     email: str
     password: str
     rol: str
-    foto: Optional[str] = None  # Nuevo campo
+    foto: Optional[str] = None 
 
     class Config:
         orm_mode = True
@@ -20,14 +20,14 @@ class Usuario(BaseModel):
     email: str
     password: str
     rol: str
-    foto: Optional[str] = None  # Nuevo campo
+    foto: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
     class Config:
         orm_mode = True
 
-
+# Modelo para crear usuarios administradores (con campos específicos)
 class CrearUsuarioAdminDTO(BaseModel):
     nombre: str
     email: str
@@ -42,7 +42,7 @@ class UsuarioUpdate(BaseModel):
     email: Optional[str] = None
     password: Optional[str] = None
     rol: Optional[str] = None
-    foto: Optional[str] = None  # Nuevo campo
+    foto: Optional[str] = None  
 
     class Config:
         orm_mode = True
@@ -60,7 +60,7 @@ class UsuarioOut(BaseModel):
     nombre: str
     email: str
     rol: str
-    foto: Optional[str] = None  # Nuevo campo
+    foto: Optional[str] = None  
     clubs_id: int
     created_at: datetime
     updated_at: datetime
@@ -68,6 +68,7 @@ class UsuarioOut(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelo para la solicitud de inicio de sesión y registro
 class LoginRequest(BaseModel):
     email: str
     password: str
@@ -75,12 +76,13 @@ class LoginRequest(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelo para la solicitud de registro de usuario
 class RegisterRequest(BaseModel):
     nombre: str
     email: str
     password: str
     rol: str = "admin"
-    foto: Optional[str] = None  # Nuevo campo
+    foto: Optional[str] = None 
 
     class Config:
         orm_mode = True

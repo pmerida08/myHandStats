@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
 
+# Modelo para la entidad Entrenador
 class Entrenador(BaseModel):
     id: int
     nombre: str
@@ -11,6 +11,7 @@ class Entrenador(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelos para crear, actualizar, eliminar y leer datos de Entrenador
 class EntrenadorCreate(BaseModel):
     nombre: str
     email: str
@@ -18,7 +19,8 @@ class EntrenadorCreate(BaseModel):
 
     class Config:
         orm_mode = True
-    
+
+# Modelo para actualizar datos de Entrenador (los campos son opcionales)   
 class EntrenadorUpdate(BaseModel):
     nombre: Optional[str] = None
     email: Optional[str] = None
@@ -27,12 +29,14 @@ class EntrenadorUpdate(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelo para eliminar Entrenador (solo necesita el ID)
 class EntrenadorDelete(BaseModel):
     id: int
 
     class Config:
         orm_mode = True
 
+# Modelo para la respuesta de Entrenador (para salida)
 class EntrenadorOut(BaseModel):
     id: int
     nombre: str

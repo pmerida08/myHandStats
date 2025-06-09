@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
+# Modelo para la entidad JugadorPartido
 class JugadorPartido(BaseModel):
     id: int
     golesli: int
@@ -56,6 +57,7 @@ class JugadorPartido(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelos para crear, actualizar, eliminar y leer datos de JugadorPartido
 class JugadorPartidoCreate(BaseModel):
     golesli: int
     golesld: int
@@ -110,6 +112,7 @@ class JugadorPartidoCreate(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelo para actualizar datos de JugadorPartido (los campos son opcionales)
 class JugadorPartidoUpdate(BaseModel):
     golesli: Optional[int] = None
     golesld: Optional[int] = None
@@ -164,12 +167,14 @@ class JugadorPartidoUpdate(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelo para eliminar JugadorPartido (solo necesita el ID)
 class JugadorPartidoDelete(BaseModel):
     id: int
 
     class Config:
         orm_mode = True
 
+# Modelo para la respuesta de JugadorPartido (para salida)
 class JugadorPartidoOut(BaseModel):
     id: int
     golesli: int
