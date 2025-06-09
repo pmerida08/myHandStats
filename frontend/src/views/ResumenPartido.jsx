@@ -1,3 +1,22 @@
+/**
+ * ResumenPartido
+ * 
+ * Vista para mostrar el resumen detallado de un partido específico.
+ * 
+ * Características:
+ * - Muestra el resultado, estadísticas y acciones del partido.
+ * - Tabs para ver resumen, goleadores, timeline de acciones, jugadores y tiros.
+ * - Visualización de estadísticas como eficacia, pérdidas y goles.
+ * - Timeline visual de las acciones del partido con iconos.
+ * - Tabla de goleadores y jugadores participantes.
+ * - Obtiene y relaciona datos de partido, acciones, tipos de acciones y jugadores.
+ * - Incluye Header y Sidebar personalizados.
+ * - Spinner de carga mientras se obtienen los datos.
+ * 
+ * Uso:
+ * - Accesible para cualquier usuario autenticado.
+ * - Se accede desde la lista de partidos o desde el menú del equipo.
+ */
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {

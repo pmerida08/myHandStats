@@ -1,3 +1,17 @@
+/**
+ * DashboardPartido
+ *
+ * Vista principal para la gestión y registro de acciones durante un partido.
+ * Permite seleccionar equipo, gestionar jugadores, registrar acciones, controlar el tiempo y marcar goles.
+ *
+ * Características principales:
+ * - Selección de equipo y jugadores.
+ * - Control de fases del juego y acciones (goles, faltas, sanciones, etc.).
+ * - Cronómetro para el partido.
+ * - Registro de goles y goles en contra.
+ * - Modal para seleccionar zona de disparo y lanzador.
+ * - Finalización de parte y partido con confirmación.
+ */
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -20,23 +34,37 @@ import { FaBars, FaPause } from "react-icons/fa";
 import Swal from "sweetalert2";
 
 const DashboardPartido = () => {
+  // Estado para los equipos disponibles
   const [equipos, setEquipos] = useState([]);
+  // Equipo seleccionado para el partido
   const [equipoSeleccionado, setEquipoSeleccionado] = useState("");
+  // Jugadores del equipo seleccionado
   const [jugadores, setJugadores] = useState([]);
+  // Jugador seleccionado para registrar acción
   const [jugadorSeleccionado, setJugadorSeleccionado] = useState(null);
-  const [faseSeleccionada, setFaseSeleccionada] = useState("Ataque Posicional"); // ✅ Fase por defecto
+  // Fase del juego seleccionada
+  const [faseSeleccionada, setFaseSeleccionada] = useState("Ataque Posicional");
+  // Estado del partido (iniciado o no)
   const [partidoIniciado, setPartidoIniciado] = useState(false);
+  // Tipo de acción/modal activo
   const [modalTipo, setModalTipo] = useState(null);
 
+  // Zona de disparo y lanzador para el modal
   const [zonaDisparo, setZonaDisparo] = useState(null);
   const [zonaLanzador, setZonaLanzador] = useState(null);
+  // Control del modal
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  // Cronómetro y control de tiempo
   const [segundos, setSegundos] = useState(0);
   const [activo, setActivo] = useState(false);
+  // Marcador de goles
   const [golesLocal, setGolesLocal] = useState(0);
   const [golesVisitante, setGolesVisitante] = useState(0);
 
+  /**
+   * Carga los equipos del club al montar el componente.
+   */
   useEffect(() => {
     const token = localStorage.getItem("token");
     fetch("https://myhandstats.onrender.com/club/equipos", {
@@ -52,6 +80,9 @@ const DashboardPartido = () => {
       .catch((err) => console.error("Error al cargar equipos:", err));
   }, []);
 
+  /**
+   * Carga los jugadores del equipo seleccionado.
+   */
   useEffect(() => {
     if (!equipoSeleccionado) return;
     const token = localStorage.getItem("token");
@@ -72,6 +103,9 @@ const DashboardPartido = () => {
       .catch((err) => console.error("Error al cargar jugadores:", err));
   }, [equipoSeleccionado]);
 
+  /**
+   * Controla el cronómetro del partido.
+   */
   useEffect(() => {
     let interval = null;
     if (activo) {
@@ -84,12 +118,18 @@ const DashboardPartido = () => {
     return () => clearInterval(interval);
   }, [activo]);
 
+  /**
+   * Formatea el tiempo en mm:ss.
+   */
   const formatoTiempo = () => {
     const min = String(Math.floor(segundos / 60)).padStart(2, "0");
     const sec = String(segundos % 60).padStart(2, "0");
     return `${min}:${sec}`;
   };
 
+  /**
+   * Inicia el partido si hay equipo seleccionado.
+   */
   const handleComenzar = () => {
     if (!equipoSeleccionado) {
       Swal.fire(
@@ -102,6 +142,9 @@ const DashboardPartido = () => {
     setPartidoIniciado(true);
   };
 
+  /**
+   * Guarda un gol, validando zonas seleccionadas.
+   */
   const handleGuardarGol = () => {
     if (!zonaDisparo || (modalTipo === "gol" && !zonaLanzador)) {
       Swal.fire(
@@ -118,6 +161,10 @@ const DashboardPartido = () => {
     setModalTipo(null);
   };
 
+  /**
+   * Maneja la selección de una acción (gol, falta, sanción, etc.).
+   * Si requiere modal, lo abre; si no, registra la acción directamente.
+   */
   const handleAccion = (accion) => {
     if (accion !== "Gol en Contra" && !jugadorSeleccionado) {
       Swal.fire(
@@ -135,6 +182,12 @@ const DashboardPartido = () => {
     }
   };
 
+  /**
+   * Muestra un diálogo de confirmación usando SweetAlert2.
+   * @param {string} mensaje Mensaje a mostrar
+   * @param {string} confirmButton Texto del botón de confirmación
+   * @returns {Promise<boolean>} true si el usuario confirma
+   */
   const confirmar = async (mensaje, confirmButton = "Sí") => {
     const result = await Swal.fire({
       title: mensaje,
@@ -146,6 +199,9 @@ const DashboardPartido = () => {
     return result.isConfirmed;
   };
 
+  /**
+   * Finaliza la parte actual del partido.
+   */
   const handleFinalizarParte = async () => {
     if (await confirmar("¿Estás seguro de finalizar la parte?")) {
       setActivo(false);
@@ -158,6 +214,9 @@ const DashboardPartido = () => {
     }
   };
 
+  /**
+   * Finaliza el partido completamente.
+   */
   const handleFinalizarPartido = async () => {
     if (await confirmar("¿Finalizar el partido completamente?")) {
       setActivo(false);
@@ -165,6 +224,7 @@ const DashboardPartido = () => {
     }
   };
 
+  // Pantalla de selección de equipo antes de iniciar el partido
   if (!partidoIniciado) {
     return (
       <Box p={8} minH="100vh" bg="white" textAlign="center">
@@ -197,6 +257,7 @@ const DashboardPartido = () => {
     );
   }
 
+  // Vista principal del dashboard de partido
   return (
     <Box p={4} minH="100vh" bg="white">
       <Flex align="center" justify="space-between" mb={6}>
@@ -236,6 +297,7 @@ const DashboardPartido = () => {
       </Flex>
 
       <Flex flexWrap="wrap" gap={6}>
+        {/* Panel izquierdo: gestión de jugadores y timeouts */}
         <Box minW="200px">
           <Text fontWeight="bold" mb={2}>
             Timeouts
@@ -293,18 +355,13 @@ const DashboardPartido = () => {
           </SimpleGrid>
         </Box>
 
-        {/* Zona derecha del Dashboard */}
+        {/* Panel derecho: fases, acciones y finalización */}
         <Box flex="1">
           <Text fontWeight="bold" mb={2}>
             Fase del Juego
           </Text>
           <Flex wrap="wrap" gap={2} mb={4}>
-            {[
-              "Ataque Posicional",
-              "Defensa Posicional",
-              "Contraataque",
-              "Repliegue",
-            ].map((fase) => (
+            {["Ataque Posicional", "Defensa Posicional", "Contraataque", "Repliegue"].map((fase) => (
               <Button
                 key={fase}
                 size="sm"
@@ -371,7 +428,7 @@ const DashboardPartido = () => {
         </Box>
       </Flex>
 
-      {/* MODAL */}
+      {/* Modal para seleccionar zona de disparo y lanzador */}
       <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
         <ModalOverlay />
         <ModalContent>
@@ -402,13 +459,7 @@ const DashboardPartido = () => {
                   Posición del Lanzador
                 </Text>
                 <Grid templateColumns="repeat(5, 1fr)" gap={2} mb={2}>
-                  {[
-                    "Ala Izquierda",
-                    "Izquierda 6M",
-                    "Centro 6M",
-                    "Derecha 6M",
-                    "Ala Derecha",
-                  ].map((pos) => (
+                  {["Ala Izquierda", "Izquierda 6M", "Centro 6M", "Derecha 6M", "Ala Derecha"].map((pos) => (
                     <Button
                       key={pos}
                       onClick={() => setZonaLanzador(pos)}
@@ -421,13 +472,7 @@ const DashboardPartido = () => {
                   ))}
                 </Grid>
                 <Grid templateColumns="repeat(3, 1fr)" gap={2}>
-                  {[
-                    "Izquierda 9M",
-                    "Centro 9M",
-                    "Derecha 9M",
-                    "Medio Campo",
-                    "Campo a Campo",
-                  ].map((pos) => (
+                  {["Izquierda 9M", "Centro 9M", "Derecha 9M", "Medio Campo", "Campo a Campo"].map((pos) => (
                     <Button
                       key={pos}
                       onClick={() => setZonaLanzador(pos)}

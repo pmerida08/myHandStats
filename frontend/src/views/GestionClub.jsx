@@ -1,3 +1,16 @@
+/**
+ * ClubAdminPanel
+ * 
+ * Vista de administración del club para usuarios con rol "admin".
+ * Permite gestionar usuarios, equipos, entrenadores y la información del club.
+ * 
+ * Características:
+ * - Solo accesible para administradores (verifica el rol en el token).
+ * - Muestra el nombre y logo del club en el header.
+ * - Ofrece botones para navegar a las diferentes gestiones del club.
+ * - Incluye Sidebar y Header personalizados.
+ * - Spinner de carga mientras se verifica el acceso y se cargan los datos.
+ */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -14,8 +27,7 @@ import {
 import { FaUsers, FaUsersCog, FaChalkboardTeacher, FaInfoCircle } from "react-icons/fa";
 import Sidebar from '../components/Sidebar';
 import AuthWrapper from "../components/AuthWrapper";
-import Header from "../components/Header"; // <-- Añade el import
-
+import Header from "../components/Header";
 const ClubAdminPanel = () => {
   const navigate = useNavigate();
   const [token, setToken] = useState(null);
@@ -24,10 +36,15 @@ const ClubAdminPanel = () => {
   const bg = useColorModeValue("white", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
 
-  // Para el header
+  // Estado para el header
   const [userName, setUserName] = useState("");
   const [club, setClub] = useState({ nombre: "", logo: "" });
 
+  /**
+   * useEffect para:
+   * - Verificar el token y el rol del usuario (solo admin puede acceder).
+   * - Cargar datos del usuario y club para el header.
+   */
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
 
@@ -83,6 +100,7 @@ const ClubAdminPanel = () => {
     setIsLoading(false);
   }, [navigate]);
 
+  // Spinner de carga mientras se verifica el acceso
   if (isLoading) {
     return (
       <Center h="100vh">
@@ -91,11 +109,13 @@ const ClubAdminPanel = () => {
     );
   }
 
+  // Si no hay token válido, no renderiza nada
   if (!token) return null;
 
   return (
     <AuthWrapper requiredRole={null}>
       <Box minH="100vh" bg={bg} p={{ base: 2, md: 8 }} position="relative">
+        {/* Logo de fondo */}
         <Image
           src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/public/imagenes//logo.avif"
           alt="Logo MyHandStats"
@@ -109,14 +129,17 @@ const ClubAdminPanel = () => {
           pointerEvents="none"
           userSelect="none"
         />
+        {/* Header con datos del club y usuario */}
         <Header
           onOpen={onOpen}
           userName={userName}
           club={club}
           texto="Panel de Administración del Club"
         />
+        {/* Sidebar de navegación */}
         <Sidebar isOpen={isOpen} onClose={onClose} />
 
+        {/* Panel principal de administración */}
         <Box
           bg={cardBg}
           borderRadius="2xl"

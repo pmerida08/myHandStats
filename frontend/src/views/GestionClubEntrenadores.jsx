@@ -1,3 +1,20 @@
+/**
+ * GestionEntrenadores
+ *
+ * Vista de administración para asignar y gestionar entrenadores de un equipo.
+ * Permite:
+ * - Ver los entrenadores disponibles en el club.
+ * - Asignar entrenadores a un equipo.
+ * - Ver y eliminar entrenadores ya asignados al equipo.
+ *
+ * Características:
+ * - Solo accesible para usuarios con rol "admin".
+ * - Muestra el header y sidebar personalizados.
+ * - Incluye feedback visual con toasts y spinner de carga.
+ *
+ * Props:
+ * - equipoId (opcional): ID del equipo a gestionar (si no se usa el de localStorage).
+ */
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -19,15 +36,27 @@ import AuthWrapper from "../components/AuthWrapper";
 import Header from "../components/Header";
 
 const GestionEntrenadores = ({ equipoId }) => {
+  // Estado para la lista de entrenadores disponibles en el club
   const [entrenadoresDisponibles, setEntrenadoresDisponibles] = useState([]);
+  // Estado para la lista de entrenadores asignados al equipo
   const [entrenadoresAsignados, setEntrenadoresAsignados] = useState([]);
+  // Estado para el entrenador seleccionado en el select
   const [entrenadorSeleccionado, setEntrenadorSeleccionado] = useState("");
+  // Estado de carga
   const [loading, setLoading] = useState(false);
+  // Control del sidebar
   const { isOpen, onOpen, onClose } = useDisclosure();
+  // Toast para notificaciones
   const toast = useToast();
+  // Estado para el nombre de usuario y club (para el header)
   const [userName, setUserName] = useState("");
   const [club, setClub] = useState({ nombre: "", logo: "" });
 
+  /**
+   * useEffect inicial:
+   * - Carga el nombre del usuario y los datos del club para el header.
+   * - Llama a cargarEntrenadores para obtener los entrenadores disponibles y asignados.
+   */
   useEffect(() => {
     // Cargar nombre usuario y club
     const token = localStorage.getItem("token");
@@ -66,10 +95,14 @@ const GestionEntrenadores = ({ equipoId }) => {
     // eslint-disable-next-line
   }, []);
 
+  /**
+   * Carga los entrenadores disponibles en el club y los asignados al equipo.
+   */
   const cargarEntrenadores = async () => {
     setLoading(true);
     const token = localStorage.getItem("token");
     try {
+      // Entrenadores disponibles en el club
       const res1 = await fetch(
         `https://myhandstats.onrender.com/club/entrenadores`,
         {
@@ -79,6 +112,7 @@ const GestionEntrenadores = ({ equipoId }) => {
       const data1 = await res1.json();
       setEntrenadoresDisponibles(data1.entrenadores || data1 || []);
 
+      // Entrenadores asignados al equipo
       const equipoIdLocal = localStorage.getItem("id_equipo");
       const res2 = await fetch(
         `https://myhandstats.onrender.com/equipo/${equipoIdLocal}/entrenadores_equipo`,
@@ -116,6 +150,9 @@ const GestionEntrenadores = ({ equipoId }) => {
     setLoading(false);
   };
 
+  /**
+   * Asocia el entrenador seleccionado al equipo.
+   */
   const asociarEntrenador = async () => {
     if (!entrenadorSeleccionado) return;
     const token = localStorage.getItem("token");
@@ -154,6 +191,10 @@ const GestionEntrenadores = ({ equipoId }) => {
     }
   };
 
+  /**
+   * Elimina la asociación de un entrenador con el equipo.
+   * @param {string|number} entrenadorId - ID del entrenador a desasociar
+   */
   const eliminarAsociacion = async (entrenadorId) => {
     const token = localStorage.getItem("token");
     const equipo_id = localStorage.getItem("id_equipo") || equipoId;
@@ -184,6 +225,7 @@ const GestionEntrenadores = ({ equipoId }) => {
   return (
     <AuthWrapper requiredRole="admin">
       <Box p={4} position="relative" minH="100vh" bg="#f7f9fa">
+        {/* Logo de fondo */}
         <Image
           src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/public/imagenes//logo.avif"
           alt="Logo MyHandStats"
@@ -197,6 +239,7 @@ const GestionEntrenadores = ({ equipoId }) => {
           pointerEvents="none"
           userSelect="none"
         />
+        {/* Header y Sidebar */}
         <Header
           onOpen={onOpen}
           userName={userName}
@@ -204,7 +247,9 @@ const GestionEntrenadores = ({ equipoId }) => {
           texto="Gestión de Entrenadores"
         />
         <Sidebar isOpen={isOpen} onClose={onClose} />
+        {/* Panel principal */}
         <Flex justify="center" align="center" direction="column" px={4}>
+          {/* Asignar entrenador */}
           <Box
             w="100%"
             maxW="600px"
@@ -236,6 +281,7 @@ const GestionEntrenadores = ({ equipoId }) => {
             </VStack>
           </Box>
 
+          {/* Entrenadores asignados */}
           <Box
             w="100%"
             maxW="600px"

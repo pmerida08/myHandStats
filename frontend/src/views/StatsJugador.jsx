@@ -1,3 +1,20 @@
+/**
+ * StatsJugador
+ * 
+ * Vista de estadísticas individuales para un jugador.
+ * 
+ * Características:
+ * - Muestra los datos y estadísticas de un jugador específico del equipo.
+ * - Visualiza la eficacia de lanzamientos, goles por zona, pérdidas, fallos, amonestaciones y exclusiones.
+ * - Si el jugador es portero, muestra goles en contra por zona.
+ * - Usa gráficos de barras y doughnut para representar los datos (Chart.js).
+ * - Incluye Header y Sidebar personalizados.
+ * - Spinner de carga mientras se obtienen los datos.
+ * 
+ * Uso:
+ * - Accesible para cualquier usuario autenticado desde el listado de jugadores o desde el resumen de partido.
+ * - Permite analizar el rendimiento individual de cada jugador.
+ */
 import {
   Box,
   Text,

@@ -1,5 +1,20 @@
+/**
+ * NotFound
+ * 
+ * Vista para mostrar un mensaje de error 404 cuando la ruta no existe.
+ * 
+ * Características:
+ * - Muestra el logo y nombre de MyHandStats.
+ * - Mensaje claro de "Página no encontrada".
+ * - Botón para volver al inicio de la aplicación.
+ * - Diseño centrado y visualmente amigable usando Chakra UI.
+ * 
+ * Uso:
+ * - Se utiliza como fallback para rutas no definidas en el router.
+ */
 import { Box, Heading, Text, Button, Image } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+
 
 export default function NotFound() {
   const navigate = useNavigate();

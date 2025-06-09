@@ -1,3 +1,19 @@
+/**
+ * VistaAdmin
+ * 
+ * Vista de administración para gestionar los equipos de un club.
+ * 
+ * Características:
+ * - Muestra un listado de equipos del club (simulado, pendiente de endpoint real).
+ * - Permite ordenar los equipos por nombre o fecha (menú de ejemplo).
+ * - Muestra un spinner de carga mientras se obtienen los datos.
+ * - Si no hay equipos, muestra mensaje y botón para crear uno nuevo.
+ * - Diseño visual con Chakra UI y uso de iconos.
+ * 
+ * Uso:
+ * - Accesible solo para administradores del club.
+ * - Se utilizará como panel principal de gestión de equipos.
+ */
 import { useEffect, useState } from "react";
 import {
   Box,

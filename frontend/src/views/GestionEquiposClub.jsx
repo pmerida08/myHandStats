@@ -1,3 +1,18 @@
+/**
+ * EquiposClubAdmin
+ * 
+ * Vista de administración para la gestión de equipos del club (solo para administradores).
+ * Permite:
+ * - Listar todos los equipos del club.
+ * - Crear nuevos equipos (nombre, categoría, descripción).
+ * - Editar equipos existentes.
+ * 
+ * Características:
+ * - Solo accesible para usuarios con rol "admin".
+ * - Muestra el header y sidebar personalizados.
+ * - Incluye feedback visual con toasts y spinner de carga.
+ * - Modal para crear y editar equipos.
+ */
 import {
   Box,
   Text,
@@ -47,7 +62,11 @@ const EquiposClubAdmin = () => {
 
   const navigate = useNavigate();
 
-  // Cargar token y clubId
+  /**
+   * useEffect inicial:
+   * - Verifica el token y el rol del usuario (solo admin puede acceder).
+   * - Extrae el clubId del token.
+   */
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
@@ -69,6 +88,9 @@ const EquiposClubAdmin = () => {
     setIsTokenLoading(false);
   }, [navigate]);
 
+  /**
+   * useEffect para cargar datos del usuario y club para el header.
+   */
   useEffect(() => {
     if (token) {
       // Cargar nombre usuario
@@ -105,6 +127,9 @@ const EquiposClubAdmin = () => {
     }
   }, [token]);
 
+  /**
+   * Carga la lista de equipos del club.
+   */
   const cargarEquipos = () => {
     setLoading(true);
     fetch("https://myhandstats.onrender.com/club/equipos", {
@@ -130,18 +155,26 @@ const EquiposClubAdmin = () => {
       .finally(() => setLoading(false));
   };
 
+  /**
+   * useEffect para cargar equipos cuando hay token.
+   */
   useEffect(() => {
     if (token) cargarEquipos();
   }, [token]);
 
-  // Abrir modal para crear nuevo equipo
+  /**
+   * Abre el modal para crear un nuevo equipo.
+   */
   const abrirModalCrear = () => {
     setModoEdicion(false);
     setEquipoActual({ id: null, nombre: "", categoria: "", descripcion: "" });
     setIsModalOpen(true);
   };
 
-  // Abrir modal para editar equipo
+  /**
+   * Abre el modal para editar un equipo existente.
+   * @param {object} equipo - Equipo a editar
+   */
   const abrirModalEditar = (equipo) => {
     setModoEdicion(true);
     setEquipoActual({
@@ -153,11 +186,17 @@ const EquiposClubAdmin = () => {
     setIsModalOpen(true);
   };
 
+  /**
+   * Maneja los cambios en los inputs del formulario de equipo.
+   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEquipoActual((prev) => ({ ...prev, [name]: value }));
   };
 
+  /**
+   * Guarda un equipo nuevo o editado.
+   */
   const guardarEquipo = () => {
     // Validar campos básicos
     if (
@@ -223,6 +262,7 @@ const EquiposClubAdmin = () => {
       });
   };
 
+  // Spinner de carga mientras se verifica el acceso
   if (isTokenLoading) {
     return (
       <Center h="100vh">
@@ -231,6 +271,7 @@ const EquiposClubAdmin = () => {
     );
   }
 
+  // Si no hay token válido, no renderiza nada
   if (!token) return null;
 
   return (
@@ -256,16 +297,8 @@ const EquiposClubAdmin = () => {
           texto="Gestión de Equipos del Club"
         />
         <Sidebar isOpen={isOpen} onClose={onClose} />
-        {/* Elimina el Flex con el Heading, ya que el Header lo muestra */}
-        {/* 
-        <Flex align="center" justify="space-between" mb={8}>
-          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-          <Heading size="lg" color="#014C4C">
-            Gestión de Equipos del Club
-          </Heading>
-          <Box w="6" />
-        </Flex>
-        */}
+
+        {/* Listado de equipos */}
         {loading ? (
           <Box textAlign="center" mt={10}>
             <Spinner size="xl" color="teal.600" />
@@ -340,6 +373,7 @@ const EquiposClubAdmin = () => {
           </Box>
         )}
 
+        {/* Botón para abrir modal de creación */}
         <IconButton
           icon={<FaPlus />}
           bg="#014C4C"
@@ -355,6 +389,7 @@ const EquiposClubAdmin = () => {
           onClick={abrirModalCrear}
         />
 
+        {/* Modal para crear o editar equipo */}
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}

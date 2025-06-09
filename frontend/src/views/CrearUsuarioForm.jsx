@@ -1,3 +1,16 @@
+/**
+ * CambiarContraseñaForm
+ *
+ * Formulario para establecer una nueva contraseña al activar la cuenta de usuario.
+ *
+ * Funcionamiento:
+ * - Extrae el token de la URL.
+ * - Permite al usuario introducir y confirmar una nueva contraseña.
+ * - Valida que ambos campos estén completos y que las contraseñas coincidan.
+ * - Envía la nueva contraseña al backend para activar la cuenta.
+ * - Muestra notificaciones de éxito o error.
+ * - Redirige al login tras cambiar la contraseña correctamente.
+ */
 import { useState } from "react";
 import {
   Box,
@@ -16,6 +29,7 @@ import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const CambiarContraseñaForm = () => {
+  // Estado para la nueva contraseña y su confirmación
   const [nuevaContraseña, setNuevaContraseña] = useState("");
   const [confirmarContraseña, setConfirmarContraseña] = useState("");
   const toast = useToast();
@@ -27,6 +41,10 @@ const CambiarContraseñaForm = () => {
   const token = params.get("token");
   console.log("Token extraído de la URL:", token);
 
+  /**
+   * Maneja el envío del formulario.
+   * Valida los campos y realiza la petición para establecer la nueva contraseña.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!nuevaContraseña || !confirmarContraseña) {

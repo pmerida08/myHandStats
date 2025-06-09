@@ -1,3 +1,26 @@
+/**
+ * Login
+ * 
+ * Vista de inicio de sesión para usuarios de MyHandStats.
+ * 
+ * Características:
+ * - Permite iniciar sesión con email y contraseña.
+ * - Permite iniciar sesión con Google (OAuth).
+ * - Muestra mensajes de error y spinner de carga durante el proceso.
+ * - Guarda el token JWT en localStorage al iniciar sesión correctamente.
+ * - Redirige al usuario a la selección de equipo tras el login.
+ * - Diseño visual atractivo con Chakra UI y avatares decorativos.
+ * 
+ * Componentes principales:
+ * - Formulario de login tradicional.
+ * - Botón de login con Google.
+ * - Mensajes de error y feedback visual.
+ * - Avatares decorativos y llamada a la acción para unirse a la plataforma.
+ * 
+ * Uso:
+ * - Accesible para cualquier usuario (no requiere autenticación previa).
+ * - Navegación a registro y selección de equipo tras login exitoso.
+ */
 import {
   Box,
   Button,
@@ -15,6 +38,9 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+
+
+
 import avatar1 from "../assets/avatars/avatar_1.png";
 import avatar2 from "../assets/avatars/avatar_2.png";
 import avatar3 from "../assets/avatars/avatar_3.png";

@@ -1,3 +1,17 @@
+/**
+ * DashboardPrincipal
+ *
+ * Vista principal del dashboard del equipo.
+ * Muestra estadísticas generales, gráficos y tablas de jugadores y partidos.
+ *
+ * Características:
+ * - Muestra el nombre y logo del club y equipo.
+ * - Gráficos de goles totales y comparativa de últimos partidos.
+ * - Tablas de lanzadores de 7m, goleadores, amonestaciones, historial de partidos, aspecto defensivo y pérdidas.
+ * - Permite alternar entre ver el top 5 o todos los registros en cada tabla.
+ * - Calcula y muestra el porcentaje de victorias.
+ * - Carga datos de usuario, club, equipo, jugadores y partidos al montar el componente.
+ */
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -5,17 +19,12 @@ import {
   Flex,
   Icon,
   Button,
-  Grid,
   Divider,
   useDisclosure,
-  Avatar,
-  GridItem,
-  Collapse,
   Spinner,
   Image,
 } from "@chakra-ui/react";
 import { FaBars, FaArrowUp, FaArrowDown } from "react-icons/fa";
-
 import { Doughnut, Bar } from "react-chartjs-2";
 import {
   Chart,
@@ -36,17 +45,6 @@ Chart.register(
 );
 import AuthWrapper from "../components/AuthWrapper";
 import Header from "../components/Header";
-
-// Función para decodificar el token JWT y extraer el id del club
-function getClubIdFromToken(token) {
-  if (!token) return null;
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload.club_id || payload.club || payload.id || null;
-  } catch {
-    return null;
-  }
-}
 
 const DashboardPrincipal = () => {
   const { onOpen } = useDisclosure();
@@ -142,6 +140,18 @@ const DashboardPrincipal = () => {
       });
   }, []);
 
+  // Función para decodificar el token JWT y extraer el id del club
+  function getClubIdFromToken(token) {
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.club_id || payload.club || payload.id || null;
+    } catch {
+      return null;
+    }
+  }
+
+  // Datos para el gráfico de goles totales
   const golesData = {
     labels: ["Goles a favor", "Goles en contra"],
     datasets: [
@@ -163,7 +173,7 @@ const DashboardPrincipal = () => {
     totalPartidos > 0 ? Math.round((partidosGanados / totalPartidos) * 100) : 0;
   const esPorcentajeAlto = porcentajeGanados >= 50;
 
-  // Prepara los datos para el gráfico de barras
+  // Prepara los datos para el gráfico de barras de los últimos partidos
   const partidosOrdenados = ultimosPartidos
     .slice()
     .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
@@ -197,6 +207,7 @@ const DashboardPrincipal = () => {
     },
   };
 
+  // Spinner de carga mientras se obtienen los datos
   if (loading) {
     return (
       <Box
@@ -213,6 +224,7 @@ const DashboardPrincipal = () => {
   return (
     <AuthWrapper requiredRole={null}>
       <Box p={4} minH="100vh" bg="white">
+        {/* Logo de fondo */}
         <Image
           src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/public/imagenes//logo.avif"
           alt="Logo MyHandStats"
@@ -236,7 +248,7 @@ const DashboardPrincipal = () => {
           texto={equipo.nombre || "Mi Equipo"}
         />
 
-        {/* Sustituye el Grid por Flex */}
+        {/* Contenido principal del dashboard */}
         <Flex
           direction="column"
           gap={4}

@@ -1,3 +1,25 @@
+/**
+ * Registrar
+ * 
+ * Vista de registro para nuevos usuarios en MyHandStats.
+ * 
+ * Características:
+ * - Permite crear una cuenta con nombre, email y contraseña.
+ * - Permite registrarse usando Google (OAuth).
+ * - Muestra mensajes de error y spinner de carga durante el proceso.
+ * - Guarda el token JWT en localStorage tras registro con Google y redirige a selección de equipo.
+ * - Diseño visual atractivo con Chakra UI y avatares decorativos.
+ * 
+ * Componentes principales:
+ * - Formulario de registro tradicional.
+ * - Botón de registro con Google.
+ * - Mensajes de error y feedback visual.
+ * - Avatares decorativos y llamada a la acción para unirse a la plataforma.
+ * 
+ * Uso:
+ * - Accesible para cualquier usuario (no requiere autenticación previa).
+ * - Navegación a login y selección de equipo tras registro exitoso.
+ */
 import {
   Box,
   Button,
@@ -13,6 +35,7 @@ import {
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google'
+
 
 const avatars = [
   'https://randomuser.me/api/portraits/women/65.jpg',

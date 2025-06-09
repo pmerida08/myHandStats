@@ -1,3 +1,19 @@
+/**
+ * UsuariosClubAdmin
+ * 
+ * Vista de administración para la gestión de usuarios del club (solo para administradores).
+ * Permite:
+ * - Listar todos los usuarios del club (excepto administradores).
+ * - Crear nuevos usuarios (nombre, email, rol).
+ * - Editar el rol de usuarios existentes.
+ * - Eliminar usuarios del club.
+ * 
+ * Características:
+ * - Solo accesible para usuarios con rol "admin".
+ * - Muestra el header y sidebar personalizados.
+ * - Incluye feedback visual con toasts y spinner de carga.
+ * - Modal para crear y editar usuarios.
+ */
 import {
   Box,
   Text,
@@ -26,7 +42,7 @@ import {
   Image,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { FaPlus, FaUser, FaBars, FaTrash } from "react-icons/fa"; // Añade FaTrash
+import { FaPlus, FaUser, FaBars, FaTrash } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
 import { useNavigate } from "react-router-dom";
@@ -54,6 +70,11 @@ const UsuariosClubAdmin = () => {
 
   const navigate = useNavigate();
 
+  /**
+   * useEffect inicial:
+   * - Verifica el token y el rol del usuario (solo admin puede acceder).
+   * - Extrae el clubId del token.
+   */
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
@@ -75,6 +96,9 @@ const UsuariosClubAdmin = () => {
     setIsTokenLoading(false);
   }, [navigate]);
 
+  /**
+   * useEffect para cargar datos del usuario y club para el header.
+   */
   useEffect(() => {
     if (token) {
       // Cargar nombre usuario
@@ -111,6 +135,9 @@ const UsuariosClubAdmin = () => {
     }
   }, [token]);
 
+  /**
+   * Carga la lista de usuarios del club.
+   */
   const cargarUsuarios = () => {
     setLoading(true);
     fetch("https://myhandstats.onrender.com/club/usuarios", {
@@ -124,6 +151,9 @@ const UsuariosClubAdmin = () => {
       .finally(() => setLoading(false));
   };
 
+  /**
+   * Crea un nuevo usuario en el club.
+   */
   const crearUsuario = () => {
     if (!nuevoUsuario.nombre || !nuevoUsuario.email || !nuevoUsuario.rol) {
       toast({
@@ -181,6 +211,9 @@ const UsuariosClubAdmin = () => {
       });
   };
 
+  /**
+   * Edita el rol de un usuario existente.
+   */
   const editarUsuario = () => {
     // Solo permite cambiar el rol
     const usuarioEditado = {
@@ -228,6 +261,10 @@ const UsuariosClubAdmin = () => {
       });
   };
 
+  /**
+   * Abre el modal de edición para un usuario.
+   * @param {object} usuario - Usuario a editar
+   */
   const abrirModalEdicion = (usuario) => {
     setModoEdicion(true);
     setUsuarioSeleccionado(usuario);
@@ -239,15 +276,22 @@ const UsuariosClubAdmin = () => {
     setIsModalOpen(true);
   };
 
+  /**
+   * Maneja los cambios en los inputs del formulario de usuario.
+   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNuevoUsuario((prev) => ({ ...prev, [name]: value }));
   };
 
+  /**
+   * Carga los usuarios al montar el componente o cuando cambia el token.
+   */
   useEffect(() => {
     if (token) cargarUsuarios();
   }, [token]);
 
+  // Spinner de carga mientras se verifica el acceso
   if (isTokenLoading) {
     return (
       <Center h="100vh">
@@ -256,6 +300,7 @@ const UsuariosClubAdmin = () => {
     );
   }
 
+  // Si no hay token válido, no renderiza nada
   if (!token) return null;
 
   return (
@@ -281,16 +326,8 @@ const UsuariosClubAdmin = () => {
           texto="Gestión de Usuarios del Club"
         />
         <Sidebar isOpen={isOpen} onClose={onClose} />
-        {/* Elimina el Flex con el Heading, ya que el Header lo muestra */}
-        {/* 
-        <Flex align="center" justify="space-between" mb={8}>
-          <Icon as={FaBars} boxSize={6} onClick={onOpen} cursor="pointer" />
-          <Heading size="lg" color="#014C4C">
-            Gestión de Usuarios del Club
-          </Heading>
-          <Box w="6" />
-        </Flex>
-        */}
+
+        {/* Listado de usuarios */}
         {loading ? (
           <Box textAlign="center" mt={10}>
             <Spinner size="xl" color="teal.600" />
@@ -422,6 +459,7 @@ const UsuariosClubAdmin = () => {
           </Flex>
         )}
 
+        {/* Botón para abrir modal de creación */}
         <IconButton
           icon={<FaPlus />}
           bg="#014C4C"
@@ -445,6 +483,7 @@ const UsuariosClubAdmin = () => {
           }}
         />
 
+        {/* Modal para crear o editar usuario */}
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}

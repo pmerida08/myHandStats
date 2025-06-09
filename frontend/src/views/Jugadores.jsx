@@ -1,3 +1,22 @@
+/**
+ * Jugadores
+ *
+ * Vista para la gestión y visualización de jugadores de un equipo.
+ * Permite:
+ * - Listar todos los jugadores del equipo.
+ * - Buscar jugadores por nombre.
+ * - Crear nuevos jugadores (con foto, dorsal, posición, etc.).
+ * - Editar datos y foto de jugadores existentes.
+ * - Visualizar estadísticas individuales de cada jugador.
+ *
+ * Características:
+ * - Solo accesible para usuarios autenticados.
+ * - Muestra el header personalizado y logo de fondo.
+ * - Incluye feedback visual con toasts y spinner de carga.
+ * - Modal para crear y editar jugadores.
+ * - Permite subir y actualizar la foto del jugador usando Supabase Storage.
+ * - Calcula y muestra la edad del jugador a partir de la fecha de nacimiento.
+ */
 import {
   Box,
   Text,
@@ -475,8 +494,7 @@ const Jugadores = () => {
                   mb={8}
                   border="1px solid #e2e8f0"
                 >
-                  {/* Círculo decorativo sutil */}
-                  
+                  {/* Tarjeta de jugador con datos y botón de edición */}
                   <Box
                     display="flex"
                     flexDirection="column"
@@ -571,6 +589,7 @@ const Jugadores = () => {
           </Flex>
         )}
 
+        {/* Botón para abrir modal de creación */}
         <IconButton
           icon={<FaPlus />}
           bg="#014C4C"
@@ -596,6 +615,7 @@ const Jugadores = () => {
           }}
         />
 
+        {/* Modal para crear o editar jugador */}
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}

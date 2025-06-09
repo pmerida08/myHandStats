@@ -1,3 +1,21 @@
+/**
+ * StatsAvanzadas
+ * 
+ * Vista de estadísticas avanzadas para un equipo.
+ * 
+ * Características:
+ * - Muestra estadísticas ofensivas y defensivas agregadas del equipo.
+ * - Permite ver estadísticas generales, por partido y por jugador (tabs).
+ * - Carga y muestra datos de jugadores, partidos y club.
+ * - Incluye tablas detalladas de lanzamientos, goles, pérdidas, recuperaciones, sanciones, etc.
+ * - Permite seleccionar un partido para ver sus estadísticas agregadas.
+ * - Diseño responsivo y visual con Chakra UI.
+ * - Spinner de carga general y por tab.
+ * 
+ * Uso:
+ * - Accesible para cualquier usuario autenticado con equipo seleccionado.
+ * - Permite analizar el rendimiento global y detallado del equipo y sus jugadores.
+ */
 import { useEffect, useState, useMemo } from "react";
 import {
   Box,

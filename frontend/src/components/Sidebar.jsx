@@ -1,3 +1,15 @@
+/**
+ * Sidebar
+ * 
+ * Componente de barra lateral de navegación para la aplicación.
+ * Permite navegar entre las diferentes secciones privadas, muestra el usuario actual y permite cerrar sesión.
+ * 
+ * Características:
+ * - Puede colapsarse o expandirse.
+ * - Muestra el avatar y nombre del usuario.
+ * - El menú se adapta según el rol del usuario.
+ * - Permite cerrar sesión.
+ */
 import { useState, useEffect, useMemo } from "react";
 import {
   Box,
@@ -28,15 +40,20 @@ import {
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 
 const Sidebar = () => {
+  // Estado para controlar si el sidebar está colapsado
   const [isCollapsed, setIsCollapsed] = useState(true);
+  // Estado para almacenar la información del usuario
   const [user, setUser] = useState(null);
+  // Estado para mostrar spinner mientras se carga el usuario
   const [loadingUser, setLoadingUser] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Ancho del sidebar según su estado
   const sidebarWidth = isCollapsed ? "60px" : "260px";
 
+  // Colores y estilos según el modo de color
   const bgCard = useColorModeValue("white", "gray.900");
   const shadowCard = useColorModeValue("xl", "dark-lg");
   const textPrimary = useColorModeValue("gray.800", "gray.100");
@@ -48,9 +65,13 @@ const Sidebar = () => {
   const iconBgActive = useColorModeValue("teal.100", "teal.900");
   const borderColor = useColorModeValue("gray.200", "gray.700");
 
+  // Componente animado para los iconos
   const IconMotion = motion(Icon);
 
-  // Menú completo con acceso a todas las rutas
+  /**
+   * Menú de navegación principal.
+   * Se adapta según el rol del usuario (por ejemplo, el entrenador no ve el menú de Club).
+   */
   const menuItems = useMemo(
     () => {
       // Si el usuario es entrenador, no mostrar el icono/menú de Club
@@ -131,6 +152,10 @@ const Sidebar = () => {
     [user?.rol]
   );
 
+  /**
+   * Efecto para cargar el usuario al montar el componente o cambiar de ruta.
+   * Si no hay token, redirige al login.
+   */
   useEffect(() => {
     if (location.pathname === "/" || location.pathname === "/registrar") {
       setLoadingUser(false);
@@ -209,7 +234,7 @@ const Sidebar = () => {
       </Flex>
 
       <VStack align="stretch" spacing={4} mt={2} px={isCollapsed ? 0 : 2}>
-        {/* Avatar */}
+        {/* Avatar del usuario */}
         <Flex
           align="center"
           flexDirection="column"
@@ -249,7 +274,7 @@ const Sidebar = () => {
 
         <Divider borderColor={borderColor} />
 
-        {/* Menú principal */}
+        {/* Menú principal de navegación */}
         <VStack align="stretch" spacing={1}>
           {menuItems.map((item) => (
             <Box key={item.label} px={isCollapsed ? 0 : 2}>
@@ -297,7 +322,7 @@ const Sidebar = () => {
           ))}
         </VStack>
 
-        {/* Cerrar sesión */}
+        {/* Botón para cerrar sesión */}
         <Box mt={6} px={isCollapsed ? 0 : 2}>
           <Divider borderColor={borderColor} />
           <VStack align="stretch" spacing={2} mt={3}>

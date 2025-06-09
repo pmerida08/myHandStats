@@ -1,3 +1,24 @@
+/**
+ * Partidos
+ * 
+ * Vista para la gestión y visualización de partidos de un equipo.
+ * Permite:
+ * - Listar todos los partidos del equipo, ordenados por fecha.
+ * - Filtrar partidos por mes.
+ * - Visualizar el resumen de cada partido.
+ * - Eliminar partidos (solo para usuarios con rol "admin").
+ * 
+ * Características:
+ * - Solo accesible para usuarios autenticados.
+ * - Muestra el header personalizado y logo de fondo.
+ * - Incluye feedback visual con toasts y spinner de carga.
+ * - Modal de confirmación para eliminar partidos.
+ * - Colores visuales para victoria, empate y derrota.
+ * 
+ * Uso:
+ * - Accesible desde el menú principal del equipo.
+ * - Permite navegar al resumen de cada partido.
+ */
 import { useEffect, useState, useCallback } from "react";
 import {
   Box,
@@ -21,6 +42,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import AuthWrapper from "../components/AuthWrapper";
 import Header from "../components/Header";
+
 
 const Partidos = () => {
   const [partidos, setPartidos] = useState([]);

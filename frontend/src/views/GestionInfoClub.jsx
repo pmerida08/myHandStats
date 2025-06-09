@@ -1,3 +1,17 @@
+/**
+ * ClubInfo
+ * 
+ * Vista de administración para editar la información general del club.
+ * Permite:
+ * - Visualizar los datos actuales del club (nombre, descripción, teléfono, suscripción, logo).
+ * - Editar los datos del club y subir un nuevo logo.
+ * 
+ * Características:
+ * - Solo accesible para usuarios con rol "admin".
+ * - Muestra el header y sidebar personalizados.
+ * - Incluye feedback visual con toasts y spinner de carga.
+ * - Modal para editar la información del club.
+ */
 import {
   Box,
   Text,
@@ -30,7 +44,7 @@ import { useNavigate } from "react-router-dom";
 import { createClient } from "@supabase/supabase-js";
 import Header from "../components/Header";
 
-// Configuración de Supabase
+// Configuración de Supabase para subir imágenes/logos
 const SUPABASE_URL =
   import.meta.env.VITE_SUPABASE_URL ||
   "https://rdpazmfdbcundrogccsb.supabase.co";
@@ -40,19 +54,23 @@ const SUPABASE_KEY =
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const ClubInfo = () => {
-  const [clubInfo, setClubInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({});
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [userName, setUserName] = useState("");
-  const [club, setClub] = useState({ nombre: "", logo: "" });
+  const [clubInfo, setClubInfo] = useState(null); // Datos actuales del club
+  const [loading, setLoading] = useState(true); // Estado de carga de datos
+  const [formData, setFormData] = useState({}); // Datos del formulario de edición
+  const [selectedFile, setSelectedFile] = useState(null); // Archivo de logo seleccionado
+  const [userName, setUserName] = useState(""); // Nombre del usuario para el header
+  const [club, setClub] = useState({ nombre: "", logo: "" }); // Info club para el header
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [token, setToken] = useState(null);
-  const [isTokenLoading, setIsTokenLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Control del modal de edición
+  const [token, setToken] = useState(null); // Token JWT
+  const [isTokenLoading, setIsTokenLoading] = useState(true); // Estado de carga del token
   const navigate = useNavigate();
 
+  /**
+   * useEffect inicial:
+   * - Verifica el token y lo guarda en el estado.
+   */
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
@@ -69,6 +87,9 @@ const ClubInfo = () => {
     setIsTokenLoading(false);
   }, [navigate]);
 
+  /**
+   * useEffect para cargar la información del club.
+   */
   useEffect(() => {
     if (!token) return;
     setLoading(true);
@@ -93,6 +114,9 @@ const ClubInfo = () => {
       .finally(() => setLoading(false));
   }, [token, toast]);
 
+  /**
+   * useEffect para cargar datos del usuario y club para el header.
+   */
   useEffect(() => {
     if (!token) return;
     // Cargar nombre usuario
@@ -128,11 +152,19 @@ const ClubInfo = () => {
       });
   }, [token]);
 
+  /**
+   * Maneja los cambios en los inputs del formulario de edición.
+   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  /**
+   * Sube el logo seleccionado a Supabase Storage y retorna la URL pública.
+   * @param {File} file - Archivo de imagen a subir
+   * @returns {Promise<string>} URL pública del logo subido
+   */
   const subirLogo = async (file) => {
     const fileExt = file.name.split(".").pop();
     const fileName = `club_${Date.now()}.${fileExt}`;
@@ -157,6 +189,10 @@ const ClubInfo = () => {
     return urlData.publicUrl;
   };
 
+  /**
+   * Guarda los cambios realizados en la información del club.
+   * Si se seleccionó un nuevo logo, lo sube y actualiza la URL.
+   */
   const guardarCambios = async () => {
     try {
       let updatedData = { ...formData };
@@ -200,6 +236,7 @@ const ClubInfo = () => {
     }
   };
 
+  // Spinner de carga mientras se verifica el acceso
   if (isTokenLoading) {
     return (
       <Center h="100vh">
@@ -207,16 +244,6 @@ const ClubInfo = () => {
       </Center>
     );
   }
-
-  //   async function testList() {
-  //   const { data, error } = await supabase.storage.from('imagenes').list();
-  //   if (error) {
-  //     console.error("Error listando archivos:", error);
-  //   } else {
-  //     console.log("Archivos en bucket:", data);
-  //   }
-  // }
-  // testList();
 
   return (
     <AuthWrapper requiredRole={"admin"}>

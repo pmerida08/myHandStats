@@ -1,3 +1,21 @@
+/**
+ * SeleccionEquipo
+ * 
+ * Vista para que el usuario seleccione el equipo con el que va a trabajar.
+ * 
+ * Características:
+ * - Muestra todos los equipos disponibles del club.
+ * - Permite seleccionar un equipo y guardar su ID en localStorage para el resto de la sesión.
+ * - Si el usuario es administrador, puede crear nuevos equipos desde un modal.
+ * - Incluye Header y Sidebar personalizados.
+ * - Muestra spinner de carga mientras se obtienen los datos.
+ * - Muestra mensaje si no existen equipos y opción de crear uno si es admin.
+ * - Modal para crear un nuevo equipo con nombre, categoría y descripción.
+ * 
+ * Uso:
+ * - Accesible para cualquier usuario autenticado tras iniciar sesión.
+ * - Es el paso previo antes de acceder al dashboard y funcionalidades del equipo.
+ */
 import {
   Box,
   Spinner,

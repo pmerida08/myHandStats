@@ -1,3 +1,24 @@
+/**
+ * LandingPage
+ * 
+ * Página de bienvenida y presentación de MyHandStats.
+ * 
+ * Características:
+ * - Presenta el producto y sus funcionalidades principales.
+ * - Navegación por secciones (Inicio, Funcionalidades, Contacto) con scroll suave y resaltado de sección activa.
+ * - Hero principal con llamada a la acción para registro e inicio de sesión.
+ * - Explicación visual de las fases de uso de la plataforma (crear equipos, gestionar jugadores, partidos, estadísticas).
+ * - Sección de registro/contacto para clubes y usuarios.
+ * - Uso de animaciones con Framer Motion y diseño responsivo con Chakra UI.
+ * 
+ * Componentes principales:
+ * - Feature: Muestra una característica individual con icono y título.
+ * - Secciones: Hero, Características, Detalles, Guía por fases, Registro de club/contacto.
+ * 
+ * Uso:
+ * - Accesible para cualquier usuario (no requiere autenticación).
+ * - Permite navegar a login y registro.
+ */
 import {
   Box,
   Button,
@@ -33,6 +54,9 @@ import fase1 from "../assets/fase1wireframe.png";
 import fase2 from "../assets/fase2wireframe.png";
 import fase4 from "../assets/fase4wireframe.png";
 import prueba from "../assets/dashboardwireframe.png";
+
+
+
 
 const primaryColor = "#014C4C";
 const primaryColorHover = "#013838";
@@ -683,3 +707,4 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
+

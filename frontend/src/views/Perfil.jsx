@@ -1,3 +1,19 @@
+/**
+ * EditarPerfil
+ * 
+ * Vista para que el usuario edite su perfil personal.
+ * 
+ * Características:
+ * - Permite cambiar el nombre, la foto de perfil y la contraseña.
+ * - Muestra el email (no editable).
+ * - Sube la foto de perfil a Supabase Storage y actualiza la URL.
+ * - Muestra feedback visual con toasts de éxito o error.
+ * - Incluye Header y Sidebar personalizados.
+ * 
+ * Uso:
+ * - Accesible para cualquier usuario autenticado.
+ * - Guarda los cambios en el backend y actualiza la vista.
+ */
 import {
   Box,
   Input,
@@ -25,6 +41,7 @@ const SUPABASE_KEY =
   import.meta.env.VITE_SUPABASE_KEY ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkcGF6bWZkYmN1bmRyb2djY3NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1MTA4MjksImV4cCI6MjA2MjA4NjgyOX0.sSfVgFsJvoFYnl-jc-wJabyYUisgwgDv1jwU9rpzsw4";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
 
 const EditarPerfil = () => {
   const [usuario, setUsuario] = useState(null);
