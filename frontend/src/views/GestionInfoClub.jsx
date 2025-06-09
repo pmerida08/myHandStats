@@ -1,11 +1,11 @@
 /**
  * ClubInfo
- * 
+ *
  * Vista de administración para editar la información general del club.
  * Permite:
  * - Visualizar los datos actuales del club (nombre, descripción, teléfono, suscripción, logo).
  * - Editar los datos del club y subir un nuevo logo.
- * 
+ *
  * Características:
  * - Solo accesible para usuarios con rol "admin".
  * - Muestra el header y sidebar personalizados.
@@ -45,12 +45,8 @@ import { createClient } from "@supabase/supabase-js";
 import Header from "../components/Header";
 
 // Configuración de Supabase para subir imágenes/logos
-const SUPABASE_URL =
-  import.meta.env.VITE_SUPABASE_URL ||
-  "https://rdpazmfdbcundrogccsb.supabase.co";
-const SUPABASE_KEY =
-  import.meta.env.VITE_SUPABASE_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkcGF6bWZkYmN1bmRyb2djY3NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1MTA4MjksImV4cCI6MjA2MjA4NjgyOX0.sSfVgFsJvoFYnl-jc-wJabyYUisgwgDv1jwU9rpzsw4";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const ClubInfo = () => {
