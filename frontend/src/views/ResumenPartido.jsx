@@ -331,7 +331,7 @@ const ResumenPartido = () => {
           </Flex>
 
           <Flex justify="center" mb={6} gap={6}>
-            {["Resumen", "Goleadores", "Timeline", "Jugadores", "Tiros"].map(
+            {["Resumen", "Goleadores", "Timeline", "Jugadores"].map(
               (tab) => (
                 <Text
                   key={tab}
