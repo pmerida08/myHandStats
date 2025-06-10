@@ -273,7 +273,7 @@ def actualizar_usuario(usuario_id: int, usuario_data: UsuarioUpdate, datos_token
     # Si el rol no se ha actualizado, mantener el rol actual
     rol_nuevo = usuario_data.rol if "rol" in usuario_data.dict(exclude_unset=True) else rol_actual
 
-    # Si el rol cambia de "entrenador" a otro, eliminar de entrenadores y club_entrenador
+    # Si el rol cambia de "entrenador" a otro, eliminar de entrenadores, club_entrenador y equipo_entrenador
     if rol_actual == "entrenador" and rol_nuevo != "entrenador":
         # Buscar el entrenador relacionado
         entrenador = supabase.table("entrenadores").select("id").eq("usuario_id", usuario_id).execute()
@@ -281,6 +281,8 @@ def actualizar_usuario(usuario_id: int, usuario_data: UsuarioUpdate, datos_token
             entrenador_id = entrenador.data[0]["id"]
             # Eliminar relación en club_entrenador
             supabase.table("club_entrenador").delete().eq("entrenador_id", entrenador_id).execute()
+            # Eliminar relación en equipo_entrenador
+            supabase.table("equipo_entrenador").delete().eq("entrenador_id", entrenador_id).execute()
             # Eliminar de entrenadores
             supabase.table("entrenadores").delete().eq("id", entrenador_id).execute()
 
@@ -300,13 +302,13 @@ def eliminar_usuario(usuario_id: int, datos_token: dict = Depends(obtener_info_d
     if not response.data:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    usuario = response.data[0]
+    usuario = response.data[0] 
 
-    # Si el usuario es entrenador, eliminar también de entrenadores, club_entrenador y equipo_entrenador
-    if usuario["rol"] == "entrenador":
-        entrenador = supabase.table("entrenadores").select("id").eq("usuario_id", usuario_id).execute()
-        if entrenador.data:
-            entrenador_id = entrenador.data[0]["id"]
+    # Eliminar cualquier relación en entrenadores, club_entrenador y equipo_entrenador
+    entrenador = supabase.table("entrenadores").select("id").eq("usuario_id", usuario_id).execute()
+    if entrenador.data:
+        for ent in entrenador.data:
+            entrenador_id = ent["id"]
             # Eliminar relación en club_entrenador
             supabase.table("club_entrenador").delete().eq("entrenador_id", entrenador_id).execute()
             # Eliminar relación en equipo_entrenador
