@@ -171,10 +171,20 @@ function StatsJugador() {
     { label: "EI", value: jugador.gol_en_contra_ei || 0 },
     { label: "ED", value: jugador.gol_en_contra_ed || 0 },
     { label: "C", value: jugador.gol_en_contra_c || 0 },
-    { label: "T", value: jugador.gol_en_contra_t || 0 },
     { label: "PI", value: jugador.gol_en_contra_pi || 0 },
     { label: "7m", value: jugador.gol_en_contra_7m || 0 },
   ];
+
+  // Calcular totales para portero
+  const goles_en_contra_totales = golesEnContra.reduce((acc, zona) => acc + zona.value, 0);
+  const lanzamientos_en_contra_totales = 
+    (jugador.lanzamientos_en_contra_li || 0) +
+    (jugador.lanzamientos_en_contra_ld || 0) +
+    (jugador.lanzamientos_en_contra_ei || 0) +
+    (jugador.lanzamientos_en_contra_ed || 0) +
+    (jugador.lanzamientos_en_contra_c || 0) +
+    (jugador.lanzamientos_en_contra_pi || 0) +
+    (jugador.lanzamientos_en_contra_7m || 0);
 
   return (
     <AuthWrapper requiredRole={null}>
@@ -188,11 +198,9 @@ function StatsJugador() {
         />
         <Sidebar isOpen={isOpen} onClose={onClose} />
         <Box>
-
           <Card
-           
-            w="100%"       
-            mx={0}         
+            w="100%"
+            mx={0}
             p={{ base: 4, md: 8 }}
             borderRadius="xl"
             shadow="md"
@@ -202,7 +210,7 @@ function StatsJugador() {
               align="center"
               mb={8}
               direction={{ base: "column", md: "row" }}
-              >
+            >
               <Image
                 src={jugador.foto}
                 alt={jugador.nombre}
@@ -213,7 +221,7 @@ function StatsJugador() {
                 mb={{ base: 4, md: 0 }}
                 border="3px solid #014C4C"
                 bg="white"
-                />
+              />
               <Box textAlign={{ base: "center", md: "left" }}>
                 <Heading size="lg" color="#014C4C">
                   {jugador.nombre}
@@ -226,7 +234,7 @@ function StatsJugador() {
                   display="flex"
                   alignItems="center"
                   justifyContent={{ base: "center", md: "flex-start" }}
-                  >
+                >
                   Dorsal:
                   <Box as="span" color="#014C4C" ml={2}>
                     {jugador.dorsal}
@@ -250,32 +258,67 @@ function StatsJugador() {
             <Divider mb={8} />
 
             <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={8}>
-              <Card bg={chartBoxBg} p={4} shadow="sm">
-                <Heading
-                  size="sm"
-                  mb={4}
-                  textAlign="center"
-                  color="#014C4C"
-                  fontWeight="bold"
+              {/* Eficacia de Lanzamientos Totales */}
+              {!isPortero && (
+                <Card bg={chartBoxBg} p={4} shadow="sm">
+                  <Heading
+                    size="sm"
+                    mb={4}
+                    textAlign="center"
+                    color="#014C4C"
+                    fontWeight="bold"
                   >
-                  Eficacia de Lanzamientos Totales
-                </Heading>
-                <Box h="260px">
-                  <Doughnut
-                    data={{
-                      labels: ["Goles", "Fallos"],
-                      datasets: [
-                        {
-                          data: [totalGoles, totalLanzamientos - totalGoles],
-                          backgroundColor: ["#38A169", "#E53E3E"],
-                        },
-                      ],
-                    }}
-                    options={{ responsive: true, maintainAspectRatio: false }}
+                    Eficacia de Lanzamientos Totales
+                  </Heading>
+                  <Box h="260px">
+                    <Doughnut
+                      data={{
+                        labels: ["Goles", "Fallos"],
+                        datasets: [
+                          {
+                            data: [totalGoles, totalLanzamientos - totalGoles],
+                            backgroundColor: ["#38A169", "#E53E3E"],
+                          },
+                        ],
+                      }}
+                      options={{ responsive: true, maintainAspectRatio: false }}
                     />
-                </Box>
-              </Card>
+                  </Box>
+                </Card>
+              )}
 
+              {/* Gráfica para portero: Goles en contra totales vs Lanzamientos totales */}
+              {isPortero && (
+                <Card bg={chartBoxBg} p={4} shadow="sm">
+                  <Heading
+                    size="sm"
+                    mb={4}
+                    textAlign="center"
+                    color="#014C4C"
+                    fontWeight="bold"
+                  >
+                    Goles en Contra Totales vs Lanzamientos Totales
+                  </Heading>
+                  <Box h="260px">
+                    <Doughnut
+                      data={{
+                        labels: ["Goles en contra", "Paradas"],
+                        datasets: [
+                          {
+                            data: [
+                              goles_en_contra_totales,
+                              lanzamientos_en_contra_totales - goles_en_contra_totales,
+                            ],
+                            backgroundColor: ["#E53E3E", "#38A169"],
+                          },
+                        ],
+                      }}
+                      options={{ responsive: true, maintainAspectRatio: false }}
+                    />
+                  </Box>
+                </Card>
+              )}
+              {/* Goles por Zona o Goles en Contra por Zona */}
               <Card bg={chartBoxBg} p={4} shadow="sm">
                 <Heading
                   size="sm"
@@ -283,27 +326,28 @@ function StatsJugador() {
                   textAlign="center"
                   color="#014C4C"
                   fontWeight="bold"
-                  >
-                  Goles por Zona
+                >
+                  {isPortero ? "Goles en Contra por Zona" : "Goles por Zona"}
                 </Heading>
                 <Box h="260px">
                   <Bar
                     data={{
-                      labels: golesPorZona.map((z) => z.label),
+                      labels: (isPortero ? golesEnContra : golesPorZona).map((z) => z.label),
                       datasets: [
                         {
-                          label: "Goles",
-                          data: golesPorZona.map((z) => z.value),
-                          backgroundColor: "#3182CE",
+                          label: isPortero ? "Goles en contra" : "Goles",
+                          data: (isPortero ? golesEnContra : golesPorZona).map((z) => z.value),
+                          backgroundColor: isPortero ? "#E53E3E" : "#3182CE",
                           borderRadius: 6,
                         },
                       ],
                     }}
                     options={{ responsive: true, maintainAspectRatio: false }}
-                    />
+                  />
                 </Box>
               </Card>
 
+              {/* Solo para jugadores de campo: estadísticas negativas y amonestaciones */}
               {!isPortero && (
                 <>
                   <Card
@@ -399,41 +443,6 @@ function StatsJugador() {
                     </Box>
                   </Card>
                 </>
-              )}
-
-              {isPortero && (
-                <Card
-                bg={chartBoxBg}
-                p={4}
-                shadow="sm"
-                gridColumn={{ md: "span 2" }}
-                >
-                  <Heading
-                    size="sm"
-                    mb={4}
-                    textAlign="center"
-                    color="#014C4C"
-                    fontWeight="bold"
-                    >
-                    Goles en Contra por Zona
-                  </Heading>
-                  <Box h="260px">
-                    <Bar
-                      data={{
-                        labels: golesEnContra.map((z) => z.label),
-                        datasets: [
-                          {
-                            label: "Goles en contra",
-                            data: golesEnContra.map((z) => z.value),
-                            backgroundColor: "#E53E3E",
-                            borderRadius: 6,
-                          },
-                        ],
-                      }}
-                      options={{ responsive: true, maintainAspectRatio: false }}
-                      />
-                  </Box>
-                </Card>
               )}
             </Grid>
           </Card>
