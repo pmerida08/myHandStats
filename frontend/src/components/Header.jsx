@@ -9,13 +9,22 @@
  * - texto: string. Título o texto a mostrar en el centro del header.
  * - club: objeto. Información del club (nombre y logo).
  */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Flex, Text, Avatar } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 
 const Header = ({ texto, club }) => {
+    const navigate = useNavigate();
     // Estado para controlar la apertura del Sidebar
     const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+    useEffect(() => {
+        const idEquipo = localStorage.getItem("id_equipo");
+        if (!idEquipo) {
+            navigate("/seleccionar-equipo");
+        }
+    }, [navigate]);
 
     /**
      * Cierra el Sidebar
