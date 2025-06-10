@@ -28,6 +28,7 @@ import {
   useColorModeValue,
   useDisclosure,
   Icon,
+  Avatar,
 } from "@chakra-ui/react";
 import { FaBars } from "react-icons/fa";
 import { useParams } from "react-router-dom";
@@ -211,16 +212,17 @@ function StatsJugador() {
               mb={8}
               direction={{ base: "column", md: "row" }}
             >
-              <Image
-                src={jugador.foto}
-                alt={jugador.nombre}
-                boxSize="110px"
-                borderRadius="full"
-                objectFit="cover"
+              <Avatar
+                name={jugador.nombre}
+                src={jugador.foto && jugador.foto !== "foto.jpg" ? jugador.foto : undefined}
+                size="2xl"
+                bg="#b2f5ea"
+                color="#014C4C"
+                border="3px solid #014C4C"
                 mr={{ md: 8 }}
                 mb={{ base: 4, md: 0 }}
-                border="3px solid #014C4C"
-                bg="white"
+                boxSize="110px"
+                showBorder
               />
               <Box textAlign={{ base: "center", md: "left" }}>
                 <Heading size="lg" color="#014C4C">
