@@ -73,6 +73,15 @@ const Login = () => {
       }
 
       const data = await response.json();
+
+      // Decodificar el token para comprobar el rol
+      const payload = JSON.parse(atob(data.access_token.split('.')[1]));
+      if (payload.rol === "usuario") {
+        setError("El acceso de usuario estándar está deshabilitado. Contacta con tu club.");
+        setIsLoading(false);
+        return;
+      }
+
       localStorage.setItem("token", data.access_token);
       navigate("/seleccionar-equipo");
     } catch (error) {
@@ -101,6 +110,15 @@ const Login = () => {
         throw new Error("Error al iniciar sesión con Google");
       }
       const data = await response.json();
+
+      // Decodificar el token para comprobar el rol
+      const payload = JSON.parse(atob(data.access_token.split('.')[1]));
+      if (payload.rol === "usuario") {
+        setError("El acceso de usuario estándar está deshabilitado. Contacta con tu club.");
+        setIsLoading(false);
+        return;
+      }
+
       localStorage.setItem("token", data.access_token);
       navigate("/seleccionar-equipo");
     } catch (error) {
