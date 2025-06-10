@@ -203,7 +203,7 @@ const DashboardPrincipal = () => {
       title: { display: false },
     },
     scales: {
-      x: { beginAtZero: true, min: 0, max: 10, ticks: { stepSize: 5 } },
+      x: { beginAtZero: true, min: 0, max: 40, ticks: { stepSize: 5 } },
     },
   };
 
