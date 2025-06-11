@@ -635,7 +635,24 @@ def actualizar_jugador(equipo_id: int, id: int, jugador: JugadorUpdate, datos_to
         respuesta = supabase.table("jugadores").update(datos_actualizados).eq("id", id).execute()
         if not respuesta.data:
             raise HTTPException(status_code=404, detail="Jugador no encontrado")
-        return respuesta.data[0]
+
+        jugador = respuesta.data[0]
+
+        # Obtener posiciones del jugador
+        posiciones_resp = supabase.table("jugador_posicion").select("*").eq("jugador_id", id).execute()
+        posiciones = posiciones_resp.data if posiciones_resp.data else []
+
+        if posiciones:
+            posicion_ids = [pos["posicion_id"] for pos in posiciones]
+            posiciones_nombres_resp = supabase.table("posiciones").select("*").in_("id", posicion_ids).execute()
+            posiciones_nombres = posiciones_nombres_resp.data if posiciones_nombres_resp.data else []
+            # Mapear id de posición a objeto
+            id_a_posicion = {p["id"]: {"id": p["id"], "nombre": p["nombre"]} for p in posiciones_nombres}
+            jugador["posiciones"] = [id_a_posicion.get(pos["posicion_id"]) for pos in posiciones if id_a_posicion.get(pos["posicion_id"])]
+        else:
+            jugador["posiciones"] = []
+
+        return jugador
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al actualizar jugador: {str(e)}")
 
