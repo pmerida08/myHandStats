@@ -267,25 +267,6 @@ const LandingPage = () => {
                     Regístrate gratis
                   </Button>
                 </motion.div>
-                <Button
-                  as={RouterLink}
-                  to="/demo"
-                  leftIcon={<Icon as={FaPlay} />}
-                  size="lg"
-                  variant="ghost"
-                  bg="white"
-                  color="gray.700"
-                  border="1px solid"
-                  borderColor="gray.200"
-                  rounded="full"
-                  px={8}
-                  _hover={{
-                    bg: "gray.50",
-                    boxShadow: "md",
-                  }}
-                >
-                  Ver demo
-                </Button>
               </Stack>
 
               {/* Stats */}
@@ -741,16 +722,7 @@ const LandingPage = () => {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
-        sx={{
-          background: "linear-gradient(120deg, #057a55, #10b981, #065f46)",
-          backgroundSize: "600% 600%",
-          animation: "moverFondo 12s ease infinite",
-          "@keyframes moverFondo": {
-            "0%": { backgroundPosition: "0% 50%" },
-            "50%": { backgroundPosition: "100% 50%" },
-            "100%": { backgroundPosition: "0% 50%" },
-          },
-        }}
+        bg={primaryColor}
       >
         <Heading fontSize={{ base: "3xl", md: "4xl" }} fontWeight="extrabold" mb={4}>
           ¡Registra partidos en tiempo real!
