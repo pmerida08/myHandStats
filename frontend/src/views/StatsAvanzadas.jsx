@@ -1,8 +1,8 @@
 /**
  * StatsAvanzadas
- * 
+ *
  * Vista de estadísticas avanzadas para un equipo.
- * 
+ *
  * Características:
  * - Muestra estadísticas ofensivas y defensivas agregadas del equipo.
  * - Permite ver estadísticas generales, por partido y por jugador (tabs).
@@ -11,7 +11,7 @@
  * - Permite seleccionar un partido para ver sus estadísticas agregadas.
  * - Diseño responsivo y visual con Chakra UI.
  * - Spinner de carga general y por tab.
- * 
+ *
  * Uso:
  * - Accesible para cualquier usuario autenticado con equipo seleccionado.
  * - Permite analizar el rendimiento global y detallado del equipo y sus jugadores.
@@ -538,13 +538,27 @@ const StatsAvanzadas = () => {
                     <Tbody>
                       <Tr>
                         <Td>{infoEquipo.ofensiva.lanzamientos.total}</Td>
-                        <Td>{infoEquipo.ofensiva.lanzamientos.lanzamiento_7m}</Td>
-                        <Td>{infoEquipo.ofensiva.lanzamientos.lanzamiento_ed}</Td>
-                        <Td>{infoEquipo.ofensiva.lanzamientos.lanzamiento_ei}</Td>
-                        <Td>{infoEquipo.ofensiva.lanzamientos.lanzamiento_ld}</Td>
-                        <Td>{infoEquipo.ofensiva.lanzamientos.lanzamiento_li}</Td>
-                        <Td>{infoEquipo.ofensiva.lanzamientos.lanzamiento_c}</Td>
-                        <Td>{infoEquipo.ofensiva.lanzamientos.lanzamiento_pi}</Td>
+                        <Td>
+                          {infoEquipo.ofensiva.lanzamientos.lanzamiento_7m}
+                        </Td>
+                        <Td>
+                          {infoEquipo.ofensiva.lanzamientos.lanzamiento_ed}
+                        </Td>
+                        <Td>
+                          {infoEquipo.ofensiva.lanzamientos.lanzamiento_ei}
+                        </Td>
+                        <Td>
+                          {infoEquipo.ofensiva.lanzamientos.lanzamiento_ld}
+                        </Td>
+                        <Td>
+                          {infoEquipo.ofensiva.lanzamientos.lanzamiento_li}
+                        </Td>
+                        <Td>
+                          {infoEquipo.ofensiva.lanzamientos.lanzamiento_c}
+                        </Td>
+                        <Td>
+                          {infoEquipo.ofensiva.lanzamientos.lanzamiento_pi}
+                        </Td>
                         <Td>
                           {infoEquipo.ofensiva.lanzamientos.lanzamiento_ext_li}
                         </Td>
@@ -729,13 +743,27 @@ const StatsAvanzadas = () => {
                   </Thead>
                   <Tbody>
                     <Tr>
-                      <Td>{infoEquipo.defensiva.gol_en_contra.gol_en_contra_ei}</Td>
-                      <Td>{infoEquipo.defensiva.gol_en_contra.gol_en_contra_ed}</Td>
-                      <Td>{infoEquipo.defensiva.gol_en_contra.gol_en_contra_li}</Td>
-                      <Td>{infoEquipo.defensiva.gol_en_contra.gol_en_contra_ld}</Td>
-                      <Td>{infoEquipo.defensiva.gol_en_contra.gol_en_contra_c}</Td>
-                      <Td>{infoEquipo.defensiva.gol_en_contra.gol_en_contra_pi}</Td>
-                      <Td>{infoEquipo.defensiva.gol_en_contra.gol_en_contra_7m}</Td>
+                      <Td>
+                        {infoEquipo.defensiva.gol_en_contra.gol_en_contra_ei}
+                      </Td>
+                      <Td>
+                        {infoEquipo.defensiva.gol_en_contra.gol_en_contra_ed}
+                      </Td>
+                      <Td>
+                        {infoEquipo.defensiva.gol_en_contra.gol_en_contra_li}
+                      </Td>
+                      <Td>
+                        {infoEquipo.defensiva.gol_en_contra.gol_en_contra_ld}
+                      </Td>
+                      <Td>
+                        {infoEquipo.defensiva.gol_en_contra.gol_en_contra_c}
+                      </Td>
+                      <Td>
+                        {infoEquipo.defensiva.gol_en_contra.gol_en_contra_pi}
+                      </Td>
+                      <Td>
+                        {infoEquipo.defensiva.gol_en_contra.gol_en_contra_7m}
+                      </Td>
                     </Tr>
                   </Tbody>
                 </Table>
@@ -756,9 +784,15 @@ const StatsAvanzadas = () => {
                       <Td>
                         {infoEquipo.defensiva.amonestacion.tarjetas_amarillas}
                       </Td>
-                      <Td>{infoEquipo.defensiva.amonestacion.tarjetas_azules}</Td>
-                      <Td>{infoEquipo.defensiva.amonestacion.tarjetas_rojas}</Td>
-                      <Td>{infoEquipo.defensiva.amonestacion.exclusion_2_min}</Td>
+                      <Td>
+                        {infoEquipo.defensiva.amonestacion.tarjetas_azules}
+                      </Td>
+                      <Td>
+                        {infoEquipo.defensiva.amonestacion.tarjetas_rojas}
+                      </Td>
+                      <Td>
+                        {infoEquipo.defensiva.amonestacion.exclusion_2_min}
+                      </Td>
                     </Tr>
                   </Tbody>
                 </Table>
@@ -777,8 +811,8 @@ const StatsAvanzadas = () => {
                   <Thead>
                     <Tr>
                       <Th></Th>
-                      <Th>Goles/7M</Th>
-                      <Th>Paradas/7M</Th>
+                      <Th>Goles Totales/Goles 7M</Th>
+                      <Th>Paradas totales/Paradas 7M</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -790,26 +824,35 @@ const StatsAvanzadas = () => {
                         </Td>
                         <Td>
                           {(() => {
+                            // console.log(row.posiciones[idx].nombre);
+                            // console.log(row);
+                            
+                            
+                            // Si el jugador no es portero, muestra "n/a"
+                            if (row.posiciones[0]?.nombre !== "portero") {
+                              return "n/a";
+                            }
                             // Paradas de 7m
                             const paradas7m =
-                              (row.lanzamiento_7m || 0) - (row.goles7m || 0);
+                              (row.lanzamiento_en_contra_7m || 0) -
+                              (row.gol_en_contra_7m || 0);
 
                             // Paradas totales (excluyendo 7m)
                             const lanzamientos =
-                              (row.lanzamiento_c || 0) +
-                              (row.lanzamiento_pi || 0) +
-                              (row.lanzamiento_ed || 0) +
-                              (row.lanzamiento_ei || 0) +
-                              (row.lanzamiento_ld || 0) +
-                              (row.lanzamiento_li || 0);
+                              (row.lanzamiento_en_contra_c || 0) +
+                              (row.lanzamiento_en_contra_pi || 0) +
+                              (row.lanzamiento_en_contra_ed || 0) +
+                              (row.lanzamiento_en_contra_ei || 0) +
+                              (row.lanzamiento_en_contra_ld || 0) +
+                              (row.lanzamiento_en_contra_li || 0);
 
                             const goles =
-                              (row.goles_c || 0) +
-                              (row.goles_pi || 0) +
-                              (row.golesed || 0) +
-                              (row.golesei || 0) +
-                              (row.golesld || 0) +
-                              (row.golesli || 0);
+                              (row.gol_en_contra_c || 0) +
+                              (row.gol_en_contra_pi || 0) +
+                              (row.gol_en_contra_ed || 0) +
+                              (row.gol_en_contra_ei || 0) +
+                              (row.gol_en_contra_ld || 0) +
+                              (row.gol_en_contra_li || 0);
 
                             // Paradas = lanzamientos - goles
                             const paradas = lanzamientos - goles;
@@ -1209,7 +1252,11 @@ const StatsAvanzadas = () => {
                     })()
                   ) : (
                     <Flex align="center" justify="center" minH="60px">
-                      <Text color="gray.500" fontWeight="bold" textAlign="center">
+                      <Text
+                        color="gray.500"
+                        fontWeight="bold"
+                        textAlign="center"
+                      >
                         No se pudieron encontrar estadísticas del partido
                       </Text>
                     </Flex>
@@ -1233,7 +1280,12 @@ const StatsAvanzadas = () => {
                   >
                     <h2>
                       <AccordionButton _expanded={{ bg: "gray.50" }}>
-                        <Box as="span" flex="1" textAlign="left" fontWeight="bold">
+                        <Box
+                          as="span"
+                          flex="1"
+                          textAlign="left"
+                          fontWeight="bold"
+                        >
                           {jugador.nombre}{" "}
                           <Text
                             as="span"
