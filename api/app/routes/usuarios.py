@@ -40,7 +40,7 @@ def actualizar_usuario(id: int, usuario: UsuarioUpdate, datos_token: dict = Depe
         updated_user["nombre"],
         updated_user["email"],
         updated_user["foto"],
-        updated_user["clubs_id"],
+        datos_token["clubs_id"],
         updated_user["rol"],
     )
 
