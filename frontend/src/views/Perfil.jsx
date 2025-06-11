@@ -169,7 +169,7 @@ const EditarPerfil = () => {
       if (!res.ok) {
         throw new Error(data.detail || "Error al actualizar perfil");
       }
-
+      console.log("Perfil actualizado:", data);
       // Guardar el nuevo token si viene en la respuesta
       if (data.token) {
         localStorage.setItem("token", data.token);

@@ -64,6 +64,7 @@ class UsuarioOut(BaseModel):
     clubs_id: int
     created_at: datetime
     updated_at: datetime
+    token : Optional[str] = None 
 
     class Config:
         orm_mode = True

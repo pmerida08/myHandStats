@@ -35,9 +35,16 @@ def actualizar_usuario(id: int, usuario: UsuarioUpdate, datos_token: dict = Depe
     updated_user.pop("password", None)
 
     # Renovar el token con la información actualizada
-    nuevo_token = generar_token(updated_user)
+    nuevo_token = generar_token(
+        updated_user["id"],
+        updated_user["nombre"],
+        updated_user["email"],
+        updated_user["foto"],
+        updated_user["clubs_id"],
+        updated_user["rol"],
+    )
 
-    return {"usuario": updated_user, "token": nuevo_token}
+    return {**updated_user, "token": nuevo_token}
 
 
 # @router.delete("/{id}")
