@@ -654,6 +654,9 @@ const Jugadores = () => {
                 <FormControl>
                   <Input
                     name="dorsal"
+                    type="number"
+                    min={1}
+                    max={99}
                     placeholder="Dorsal"
                     value={jugadorForm.dorsal}
                     onChange={handleInputChange}
