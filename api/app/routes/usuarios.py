@@ -3,6 +3,8 @@ from app.models.usuario import UsuarioUpdate, UsuarioOut
 from app.supabase_client import supabase
 from app.services.auth import obtener_info_desde_token
 from app.utils.hashing import hash_password
+from fastapi import Request
+from app.services.auth import generar_token
  
 # Importar el cliente de Supabase
 router = APIRouter()
@@ -31,7 +33,11 @@ def actualizar_usuario(id: int, usuario: UsuarioUpdate, datos_token: dict = Depe
 
     updated_user = response.data[0]
     updated_user.pop("password", None)
-    return updated_user
+
+    # Renovar el token con la información actualizada
+    nuevo_token = generar_token(updated_user)
+
+    return {"usuario": updated_user, "token": nuevo_token}
 
 
 # @router.delete("/{id}")
