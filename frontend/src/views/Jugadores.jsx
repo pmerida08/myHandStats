@@ -299,7 +299,27 @@ const Jugadores = () => {
         }
       );
 
-      if (!res.ok) throw new Error("No se pudo actualizar el jugador");
+      if (!res.ok) {
+        let errorMsg = "No se pudo actualizar el jugador";
+        try {
+          const errorData = await res.json();
+          if (
+            errorData &&
+            (errorData.detail?.toLowerCase().includes("dorsal") ||
+              errorData.detail?.toLowerCase().includes("ya existe"))
+          ) {
+            errorMsg = errorData.detail;
+          }
+        } catch {}
+        toast({
+          title: "Error",
+          description: errorMsg,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+        return;
+      }
 
       setIsModalOpen(false);
       setEditandoJugadorId(null);
@@ -313,6 +333,13 @@ const Jugadores = () => {
       setSelectedFoto(null);
       cargarJugadores();
     } catch (err) {
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el jugador. Inténtalo de nuevo.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
       console.error("Error al editar jugador:", err);
     }
 
