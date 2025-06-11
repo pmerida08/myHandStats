@@ -183,6 +183,7 @@ const EditarPerfil = () => {
       });
       setFotoUrl(nuevaFotoUrl);
       setContraseña("");
+      window.location.reload(); 
     } catch (error) {
       toast({
         title: "Error al actualizar perfil",

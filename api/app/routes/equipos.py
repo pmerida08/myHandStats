@@ -607,21 +607,16 @@ def eliminar_entrenador_equipo(equipo_id: int, entrenador_id: int, datos_token: 
         raise HTTPException(status_code=500, detail=f"Error al eliminar el entrenador: {str(e)}")   
 
 # Endpoint para actualizar un jugador de un equipo
-@router.put("/{equipo_id}/jugador/{id}")
-def actualizar_jugador(id: int, jugador: JugadorUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
-    jugador_data = supabase.table("jugadores").select("*").eq("id", id).execute()
+@router.put("/{equipo_id}/jugador/{id}", response_model=JugadorOut)
+def actualizar_jugador(equipo_id: int, id: int, jugador: JugadorUpdate, datos_token: dict = Depends(obtener_info_desde_token)):
+    jugador_data = supabase.table("jugadores").select("*").eq("id", id).eq("equipos_id", equipo_id).execute()
     if not jugador_data.data:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
     
-    equipo_data = supabase.table("equipos").select("*").eq("id", jugador_data.data[0]["equipos_id"]).execute()
+    equipo_data = supabase.table("equipos").select("*").eq("id", equipo_id).execute()
     if not equipo_data.data:
         raise HTTPException(status_code=404, detail="Equipo del jugador no encontrado")
     
-    # Verificamos si el equipo del jugador pertenece al club del usuario
-    if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
-        raise HTTPException(status_code=403, detail="No tienes permiso para actualizar este jugador")
-
-    # Comprobar si el equipo al que pertenece el jugador pertenece al mismo club
     if equipo_data.data[0]["clubs_id"] != datos_token["clubs_id"]:
         raise HTTPException(status_code=403, detail="No tienes permiso para actualizar este jugador")
 
@@ -629,11 +624,35 @@ def actualizar_jugador(id: int, jugador: JugadorUpdate, datos_token: dict = Depe
     if not datos_actualizados:
         raise HTTPException(status_code=400, detail="No se proporcionaron datos para actualizar")
 
+    # Comprobar si se quiere actualizar el dorsal y si ya existe en el equipo
+    if "dorsal" in datos_actualizados:
+        dorsal = datos_actualizados["dorsal"]
+        existe_dorsal = supabase.table("jugadores").select("id").eq("equipos_id", equipo_id).eq("dorsal", dorsal).neq("id", id).execute()
+        if existe_dorsal.data and len(existe_dorsal.data) > 0:
+            raise HTTPException(status_code=400, detail="Ya existe un jugador con ese dorsal en este equipo")
+
     try:
         respuesta = supabase.table("jugadores").update(datos_actualizados).eq("id", id).execute()
         if not respuesta.data:
             raise HTTPException(status_code=404, detail="Jugador no encontrado")
-        return {"mensaje": "Jugador actualizado correctamente", "datos": respuesta.data}
+
+        jugador = respuesta.data[0]
+
+        # Obtener posiciones del jugador
+        posiciones_resp = supabase.table("jugador_posicion").select("*").eq("jugador_id", id).execute()
+        posiciones = posiciones_resp.data if posiciones_resp.data else []
+
+        if posiciones:
+            posicion_ids = [pos["posicion_id"] for pos in posiciones]
+            posiciones_nombres_resp = supabase.table("posiciones").select("*").in_("id", posicion_ids).execute()
+            posiciones_nombres = posiciones_nombres_resp.data if posiciones_nombres_resp.data else []
+            # Mapear id de posición a objeto
+            id_a_posicion = {p["id"]: {"id": p["id"], "nombre": p["nombre"]} for p in posiciones_nombres}
+            jugador["posiciones"] = [id_a_posicion.get(pos["posicion_id"]) for pos in posiciones if id_a_posicion.get(pos["posicion_id"])]
+        else:
+            jugador["posiciones"] = []
+
+        return jugador
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al actualizar jugador: {str(e)}")
 

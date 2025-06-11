@@ -34,15 +34,19 @@ def actualizar_usuario(id: int, usuario: UsuarioUpdate, datos_token: dict = Depe
     updated_user = response.data[0]
     updated_user.pop("password", None)
 
+    print(datos_token["clubs_id"])
     # Renovar el token con la información actualizada
     nuevo_token = generar_token(
-        updated_user["id"],
-        updated_user["nombre"],
-        updated_user["email"],
-        updated_user["foto"],
-        datos_token["clubs_id"],
-        updated_user["rol"],
+        updated_user["nombre"],      # nombre
+        updated_user["email"],       # email
+        updated_user["id"],          # user_id
+        updated_user["clubs_id"],    # clubs_id
+        updated_user["rol"],         # rol
+        updated_user["foto"],        # foto
     )
+    
+    print(nuevo_token)
+    
 
     return {**updated_user, "token": nuevo_token}
 
