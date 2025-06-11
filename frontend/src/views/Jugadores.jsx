@@ -310,7 +310,9 @@ const Jugadores = () => {
           ) {
             errorMsg = errorData.detail;
           }
-        } catch {}
+        } catch {
+          errorMsg = "Error desconocido al actualizar el jugador";
+        }
         toast({
           title: "Error",
           description: errorMsg,
