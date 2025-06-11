@@ -761,7 +761,7 @@ const LandingPage = () => {
         </Text>
         <Button
           as="a"
-          href="/app"
+          href="https://myhandstatsmatch.netlify.app/"
           bg="white"
           color="#065f46"
           size="lg"
