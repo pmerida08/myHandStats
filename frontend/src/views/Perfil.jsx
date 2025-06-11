@@ -164,9 +164,15 @@ const EditarPerfil = () => {
         }
       );
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.detail || "Error al actualizar perfil");
+        throw new Error(data.detail || "Error al actualizar perfil");
+      }
+
+      // Guardar el nuevo token si viene en la respuesta
+      if (data.token) {
+        localStorage.setItem("token", data.token);
       }
 
       toast({

@@ -41,7 +41,7 @@ def obtener_info_desde_token(token: str = Depends(oauth2_scheme)):
         # Decodifica el token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         nombre: str = payload.get("nombre")
-        email: str = payload.get("sub")  # Asegúrate de que el email esté en "sub"
+        email: str = payload.get("sub")
         user_id: int = payload.get("id")
         clubs_id: int = payload.get("clubs_id")
         rol: str = payload.get("rol")
