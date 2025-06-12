@@ -617,7 +617,7 @@ const LandingPage = () => {
               </Heading>
 
               <Text fontSize="lg" color="gray.600" mb={6} maxW="xl">
-                Registra acciones en tiempo real con nuestra aplicación optimizada para dispositivos móviles.
+                Registra acciones en tiempo real con nuestra aplicación optimizada.
               </Text>
 
               <List spacing={4}>
