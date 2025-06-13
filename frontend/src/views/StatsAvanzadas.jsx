@@ -1364,22 +1364,55 @@ const StatsAvanzadas = () => {
                             <Tr>
                               <Td>{jugador.recuperaciones || 0}</Td>
                               <Td>
-                                {(jugador.lanzamiento_c || 0) +
-                                  (jugador.lanzamiento_pi || 0) +
-                                  (jugador.lanzamiento_ed || 0) +
-                                  (jugador.lanzamiento_ei || 0) +
-                                  (jugador.lanzamiento_ld || 0) +
-                                  (jugador.lanzamiento_li || 0) -
-                                  ((jugador.goles_c || 0) +
-                                    (jugador.goles_pi || 0) +
-                                    (jugador.golesed || 0) +
-                                    (jugador.golesei || 0) +
-                                    (jugador.golesld || 0) +
-                                    (jugador.golesli || 0))}
+                                {(() => {
+                                  // Comprobar si el jugador es portero
+                                  const esPortero =
+                                    Array.isArray(jugador.posiciones) &&
+                                    jugador.posiciones.some(
+                                      (p) => (p.nombre || "").toLowerCase() === "portero"
+                                    );
+                                  if (!esPortero) return "n/a";
+
+                                  // Paradas totales: lanzamientos en contra (incluyendo 7m) - goles en contra (incluyendo 7m)
+                                  const lanzamientosTotales =
+                                    (jugador.lanzamiento_en_contra_c || 0) +
+                                    (jugador.lanzamiento_en_contra_pi || 0) +
+                                    (jugador.lanzamiento_en_contra_ed || 0) +
+                                    (jugador.lanzamiento_en_contra_ei || 0) +
+                                    (jugador.lanzamiento_en_contra_ld || 0) +
+                                    (jugador.lanzamiento_en_contra_li || 0) +
+                                    (jugador.lanzamiento_en_contra_7m || 0);
+
+                                  const golesTotales =
+                                    (jugador.gol_en_contra_c || 0) +
+                                    (jugador.gol_en_contra_pi || 0) +
+                                    (jugador.gol_en_contra_ed || 0) +
+                                    (jugador.gol_en_contra_ei || 0) +
+                                    (jugador.gol_en_contra_ld || 0) +
+                                    (jugador.gol_en_contra_li || 0) +
+                                    (jugador.gol_en_contra_7m || 0);
+
+                                  const paradasTotales = lanzamientosTotales - golesTotales;
+
+                                  return paradasTotales;
+                                })()}
                               </Td>
                               <Td>
-                                {(jugador.lanzamiento_7m || 0) -
-                                  (jugador.goles7m || 0)}
+                                {(() => {
+                                  // Comprobar si el jugador es portero
+                                  const esPortero =
+                                    Array.isArray(jugador.posiciones) &&
+                                    jugador.posiciones.some(
+                                      (p) => (p.nombre || "").toLowerCase() === "portero"
+                                    );
+                                  if (!esPortero) return "n/a";
+
+                                  // Paradas de 7m: lanzamientos en contra 7m - goles en contra 7m
+                                  return (
+                                    (jugador.lanzamiento_en_contra_7m || 0) -
+                                    (jugador.gol_en_contra_7m || 0)
+                                  );
+                                })()}
                               </Td>
                               <Td>{jugador.faltas || 0}</Td>
                               <Td>{jugador.tarjetas_amarillas || 0}</Td>
