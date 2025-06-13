@@ -1354,7 +1354,9 @@ const StatsAvanzadas = () => {
                             <Tr>
                               <Th>Recuperación</Th>
                               <Th>Paradas</Th>
+                              <Th>Goles en contra</Th>
                               <Th>Paradas 7M</Th>
+                              <Th>Goles 7m en contra</Th>
                               <Th>Faltas</Th>
                               <Th>Amarillas</Th>
                               <Th>Rojas</Th>
@@ -1365,7 +1367,6 @@ const StatsAvanzadas = () => {
                               <Td>{jugador.recuperaciones || 0}</Td>
                               <Td>
                                 {(() => {
-                                  // Comprobar si el jugador es portero
                                   const esPortero =
                                     Array.isArray(jugador.posiciones) &&
                                     jugador.posiciones.some(
@@ -1399,7 +1400,6 @@ const StatsAvanzadas = () => {
                               </Td>
                               <Td>
                                 {(() => {
-                                  // Comprobar si el jugador es portero
                                   const esPortero =
                                     Array.isArray(jugador.posiciones) &&
                                     jugador.posiciones.some(
@@ -1407,11 +1407,41 @@ const StatsAvanzadas = () => {
                                     );
                                   if (!esPortero) return "n/a";
 
-                                  // Paradas de 7m: lanzamientos en contra 7m - goles en contra 7m
+                                  // Goles en contra totales (incluyendo 7m)
+                                  return (
+                                    (jugador.gol_en_contra_c || 0) +
+                                    (jugador.gol_en_contra_pi || 0) +
+                                    (jugador.gol_en_contra_ed || 0) +
+                                    (jugador.gol_en_contra_ei || 0) +
+                                    (jugador.gol_en_contra_ld || 0) +
+                                    (jugador.gol_en_contra_li || 0) +
+                                    (jugador.gol_en_contra_7m || 0)
+                                  );
+                                })()}
+                              </Td>
+                              <Td>
+                                {(() => {
+                                  const esPortero =
+                                    Array.isArray(jugador.posiciones) &&
+                                    jugador.posiciones.some(
+                                      (p) => (p.nombre || "").toLowerCase() === "portero"
+                                    );
+                                  if (!esPortero) return "n/a";
                                   return (
                                     (jugador.lanzamiento_en_contra_7m || 0) -
                                     (jugador.gol_en_contra_7m || 0)
                                   );
+                                })()}
+                              </Td>
+                              <Td>
+                                {(() => {
+                                  const esPortero =
+                                    Array.isArray(jugador.posiciones) &&
+                                    jugador.posiciones.some(
+                                      (p) => (p.nombre || "").toLowerCase() === "portero"
+                                    );
+                                  if (!esPortero) return "n/a";
+                                  return jugador.gol_en_contra_7m || 0;
                                 })()}
                               </Td>
                               <Td>{jugador.faltas || 0}</Td>
