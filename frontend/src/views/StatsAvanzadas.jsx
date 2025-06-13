@@ -811,8 +811,8 @@ const StatsAvanzadas = () => {
                   <Thead>
                     <Tr>
                       <Th></Th>
-                      <Th>Goles Totales/Goles 7M</Th>
-                      <Th>Paradas totales/Paradas 7M</Th>
+                      <Th>Goles 7m/Lanzamiento 7M</Th>
+                      <Th>Paradas 7M/Paradas totales</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -858,7 +858,7 @@ const StatsAvanzadas = () => {
                             const paradasTotales =
                               lanzamientosTotales - golesTotales;
 
-                            return `${paradasTotales} / ${paradas7m}`;
+                            return `${paradas7m} / ${paradasTotales}`;
                           })()}
                         </Td>
                       </Tr>
