@@ -826,39 +826,39 @@ const StatsAvanzadas = () => {
                           {(() => {
                             // console.log(row.posiciones[idx].nombre);
                             // console.log(row);
-                            
-                            
+
                             // Si el jugador no es portero, muestra "n/a"
                             if (row.posiciones[0]?.nombre !== "portero") {
                               return "n/a";
                             }
-                            // Paradas de 7m
+                            // Paradas de 7m: lanzamientos en contra 7m - goles en contra 7m
                             const paradas7m =
                               (row.lanzamiento_en_contra_7m || 0) -
                               (row.gol_en_contra_7m || 0);
 
-                            // Paradas totales (excluyendo 7m)
-                            const lanzamientos =
+                            // Paradas totales: todos los lanzamientos en contra (incluyendo 7m) - todos los goles en contra (incluyendo 7m)
+                            const lanzamientosTotales =
                               (row.lanzamiento_en_contra_c || 0) +
                               (row.lanzamiento_en_contra_pi || 0) +
                               (row.lanzamiento_en_contra_ed || 0) +
                               (row.lanzamiento_en_contra_ei || 0) +
                               (row.lanzamiento_en_contra_ld || 0) +
-                              (row.lanzamiento_en_contra_li || 0);
+                              (row.lanzamiento_en_contra_li || 0) +
+                              (row.lanzamiento_en_contra_7m || 0);
 
-                            const goles =
+                            const golesTotales =
                               (row.gol_en_contra_c || 0) +
                               (row.gol_en_contra_pi || 0) +
                               (row.gol_en_contra_ed || 0) +
                               (row.gol_en_contra_ei || 0) +
                               (row.gol_en_contra_ld || 0) +
-                              (row.gol_en_contra_li || 0);
+                              (row.gol_en_contra_li || 0) +
+                              (row.gol_en_contra_7m || 0);
 
-                            // Paradas = lanzamientos - goles
-                            const paradas = lanzamientos - goles;
+                            const paradasTotales =
+                              lanzamientosTotales - golesTotales;
 
-                            // Muestra paradas de 7m y totales
-                            return `${paradas7m} / ${paradas}`;
+                            return `${paradasTotales} / ${paradas7m}`;
                           })()}
                         </Td>
                       </Tr>
