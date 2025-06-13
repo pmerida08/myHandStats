@@ -1270,7 +1270,7 @@ const StatsAvanzadas = () => {
               <Text fontWeight="bold" mb={4} color="#014C4C">
                 Estadísticas por jugador
               </Text>
-              <Accordion allowMultiple>
+              <Accordion allowMultiple width={"70%"} mx="auto">
                 {jugadores.map((jugador) => (
                   <AccordionItem
                     key={jugador.id}
