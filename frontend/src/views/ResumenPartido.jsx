@@ -31,6 +31,7 @@ import {
   FaHandPaper,
   FaSquare,
   FaRegQuestionCircle,
+
 } from "react-icons/fa";
 import {
   Box,
@@ -51,6 +52,7 @@ import {
   TableContainer,
   HStack,
   VStack,
+  Image
 } from "@chakra-ui/react";
 import Sidebar from "../components/Sidebar";
 import AuthWrapper from "../components/AuthWrapper";
@@ -293,6 +295,20 @@ const ResumenPartido = () => {
             texto="Resumen del Partido"
           />
           <Sidebar isOpen={isOpen} onClose={onClose} />
+
+           <Image
+                    src="https://rdpazmfdbcundrogccsb.supabase.co/storage/v1/object/public/imagenes//logo.avif"
+                    alt="Logo MyHandStats"
+                    position="fixed"
+                    left="50%"
+                    top="50%"
+                    transform="translate(-50%, -50%)"
+                    opacity={0.12}
+                    zIndex={0}
+                    boxSize={["250px", "350px", "450px"]}
+                    pointerEvents="none"
+                    userSelect="none"
+                  />
 
           <Flex justify="center" align="center" mb={6} gap={8}>
             <Box textAlign="center">
